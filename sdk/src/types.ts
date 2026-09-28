@@ -71,6 +71,9 @@ export interface StepView {
   causal_dependency?: string;
   resolution_round?: bigint | number | string;
   decision_hash?: string;
+  evidence_url?: string;
+  support_url?: string;
+  challenge_url?: string;
 }
 
 export interface ContractWriteRequest {
