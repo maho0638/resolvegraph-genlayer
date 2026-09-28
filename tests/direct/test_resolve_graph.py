@@ -1623,3 +1623,79 @@ def test_same_agent_multiple_steps_counts_workflow_completion_once(
     assert int(stats.bonds_returned) == 2
     assert int(stats.workflows_completed) == 1
     assert int(stats.total_bond_returned) == 2000
+
+
+def test_a2a_endpoint_must_be_https_when_supplied(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    direct_vm.sender = direct_alice
+    direct_vm.value = REWARD
+    with direct_vm.expect_revert("A2A endpoint must be a valid HTTPS URL"):
+        contract.add_step(
+            WORKFLOW_ID,
+            "bad-a2a",
+            addr(direct_bob),
+            "Worker Agent",
+            "eip155:1:0x0000000000000000000000000000000000000001#agent-7",
+            "http://agent.example/.well-known/agent-card.json",
+            REQUIREMENT,
+            RUBRIC,
+            "",
+            "",
+            future_deadline(),
+        )
+
+
+def test_unaccepted_expired_assignment_does_not_blame_assignee(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_bob,
+        deadline=future_deadline(1),
+    )
+    direct_vm.deal(contract.address, REWARD)
+    seal(direct_vm, contract, direct_alice)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+
+    contract.mark_missed_deadline(WORKFLOW_ID, STEP_ID)
+    workflow = contract.get_workflow(WORKFLOW_ID)
+
+    assert workflow.status == "ATTRIBUTED"
+    assert workflow.failed_step_id == STEP_ID
+    assert workflow.fault_class == "UNDETERMINED"
+    assert workflow.fault_step_id == ""
+    assert workflow.fault_reason == "INSUFFICIENT_EVIDENCE"
+
+
+def test_submitted_step_cannot_be_mislabeled_missed_deadline(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_bob,
+        deadline=future_deadline(1),
+    )
+    direct_vm.deal(contract.address, REWARD)
+    seal(direct_vm, contract, direct_alice)
+    accept(direct_vm, contract, direct_bob)
+    direct_vm.deal(contract.address, REWARD + BOND)
+    submit_single(direct_vm, contract, direct_bob)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+
+    with direct_vm.expect_revert("accepted-unsubmitted step"):
+        contract.mark_missed_deadline(WORKFLOW_ID, STEP_ID)
