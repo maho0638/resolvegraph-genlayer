@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resolvegraph.example/schemas/adjudication-receipt-v1.json",
+  "title": "ResolveGraph Adjudication Receipt",
+  "type": "object",
+  "required": ["schema", "workflowId", "outcome", "evidence"],
+  "properties": {
+    "schema": { "const": "resolvegraph-receipt-v1" },
+    "workflowId": { "type": "string", "minLength": 1, "maxLength": 96 },
+    "stepId": { "type": "string" },
+    "participant": { "type": "string" },
+    "agentRef": { "type": "string" },
+    "outcome": { "type": "string" },
+    "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "confidence": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "reasonCode": { "type": "string" },
+    "faultClass": { "type": "string" },
+    "decisionHash": { "type": "string" },
+    "policyVersion": { "type": "string" },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "primary": { "type": "string" },
+        "support": { "type": "string" },
+        "challenge": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
