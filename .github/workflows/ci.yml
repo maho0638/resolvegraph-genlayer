@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: resolvegraph-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -19,6 +23,8 @@ jobs:
       - run: pip install -r requirements.txt
       - run: pytest tests/direct -v
       - run: genvm-lint check contracts/resolve_graph.py
+      - name: Integration test syntax
+        run: python -m py_compile tests/integration/test_resolvegraph_studionet.py
       - name: SDK build and tests
         working-directory: sdk
         run: |
