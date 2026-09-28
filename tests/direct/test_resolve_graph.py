@@ -1699,3 +1699,184 @@ def test_submitted_step_cannot_be_mislabeled_missed_deadline(
 
     with direct_vm.expect_revert("accepted-unsubmitted step"):
         contract.mark_missed_deadline(WORKFLOW_ID, STEP_ID)
+
+
+def test_later_failure_can_slash_earlier_paid_root_cause_bond(
+    direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_bob,
+        step_id="upstream",
+        reward=5000,
+        deadline=future_deadline(24),
+        role_label="Upstream Agent",
+    )
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_charlie,
+        step_id="downstream",
+        dependency_a="upstream",
+        reward=4000,
+        deadline=future_deadline(48),
+        role_label="Downstream Agent",
+    )
+    direct_vm.deal(contract.address, 9000)
+    seal(direct_vm, contract, direct_alice)
+
+    accept(direct_vm, contract, direct_bob, "upstream", 1000)
+    direct_vm.deal(contract.address, 10000)
+    accept(direct_vm, contract, direct_charlie, "downstream", 800)
+    direct_vm.deal(contract.address, 10800)
+
+    direct_vm.sender = direct_bob
+    contract.submit_evidence(
+        WORKFLOW_ID,
+        "upstream",
+        "https://upstream.example/proof",
+        "https://upstream-support.example/proof",
+    )
+    mock_step_result(direct_vm)
+    contract.resolve_step(WORKFLOW_ID, "upstream")
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    contract.settle_passed_step(WORKFLOW_ID, "upstream")
+
+    upstream = contract.get_step(WORKFLOW_ID, "upstream")
+    assert upstream.status == "PAID"
+    assert upstream.reward_settled is True
+    assert upstream.bond_settled is False
+
+    direct_vm.sender = direct_charlie
+    contract.submit_evidence(
+        WORKFLOW_ID,
+        "downstream",
+        "https://downstream.example/proof",
+        "https://downstream-support.example/proof",
+    )
+    mock_step_result(
+        direct_vm,
+        verdict="FAIL",
+        score=20,
+        confidence=96,
+        reason_code="CONTRADICTORY_EVIDENCE",
+        failure_class="UPSTREAM",
+        causal_dependency="upstream",
+    )
+    contract.resolve_step(WORKFLOW_ID, "downstream")
+
+    downstream = contract.get_step(WORKFLOW_ID, "downstream")
+    assert downstream.failure_class == "UPSTREAM"
+    assert downstream.causal_dependency == "upstream"
+
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=4)).isoformat()
+    )
+    mock_attribution(
+        direct_vm,
+        fault_step_id="upstream",
+        fault_class="PARTICIPANT",
+        fault_reason="UPSTREAM_DEFECT",
+        confidence=96,
+    )
+    contract.attribute_failure(WORKFLOW_ID, "downstream")
+
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=6)).isoformat()
+    )
+    settled = contract.settle_failed_workflow(WORKFLOW_ID)
+
+    bob_stats = contract.get_participant_stats(addr(direct_bob))
+    charlie_stats = contract.get_participant_stats(addr(direct_charlie))
+    workflow = contract.get_workflow(WORKFLOW_ID)
+
+    assert int(settled) == 5800
+    assert workflow.status == "FAILED_SETTLED"
+    assert workflow.fault_step_id == "upstream"
+    assert int(bob_stats.bonds_slashed) == 1
+    assert int(bob_stats.total_bond_slashed) == 1000
+    assert int(charlie_stats.bonds_returned) == 1
+    assert int(charlie_stats.total_bond_returned) == 800
+
+
+def test_join_step_requires_both_dependencies_paid(
+    direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_bob,
+        step_id="branch-a",
+        reward=5000,
+        deadline=future_deadline(24),
+    )
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_charlie,
+        step_id="branch-b",
+        reward=5000,
+        deadline=future_deadline(25),
+    )
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_bob,
+        step_id="join",
+        dependency_a="branch-a",
+        dependency_b="branch-b",
+        reward=3000,
+        deadline=future_deadline(48),
+    )
+    direct_vm.deal(contract.address, 13000)
+    seal(direct_vm, contract, direct_alice)
+
+    accept(direct_vm, contract, direct_bob, "branch-a", 1000)
+    direct_vm.deal(contract.address, 14000)
+    accept(direct_vm, contract, direct_charlie, "branch-b", 1000)
+    direct_vm.deal(contract.address, 15000)
+    accept(direct_vm, contract, direct_bob, "join", 600)
+    direct_vm.deal(contract.address, 15600)
+
+    direct_vm.sender = direct_bob
+    contract.submit_evidence(
+        WORKFLOW_ID,
+        "branch-a",
+        "https://a.example/proof",
+        "https://a-support.example/proof",
+    )
+    mock_step_result(direct_vm)
+    contract.resolve_step(WORKFLOW_ID, "branch-a")
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    contract.settle_passed_step(WORKFLOW_ID, "branch-a")
+
+    assert contract.is_step_unlocked(WORKFLOW_ID, "join") is False
+
+    direct_vm.sender = direct_charlie
+    contract.submit_evidence(
+        WORKFLOW_ID,
+        "branch-b",
+        "https://b.example/proof",
+        "https://b-support.example/proof",
+    )
+    mock_step_result(direct_vm)
+    contract.resolve_step(WORKFLOW_ID, "branch-b")
+    contract.settle_passed_step(WORKFLOW_ID, "branch-b")
+
+    assert contract.is_step_unlocked(WORKFLOW_ID, "join") is True
