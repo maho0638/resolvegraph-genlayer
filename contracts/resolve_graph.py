@@ -145,6 +145,8 @@ class ParticipantStats:
 
 class ResolveGraph(gl.Contract):
     workflows: TreeMap[str, Workflow]
+    workflow_index: TreeMap[str, str]
+    workflow_count: u256
     steps: TreeMap[str, Step]
     workflow_step_index: TreeMap[str, str]
     workflow_participants: TreeMap[str, bool]
@@ -768,6 +770,10 @@ Return JSON only:
             raise gl.vm.UserError("Workflow already exists")
 
         now = self._now()
+        workflow_index = int(self.workflow_count)
+        self.workflow_index[str(workflow_index)] = workflow_id
+        self.workflow_count = u256(workflow_index + 1)
+
         self.workflows[workflow_id] = Workflow(
             id=workflow_id,
             sponsor=gl.message.sender_address,
@@ -1363,6 +1369,16 @@ Return JSON only:
             _Recipient(workflow.sponsor).emit_transfer(value=u256(refund_total))
 
         return u256(refund_total)
+
+    @gl.public.view
+    def get_workflow_count(self) -> u256:
+        return self.workflow_count
+
+    @gl.public.view
+    def get_workflow_id_by_index(self, index: u256) -> str:
+        if int(index) < 0 or int(index) >= int(self.workflow_count):
+            raise gl.vm.UserError("Workflow index out of range")
+        return self.workflow_index[str(int(index))]
 
     @gl.public.view
     def get_workflow(self, workflow_id: str) -> Workflow:
