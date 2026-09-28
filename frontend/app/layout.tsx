@@ -13,6 +13,7 @@ const nav = [
   ["/workflows/new", "Build workflow"],
   ["/operate", "Operate"],
   ["/explorer", "Explorer"],
+  ["/participants", "Participants"],
   ["/developers", "Developers"],
   ["/proof", "Proof"],
 ] as const;
