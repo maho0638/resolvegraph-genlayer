@@ -1877,6 +1877,9 @@ def test_join_step_requires_both_dependencies_paid(
     )
     mock_step_result(direct_vm)
     contract.resolve_step(WORKFLOW_ID, "branch-b")
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=4)).isoformat()
+    )
     contract.settle_passed_step(WORKFLOW_ID, "branch-b")
 
     assert contract.is_step_unlocked(WORKFLOW_ID, "join") is True
