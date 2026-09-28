@@ -5,6 +5,7 @@ Run it only after direct tests, lint, SDK tests, and frontend production build p
 """
 
 import time
+from pathlib import Path
 
 import pytest
 from gltest import get_contract_factory
@@ -32,6 +33,11 @@ def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
     )
 
     print("RESOLVEGRAPH_CONTRACT=" + str(contract.address), flush=True)
+    Path("artifacts").mkdir(parents=True, exist_ok=True)
+    Path("artifacts/resolvegraph-live-address.txt").write_text(
+        str(contract.address),
+        encoding="utf-8",
+    )
     print("RESOLVEGRAPH_SPONSOR=" + str(sponsor_account.address), flush=True)
     print("RESOLVEGRAPH_AGENT_A=" + str(agent_a.address), flush=True)
     print("RESOLVEGRAPH_AGENT_B=" + str(agent_b.address), flush=True)
