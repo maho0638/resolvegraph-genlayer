@@ -7,12 +7,28 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - run: pip install -r requirements.txt
       - run: pytest tests/direct -v
       - run: genvm-lint check contracts/resolve_graph.py
+      - name: SDK build and tests
+        working-directory: sdk
+        run: |
+          npm install
+          npm test
+      - name: Frontend typecheck
+        working-directory: frontend
+        run: |
+          npm install
+          npm run typecheck
+      - name: Frontend production build
+        working-directory: frontend
+        run: npm run build
