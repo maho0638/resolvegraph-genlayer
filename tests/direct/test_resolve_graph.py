@@ -926,3 +926,700 @@ def test_workflow_index_out_of_range_is_rejected(
 
     with direct_vm.expect_revert("Workflow index out of range"):
         contract.get_workflow_id_by_index(1)
+
+
+def test_zero_reward_step_is_rejected(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    direct_vm.sender = direct_alice
+    direct_vm.value = 0
+    with direct_vm.expect_revert("reward must be greater than zero"):
+        contract.add_step(
+            WORKFLOW_ID,
+            "zero",
+            addr(direct_bob),
+            "Builder",
+            "",
+            "",
+            REQUIREMENT,
+            RUBRIC,
+            "",
+            "",
+            future_deadline(),
+        )
+
+
+def test_maximum_eight_steps_is_enforced(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    for i in range(8):
+        add_step(
+            direct_vm,
+            contract,
+            direct_alice,
+            direct_bob,
+            step_id=f"step-{i}",
+            reward=1000,
+            deadline=future_deadline(24 + i),
+        )
+
+    with direct_vm.expect_revert("Maximum workflow steps"):
+        add_step(
+            direct_vm,
+            contract,
+            direct_alice,
+            direct_bob,
+            step_id="step-8",
+            reward=1000,
+            deadline=future_deadline(40),
+        )
+
+
+def test_duplicate_dependencies_are_rejected(
+    direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_bob,
+        step_id="first",
+        deadline=future_deadline(24),
+    )
+
+    with direct_vm.expect_revert("Dependencies must be distinct"):
+        add_step(
+            direct_vm,
+            contract,
+            direct_alice,
+            direct_charlie,
+            step_id="second",
+            dependency_a="first",
+            dependency_b="first",
+            deadline=future_deadline(48),
+        )
+
+
+def test_step_deadline_cannot_exceed_365_days(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+
+    with direct_vm.expect_revert("365 days"):
+        add_step(
+            direct_vm,
+            contract,
+            direct_alice,
+            direct_bob,
+            deadline=future_deadline(366 * 24),
+        )
+
+
+def test_step_cannot_be_added_after_seal(
+    direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    add_step(direct_vm, contract, direct_alice, direct_bob)
+    seal(direct_vm, contract, direct_alice)
+
+    with direct_vm.expect_revert("already sealed"):
+        add_step(
+            direct_vm,
+            contract,
+            direct_alice,
+            direct_charlie,
+            step_id="late",
+        )
+
+
+def test_only_sponsor_can_seal(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    add_step(direct_vm, contract, direct_alice, direct_bob)
+    direct_vm.sender = direct_bob
+    with direct_vm.expect_revert("Only the workflow sponsor"):
+        contract.seal_workflow(WORKFLOW_ID)
+
+
+def test_only_assignee_can_accept(
+    direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    add_step(direct_vm, contract, direct_alice, direct_bob)
+    seal(direct_vm, contract, direct_alice)
+
+    direct_vm.sender = direct_charlie
+    direct_vm.value = BOND
+    with direct_vm.expect_revert("assigned participant"):
+        contract.accept_step(WORKFLOW_ID, STEP_ID)
+
+
+def test_accept_after_deadline_is_rejected(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_bob,
+        deadline=future_deadline(1),
+    )
+    seal(direct_vm, contract, direct_alice)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    direct_vm.sender = direct_bob
+    direct_vm.value = BOND
+    with direct_vm.expect_revert("deadline has passed"):
+        contract.accept_step(WORKFLOW_ID, STEP_ID)
+
+
+def test_only_assignee_can_submit_evidence(
+    direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    direct_vm.sender = direct_charlie
+    with direct_vm.expect_revert("assigned participant"):
+        contract.submit_evidence(
+            WORKFLOW_ID, STEP_ID, EVIDENCE_URL, SUPPORT_URL
+        )
+
+
+def test_evidence_requires_https(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    direct_vm.sender = direct_bob
+    with direct_vm.expect_revert("must use HTTPS"):
+        contract.submit_evidence(
+            WORKFLOW_ID,
+            STEP_ID,
+            "http://deliverable.example/proof",
+            SUPPORT_URL,
+        )
+
+
+def test_www_and_trailing_dot_cannot_fake_independent_evidence(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    direct_vm.sender = direct_bob
+    with direct_vm.expect_revert("independent domains"):
+        contract.submit_evidence(
+            WORKFLOW_ID,
+            STEP_ID,
+            "https://example.com/proof",
+            "https://www.example.com./support",
+        )
+
+
+def test_userinfo_url_is_rejected(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    direct_vm.sender = direct_bob
+    with direct_vm.expect_revert("hostname is invalid"):
+        contract.submit_evidence(
+            WORKFLOW_ID,
+            STEP_ID,
+            "https://example.com@evil.example/proof",
+            SUPPORT_URL,
+        )
+
+
+def test_cannot_resolve_without_submission(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    with direct_vm.expect_revert("no unresolved evidence"):
+        contract.resolve_step(WORKFLOW_ID, STEP_ID)
+
+
+def test_unauthorized_wallet_cannot_challenge_step(
+    direct_vm, direct_deploy, direct_alice, direct_bob, direct_charlie
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    resolve_pass(direct_vm, contract)
+
+    direct_vm.sender = direct_charlie
+    with direct_vm.expect_revert("sponsor or assignee"):
+        contract.challenge_step(
+            WORKFLOW_ID,
+            STEP_ID,
+            CHALLENGE_URL,
+            "This unrelated wallet must not be able to challenge the step.",
+        )
+
+
+def test_step_challenge_after_deadline_is_rejected(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    resolve_pass(direct_vm, contract)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    direct_vm.sender = direct_alice
+    with direct_vm.expect_revert("challenge window has closed"):
+        contract.challenge_step(
+            WORKFLOW_ID,
+            STEP_ID,
+            CHALLENGE_URL,
+            "Fresh evidence arrived too late for the guaranteed challenge window.",
+        )
+
+
+def test_second_step_challenge_is_rejected(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    resolve_pass(direct_vm, contract)
+
+    direct_vm.sender = direct_alice
+    contract.challenge_step(
+        WORKFLOW_ID,
+        STEP_ID,
+        CHALLENGE_URL,
+        "Fresh evidence requests one allowed second consensus round.",
+    )
+    mock_step_result(direct_vm)
+    contract.resolve_step_challenge(WORKFLOW_ID, STEP_ID)
+
+    with direct_vm.expect_revert("challenge already used"):
+        contract.challenge_step(
+            WORKFLOW_ID,
+            STEP_ID,
+            "https://fourth.example/evidence",
+            "A second challenge must not be accepted for the same step.",
+        )
+
+
+def test_step_decision_hash_changes_after_challenge_round(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    resolve_pass(direct_vm, contract)
+    first_hash = contract.get_step(WORKFLOW_ID, STEP_ID).decision_hash
+
+    direct_vm.sender = direct_alice
+    contract.challenge_step(
+        WORKFLOW_ID,
+        STEP_ID,
+        CHALLENGE_URL,
+        "Fresh evidence is used to produce a separately auditable decision round.",
+    )
+    mock_step_result(direct_vm)
+    contract.resolve_step_challenge(WORKFLOW_ID, STEP_ID)
+    second_hash = contract.get_step(WORKFLOW_ID, STEP_ID).decision_hash
+
+    assert len(first_hash) == 64
+    assert len(second_hash) == 64
+    assert first_hash != second_hash
+
+
+def test_step_snapshots_are_bounded(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+
+    direct_vm.clear_mocks()
+    direct_vm.mock_web(
+        r".*",
+        {"status": 200, "body": "Evidence body."},
+    )
+    direct_vm.mock_llm(
+        r"(?s).*neutral step judge inside ResolveGraph.*",
+        json.dumps(
+            {
+                "verdict": "PASS",
+                "score": 95,
+                "confidence": 95,
+                "reason_code": "REQUIREMENT_MET",
+                "failure_class": "NONE",
+                "causal_dependency": "",
+                "rationale": "R" * 2000,
+                "evidence_snapshot": "E" * 2000,
+                "support_snapshot": "S" * 2000,
+            }
+        ),
+    )
+    contract.resolve_step(WORKFLOW_ID, STEP_ID)
+    step = contract.get_step(WORKFLOW_ID, STEP_ID)
+    assert len(step.rationale) <= 650
+    assert len(step.evidence_snapshot) <= 650
+    assert len(step.support_snapshot) <= 650
+
+
+def test_low_consensus_confidence_normalizes_attribution_to_undetermined(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    mock_step_result(
+        direct_vm,
+        verdict="FAIL",
+        score=10,
+        confidence=95,
+        reason_code="EVIDENCE_GAP",
+        failure_class="LOCAL",
+    )
+    contract.resolve_step(WORKFLOW_ID, STEP_ID)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    mock_attribution(direct_vm, confidence=60)
+    contract.attribute_failure(WORKFLOW_ID, STEP_ID)
+    workflow = contract.get_workflow(WORKFLOW_ID)
+
+    assert workflow.fault_class == "UNDETERMINED"
+    assert workflow.fault_step_id == ""
+    assert workflow.fault_reason == "INSUFFICIENT_EVIDENCE"
+
+
+def test_invalid_participant_fault_step_fails_closed(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    mock_step_result(
+        direct_vm,
+        verdict="FAIL",
+        score=10,
+        confidence=95,
+        reason_code="EVIDENCE_GAP",
+        failure_class="LOCAL",
+    )
+    contract.resolve_step(WORKFLOW_ID, STEP_ID)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    mock_attribution(
+        direct_vm,
+        fault_step_id="invented-step",
+        fault_class="PARTICIPANT",
+        confidence=99,
+    )
+    contract.attribute_failure(WORKFLOW_ID, STEP_ID)
+    workflow = contract.get_workflow(WORKFLOW_ID)
+
+    assert workflow.fault_class == "UNDETERMINED"
+    assert workflow.fault_step_id == ""
+
+
+def test_attribution_challenge_requires_fresh_domain(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    mock_step_result(
+        direct_vm,
+        verdict="FAIL",
+        score=10,
+        confidence=95,
+        reason_code="EVIDENCE_GAP",
+        failure_class="LOCAL",
+    )
+    contract.resolve_step(WORKFLOW_ID, STEP_ID)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    mock_attribution(direct_vm)
+    contract.attribute_failure(WORKFLOW_ID, STEP_ID)
+
+    direct_vm.sender = direct_bob
+    with direct_vm.expect_revert("fresh domain"):
+        contract.challenge_attribution(
+            WORKFLOW_ID,
+            "https://www.deliverable.example/new",
+            "The challenge must not reuse an evidence domain from the workflow.",
+        )
+
+
+def test_attribution_challenge_after_deadline_is_rejected(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    mock_step_result(
+        direct_vm,
+        verdict="FAIL",
+        score=10,
+        confidence=95,
+        reason_code="EVIDENCE_GAP",
+        failure_class="LOCAL",
+    )
+    contract.resolve_step(WORKFLOW_ID, STEP_ID)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    mock_attribution(direct_vm)
+    contract.attribute_failure(WORKFLOW_ID, STEP_ID)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=4)).isoformat()
+    )
+
+    direct_vm.sender = direct_bob
+    with direct_vm.expect_revert("challenge window has closed"):
+        contract.challenge_attribution(
+            WORKFLOW_ID,
+            "https://fresh.example/late",
+            "This attribution challenge is intentionally submitted after expiry.",
+        )
+
+
+def test_failed_workflow_cannot_settle_during_attribution_window(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    mock_step_result(
+        direct_vm,
+        verdict="FAIL",
+        score=10,
+        confidence=95,
+        reason_code="EVIDENCE_GAP",
+        failure_class="LOCAL",
+    )
+    contract.resolve_step(WORKFLOW_ID, STEP_ID)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    mock_attribution(direct_vm)
+    contract.attribute_failure(WORKFLOW_ID, STEP_ID)
+
+    with direct_vm.expect_revert("not settlement-ready"):
+        contract.settle_failed_workflow(WORKFLOW_ID)
+
+
+def test_failed_workflow_cannot_settle_twice(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    mock_step_result(
+        direct_vm,
+        verdict="FAIL",
+        score=10,
+        confidence=95,
+        reason_code="EVIDENCE_GAP",
+        failure_class="LOCAL",
+    )
+    contract.resolve_step(WORKFLOW_ID, STEP_ID)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    mock_attribution(direct_vm)
+    contract.attribute_failure(WORKFLOW_ID, STEP_ID)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=4)).isoformat()
+    )
+    contract.settle_failed_workflow(WORKFLOW_ID)
+
+    with direct_vm.expect_revert("not settlement-ready"):
+        contract.settle_failed_workflow(WORKFLOW_ID)
+
+
+def test_workflow_cannot_complete_until_every_step_is_paid(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    with direct_vm.expect_revert("Every workflow step must be PAID"):
+        contract.complete_workflow(WORKFLOW_ID)
+
+
+def test_completed_workflow_cannot_complete_twice(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    resolve_pass(direct_vm, contract)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    contract.settle_passed_step(WORKFLOW_ID, STEP_ID)
+    contract.complete_workflow(WORKFLOW_ID)
+
+    with direct_vm.expect_revert("Workflow is not active"):
+        contract.complete_workflow(WORKFLOW_ID)
+
+
+def test_only_sponsor_can_cancel_draft(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    add_step(direct_vm, contract, direct_alice, direct_bob)
+    direct_vm.deal(contract.address, REWARD)
+
+    direct_vm.sender = direct_bob
+    with direct_vm.expect_revert("Only the workflow sponsor"):
+        contract.cancel_draft_workflow(WORKFLOW_ID)
+
+
+def test_sealed_workflow_cannot_be_cancelled_as_draft(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+    add_step(direct_vm, contract, direct_alice, direct_bob)
+    seal(direct_vm, contract, direct_alice)
+
+    direct_vm.sender = direct_alice
+    with direct_vm.expect_revert("Only a draft workflow"):
+        contract.cancel_draft_workflow(WORKFLOW_ID)
+
+
+def test_attribution_decision_hash_changes_after_challenge(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+    mock_step_result(
+        direct_vm,
+        verdict="FAIL",
+        score=10,
+        confidence=95,
+        reason_code="EVIDENCE_GAP",
+        failure_class="LOCAL",
+    )
+    contract.resolve_step(WORKFLOW_ID, STEP_ID)
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    mock_attribution(direct_vm)
+    contract.attribute_failure(WORKFLOW_ID, STEP_ID)
+    first_hash = contract.get_workflow(WORKFLOW_ID).decision_hash
+
+    direct_vm.sender = direct_bob
+    contract.challenge_attribution(
+        WORKFLOW_ID,
+        "https://external-cause.example/report",
+        "Fresh evidence requests a second workflow attribution consensus round.",
+    )
+    mock_attribution(
+        direct_vm,
+        fault_step_id="",
+        fault_class="EXTERNAL",
+        fault_reason="EXTERNAL_FAILURE",
+        confidence=95,
+    )
+    contract.resolve_attribution_challenge(WORKFLOW_ID)
+    second_hash = contract.get_workflow(WORKFLOW_ID).decision_hash
+
+    assert len(first_hash) == 64
+    assert len(second_hash) == 64
+    assert first_hash != second_hash
+
+
+def test_upstream_failure_requires_real_dependency(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_active_single(direct_vm, contract, direct_alice, direct_bob)
+    submit_single(direct_vm, contract, direct_bob)
+
+    mock_step_result(
+        direct_vm,
+        verdict="FAIL",
+        score=20,
+        confidence=95,
+        reason_code="EVIDENCE_GAP",
+        failure_class="UPSTREAM",
+        causal_dependency="invented",
+    )
+    contract.resolve_step(WORKFLOW_ID, STEP_ID)
+    step = contract.get_step(WORKFLOW_ID, STEP_ID)
+
+    assert step.failure_class == "UNDETERMINED"
+    assert step.causal_dependency == ""
+
+
+def test_same_agent_multiple_steps_counts_workflow_completion_once(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_bob,
+        step_id="one",
+        reward=5000,
+        deadline=future_deadline(24),
+    )
+    add_step(
+        direct_vm,
+        contract,
+        direct_alice,
+        direct_bob,
+        step_id="two",
+        reward=5000,
+        deadline=future_deadline(36),
+    )
+    direct_vm.deal(contract.address, 10000)
+    seal(direct_vm, contract, direct_alice)
+
+    accept(direct_vm, contract, direct_bob, "one", 1000)
+    direct_vm.deal(contract.address, 11000)
+    accept(direct_vm, contract, direct_bob, "two", 1000)
+    direct_vm.deal(contract.address, 12000)
+
+    for sid, primary, support in (
+        ("one", "https://one.example/proof", "https://one-support.example/proof"),
+        ("two", "https://two.example/proof", "https://two-support.example/proof"),
+    ):
+        direct_vm.sender = direct_bob
+        contract.submit_evidence(WORKFLOW_ID, sid, primary, support)
+        mock_step_result(direct_vm)
+        contract.resolve_step(WORKFLOW_ID, sid)
+
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    contract.settle_passed_step(WORKFLOW_ID, "one")
+    contract.settle_passed_step(WORKFLOW_ID, "two")
+    contract.complete_workflow(WORKFLOW_ID)
+
+    stats = contract.get_participant_stats(addr(direct_bob))
+    assert int(stats.bonds_returned) == 2
+    assert int(stats.workflows_completed) == 1
+    assert int(stats.total_bond_returned) == 2000
