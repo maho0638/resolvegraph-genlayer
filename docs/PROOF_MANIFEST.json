@@ -1,0 +1,16 @@
+{
+  "schema": "resolvegraph-proof-v1",
+  "status": "DEVELOPMENT",
+  "scope": {
+    "project": "ResolveGraph — Multi-Agent Workflow Settlement",
+    "network": null
+  },
+  "direct_tests": null,
+  "lint": null,
+  "sdk": null,
+  "frontend": null,
+  "studionet": null,
+  "source_hash": null,
+  "production": null,
+  "submission_ready": false
+}
