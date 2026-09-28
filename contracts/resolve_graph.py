@@ -847,6 +847,8 @@ Return JSON only:
             raise gl.vm.UserError("Step already exists")
         if len(role_label) > 80 or len(agent_ref) > 300 or len(a2a_endpoint) > 500:
             raise gl.vm.UserError("Agent metadata too long")
+        if a2a_endpoint and not self._hostname(a2a_endpoint):
+            raise gl.vm.UserError("A2A endpoint must be a valid HTTPS URL")
         if len(requirement) < 20 or len(rubric) < 20:
             raise gl.vm.UserError("Requirement and rubric must be at least 20 characters")
         if len(requirement) > 1800 or len(rubric) > 2200:
@@ -1143,17 +1145,27 @@ Return JSON only:
             raise gl.vm.UserError("Workflow is not active")
 
         step = self._get_step(workflow_id, step_id)
-        if step.status in ("PAID", "RESOLVED_PASS", "RESOLVED_FAIL", "RESOLVED_UNDETERMINED"):
-            raise gl.vm.UserError("Step already reached resolution")
         if self._now() <= int(step.deadline):
             raise gl.vm.UserError("Step deadline has not passed")
 
+        if step.status == "ACCEPTED":
+            workflow.fault_step_id = step_id
+            workflow.fault_actor = step.assignee
+            workflow.fault_class = "PARTICIPANT"
+            workflow.fault_reason = "MISSED_DEADLINE"
+            workflow.fault_confidence = u256(100)
+        elif step.status == "PENDING_ACCEPTANCE":
+            workflow.fault_step_id = ""
+            workflow.fault_actor = self._zero_address()
+            workflow.fault_class = "UNDETERMINED"
+            workflow.fault_reason = "INSUFFICIENT_EVIDENCE"
+            workflow.fault_confidence = u256(100)
+        else:
+            raise gl.vm.UserError(
+                "Only an unaccepted or accepted-unsubmitted step can expire"
+            )
+
         workflow.failed_step_id = step_id
-        workflow.fault_step_id = step_id
-        workflow.fault_actor = step.assignee
-        workflow.fault_class = "PARTICIPANT"
-        workflow.fault_reason = "MISSED_DEADLINE"
-        workflow.fault_confidence = u256(100)
         workflow.attribution_round = u256(1)
         workflow.attribution_resolved_at = u256(self._now())
         workflow.attribution_deadline = u256(
