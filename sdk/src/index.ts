@@ -48,8 +48,8 @@ export function normalizeAgentRef(ref: AgentIdentityRef): {
     agentRef = `${ref.agentRegistry}#agent-${String(ref.agentId)}`;
   }
 
-  if (ref.a2aEndpoint && !ref.a2aEndpoint.startsWith("https://")) {
-    throw new Error("A2A endpoint must use HTTPS.");
+  if (ref.a2aEndpoint) {
+    normalizedHttpsHost(ref.a2aEndpoint);
   }
 
   return {
@@ -59,14 +59,28 @@ export function normalizeAgentRef(ref: AgentIdentityRef): {
   };
 }
 
-export function validateIndependentHttps(primary: string, support: string): void {
-  const a = new URL(primary);
-  const b = new URL(support);
-  if (a.protocol !== "https:" || b.protocol !== "https:") {
-    throw new Error("Evidence URLs must use HTTPS.");
+function normalizedHttpsHost(value: string): string {
+  if (value.includes("\\")) {
+    throw new Error("URL contains an unsafe backslash form.");
   }
-  const hostA = a.hostname.replace(/^www\./, "").replace(/\.$/, "").toLowerCase();
-  const hostB = b.hostname.replace(/^www\./, "").replace(/\.$/, "").toLowerCase();
+
+  const parsed = new URL(value);
+  if (parsed.protocol !== "https:") {
+    throw new Error("URL must use HTTPS.");
+  }
+  if (parsed.username || parsed.password) {
+    throw new Error("URL userinfo is not allowed.");
+  }
+
+  return parsed.hostname
+    .replace(/^www\./, "")
+    .replace(/\.$/, "")
+    .toLowerCase();
+}
+
+export function validateIndependentHttps(primary: string, support: string): void {
+  const hostA = normalizedHttpsHost(primary);
+  const hostB = normalizedHttpsHost(support);
   if (hostA === hostB) {
     throw new Error("Evidence URLs must use independent hostnames.");
   }
@@ -152,7 +166,7 @@ export function buildChallengeStep(
   challengeUrl: string,
   note: string,
 ): ContractWriteRequest {
-  if (!challengeUrl.startsWith("https://")) throw new Error("Challenge URL must use HTTPS.");
+  normalizedHttpsHost(challengeUrl);
   return {
     functionName: "challenge_step",
     args: [workflowId, stepId, challengeUrl, note],
@@ -164,7 +178,7 @@ export function buildChallengeAttribution(
   challengeUrl: string,
   note: string,
 ): ContractWriteRequest {
-  if (!challengeUrl.startsWith("https://")) throw new Error("Challenge URL must use HTTPS.");
+  normalizedHttpsHost(challengeUrl);
   return {
     functionName: "challenge_attribution",
     args: [workflowId, challengeUrl, note],
@@ -189,7 +203,11 @@ export function buildPortableReceipt(
       faultClass: step.failure_class,
       decisionHash: step.decision_hash,
       policyVersion: workflow.policy_version,
-      evidence: {},
+      evidence: {
+        primary: step.evidence_url,
+        support: step.support_url,
+        challenge: step.challenge_url,
+      },
     };
   }
 
