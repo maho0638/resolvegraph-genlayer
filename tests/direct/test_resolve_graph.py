@@ -904,3 +904,25 @@ def test_draft_cancellation_refunds_all_rewards(
 
     assert int(refunded) == 9000
     assert contract.get_workflow(WORKFLOW_ID).status == "CANCELLED"
+
+
+def test_workflow_index_supports_frontend_discovery(
+    direct_vm, direct_deploy, direct_alice
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice, workflow_id="wf-a")
+    create_workflow(direct_vm, contract, direct_alice, workflow_id="wf-b")
+
+    assert int(contract.get_workflow_count()) == 2
+    assert contract.get_workflow_id_by_index(0) == "wf-a"
+    assert contract.get_workflow_id_by_index(1) == "wf-b"
+
+
+def test_workflow_index_out_of_range_is_rejected(
+    direct_vm, direct_deploy, direct_alice
+):
+    contract = direct_deploy("contracts/resolve_graph.py")
+    create_workflow(direct_vm, contract, direct_alice)
+
+    with direct_vm.expect_revert("Workflow index out of range"):
+        contract.get_workflow_id_by_index(1)
