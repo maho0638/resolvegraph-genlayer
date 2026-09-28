@@ -1,0 +1,14 @@
+# @resolvegraph/sdk
+
+Small TypeScript integration layer for ResolveGraph.
+
+Current helpers:
+
+- parse / format native GEN values;
+- compute the deterministic participant bond;
+- normalize optional ERC-8004-style agent references;
+- reject duplicate evidence hostnames before a transaction is built;
+- construct contract write requests;
+- export portable ResolveGraph adjudication receipts.
+
+The SDK deliberately does not sign transactions or hide wallet approval. Applications can pass the generated method/args/value into GenLayerJS or Transaction Kit.
