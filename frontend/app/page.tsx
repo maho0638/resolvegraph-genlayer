@@ -1,8 +1,6 @@
 import Link from "next/link";
-import { isContractConfigured } from "@/lib/genlayer";
-
 export default function Home() {
-  const configured = isContractConfigured();
+  const configured = Boolean(process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS);
 
   return (
     <>
