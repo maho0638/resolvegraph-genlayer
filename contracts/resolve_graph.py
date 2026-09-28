@@ -1245,6 +1245,7 @@ Return JSON only:
 
         sponsor_total = 0
         return_total = 0
+        bond_returns = []
 
         for i in range(int(workflow.step_count)):
             sid = str(
@@ -1267,6 +1268,7 @@ Return JSON only:
                     )
                 else:
                     return_total += int(step.bond_posted)
+                    bond_returns.append((step.assignee, step.bond_posted))
                     stats = self._stats_for(step.assignee)
                     stats.bonds_returned = u256(int(stats.bonds_returned) + 1)
                     stats.total_bond_returned = u256(
@@ -1280,13 +1282,8 @@ Return JSON only:
         workflow.status = "FAILED_SETTLED"
         workflow.settled_at = u256(self._now())
 
-        for i in range(int(workflow.step_count)):
-            sid = str(
-                self.workflow_step_index[self._step_index_key(workflow_id, i)]
-            )
-            step = self._get_step(workflow_id, sid)
-            if int(step.bond_posted) > 0 and sid != slash_step_id:
-                _Recipient(step.assignee).emit_transfer(value=step.bond_posted)
+        for recipient, amount in bond_returns:
+            _Recipient(recipient).emit_transfer(value=amount)
 
         if sponsor_total > 0:
             _Recipient(workflow.sponsor).emit_transfer(value=u256(sponsor_total))
@@ -1319,6 +1316,7 @@ Return JSON only:
         workflow.completed_at = u256(self._now())
         workflow.settled_at = u256(self._now())
 
+        completed_participants = []
         for i in range(int(workflow.step_count)):
             sid = str(
                 self.workflow_step_index[self._step_index_key(workflow_id, i)]
@@ -1331,9 +1329,14 @@ Return JSON only:
                 stats.total_bond_returned = u256(
                     int(stats.total_bond_returned) + int(step.bond_posted)
                 )
-                stats.workflows_completed = u256(
-                    int(stats.workflows_completed) + 1
-                )
+
+                participant_key = str(step.assignee).lower()
+                if participant_key not in completed_participants:
+                    completed_participants.append(participant_key)
+                    stats.workflows_completed = u256(
+                        int(stats.workflows_completed) + 1
+                    )
+
                 _Recipient(step.assignee).emit_transfer(value=step.bond_posted)
 
         return u256(total_bonds)
