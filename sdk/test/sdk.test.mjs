@@ -95,9 +95,55 @@ test("portable receipt exposes decision hash and outcome", () => {
       score: 95,
       confidence: 94,
       decision_hash: "abc123",
+      evidence_url: "https://primary.example/proof",
+      support_url: "https://support.example/proof",
+      challenge_url: "https://challenge.example/proof",
     },
   );
   assert.equal(receipt.outcome, "PASS");
   assert.equal(receipt.decisionHash, "abc123");
   assert.equal(receipt.participant, "0x2222222222222222222222222222222222222222");
+  assert.equal(receipt.evidence.primary, "https://primary.example/proof");
+  assert.equal(receipt.evidence.support, "https://support.example/proof");
+  assert.equal(receipt.evidence.challenge, "https://challenge.example/proof");
+});
+
+test("A2A endpoint rejects non-HTTPS values", () => {
+  assert.throws(
+    () => normalizeAgentRef({ a2aEndpoint: "http://agent.example/card" }),
+    /HTTPS/,
+  );
+});
+
+test("agent registry and id must be provided together", () => {
+  assert.throws(
+    () => normalizeAgentRef({ agentRegistry: "eip155:1:0xabc" }),
+    /provided together/,
+  );
+});
+
+test("evidence builder rejects URL userinfo tricks", () => {
+  assert.throws(
+    () =>
+      buildSubmitEvidence(
+        "wf",
+        "step",
+        "https://example.com@evil.example/a",
+        "https://support.example/b",
+      ),
+    /userinfo/,
+  );
+});
+
+test("evidence builder rejects unsafe backslash URLs", () => {
+  assert.throws(
+    () =>
+      buildSubmitEvidence(
+        "wf",
+        "step",
+        "https://example.com\\@evil.example/a",
+        "https://support.example/b",
+      ),
+    /backslash/,
+  );
 });
