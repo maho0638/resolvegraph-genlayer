@@ -1,0 +1,9 @@
+{
+  "schema": "resolvegraph-verification-status-v1",
+  "status": "DEVELOPMENT",
+  "contract": null,
+  "canonical_ci": null,
+  "canonical_studionet": null,
+  "production_deployment": null,
+  "submission_ready": false
+}
