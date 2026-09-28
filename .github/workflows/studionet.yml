@@ -1,0 +1,19 @@
+name: ResolveGraph Studionet Proof
+
+on:
+  workflow_dispatch:
+
+jobs:
+  live-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Pin contract source hash
+        run: sha256sum contracts/resolve_graph.py
+      - name: Run canonical success and failure lifecycle
+        run: gltest tests/integration/test_resolvegraph_studionet.py -v -s --network studionet
