@@ -16,20 +16,21 @@ Required gates:
 - [x] workflow fault-attribution tests;
 - [x] deterministic slash threshold;
 - [x] GenVM lint;
-- [x] TypeScript SDK tests;
+- [x] TypeScript SDK tests, including provenance scope/expiry checks;
 - [x] frontend typecheck and production build;
 - [x] live Studionet create/fund/accept/submit/resolve/challenge/pay flow;
 - [x] live failed-workflow attribution/challenge/settlement flow;
 - [x] deployed-source equality / pinned source hashes;
 - [x] machine-readable proof manifest;
 - [x] reviewer walkthrough;
+- [x] signed GitHub provenance verifier with on-chain assignee match, wallet signature, immutable commit SHA, gist ownership challenge, scoped expiry and portable receipt schema;
 - [x] controlled Vercel production deployment;
 - [x] automated post-deploy smoke test.
 
 Verified production evidence:
 
-- commit `94a61f7f4401eb84f321e13136404dd028279c5c`;
-- CI `36568432075` — SUCCESS;
-- production smoke `36569042701` — SUCCESS.
+- provenance feature commit `5da51a7647dae310c551f4afcce49ea4c7e0b802`;
+- CI `36572374200` — SUCCESS;
+- production smoke `36572844244` — SUCCESS.
 
 Target achieved for this release: a complete ecosystem product, not a screenshot/demo submission.
