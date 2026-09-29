@@ -32,6 +32,7 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 ## Product / reviewer surface
 
 - workflow builder with versioned recipe starters;
+- separately deployed V2 immutable content-addressed recipe registry;
 - operator console for every lifecycle write;
 - public Explorer using production server-side read APIs;
 - per-workflow case room with challenge decision lineage;
@@ -45,7 +46,7 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 ## Canonical verification
 
 - Predeploy CI run: `36545373008` — **SUCCESS**.
-- Direct tests: **68/68 PASS**.
+- Direct tests: **74/74 PASS**.
 - GenVM lint: **PASS**.
 - SDK tests: **14/14 PASS**.
 - Frontend typecheck/build: **PASS**.
@@ -60,6 +61,11 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - Provenance feature verification commit: `5da51a7647dae310c551f4afcce49ea4c7e0b802`.
 - Provenance feature CI run: `36572374200` — **SUCCESS**.
 - Provenance feature production smoke run: `36572844244` — **SUCCESS**.
+- V2 immutable recipe registry Studionet run: `36587816018` — **SUCCESS** after retrying a transient GenLayer gateway 502.
+- V2 contract: `0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1`.
+- V2 source SHA256: `2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673`.
+- V2 deployed-source equality: **true**.
+- V2 live workflow `rg-v2-live-recipe-v1`: **ACTIVE**, with software-delivery, research-verification and service-sla steps each bound to its immutable recipe hash.
 - Smoke coverage includes overview, Explorer, operator console, recipes, participant ledger, provenance verifier, developer page, proof page, canonical case room, logo asset, health API, workflow API, step API, participant API, portable receipt, evidence manifest, provenance endpoint validation, canonical success/failure state and public verification snapshot.
 
 Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.
@@ -70,7 +76,7 @@ Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.
 - The GitHub provenance adapter independently verifies the on-chain assignee wallet signature, frozen step-policy digest, GitHub commit association and owner-controlled gist challenge. It emits an external receipt; it does not alter the current contract's payout rules and it does not maintain a global single-use nonce registry.
 - The evidence-manifest digest covers contract-stored evidence metadata, bounded snapshots, commitment fields and decision fields. It does **not** claim a byte-level hash of the remote web source.
 - The verified contract is on **GenLayer Studionet**; the frontend is a production web deployment, not a mainnet claim.
-- Cross-chain settlement and a dedicated on-chain recipe registry are not claimed by this release. Signed GitHub provenance is implemented as an external verification layer, not as on-chain settlement enforcement.
+- Cross-chain settlement is not claimed by this release. The dedicated on-chain recipe registry is implemented and live-verified in the separate V2 contract; it is not silently substituted for the canonical V1 settlement contract used by the production builder. Signed GitHub provenance remains an external verification layer, not on-chain settlement enforcement.
 
 ## Release gate
 

@@ -41,6 +41,28 @@ A successful step pays its reward only after the initial one-hour challenge wind
 - ambiguous, external or multi-party fault returns bonds rather than forcing an arbitrary slash;
 - all still-unpaid step rewards return to the sponsor on failed-workflow settlement.
 
+## Immutable recipe registry (V2)
+
+ResolveGraph V2 adds a separate content-addressed policy registry without mutating the canonical V1 settlement deployment. A recipe hash commits to:
+
+- recipe ID and explicit version;
+- display name and role label;
+- natural-language requirement and rubric;
+- evidence type;
+- the one-hour challenge policy;
+- the 20% bond rule (bond divisor 5);
+- the step-reward plus locked-bond payout mode.
+
+The hash uses length-prefixed canonical fields before SHA-256 hashing, avoiding delimiter ambiguity. Registry entries have no update method. Re-registering identical content is rejected, and changing the version or policy content produces a different hash. `add_step_from_recipe` copies the registered policy into the step and also stores `recipe_id`, `recipe_version`, and `recipe_hash`, so later review can prove exactly which reusable policy instantiated the commitment.
+
+Verified V2 Studionet contract:
+`0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1`
+
+Verified live workflow:
+`rg-v2-live-recipe-v1` with three recipe-bound steps.
+
+The production V1 builder is intentionally not auto-migrated to V2. This keeps the already verified settlement contract stable while V2 remains an opt-in evolution.
+
 ## Consensus boundary
 
 GenLayer is used only for semantic decisions that deterministic code cannot make:

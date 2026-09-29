@@ -7,6 +7,7 @@ Required gates:
 - [x] bounded and documented Intelligent Contract state machine;
 - [x] positive, negative, conflict and unavailable-evidence paths;
 - [x] dependency graph tests;
+- [x] immutable V2 recipe registry tests: duplicate rejection, version/hash separation, unknown-hash rejection and frozen step binding;
 - [x] role/authorization tests;
 - [x] challenge-window enforcement;
 - [x] validator-disagreement rejection;
@@ -19,6 +20,7 @@ Required gates:
 - [x] TypeScript SDK tests, including provenance scope/expiry checks;
 - [x] frontend typecheck and production build;
 - [x] live Studionet create/fund/accept/submit/resolve/challenge/pay flow;
+- [x] separate V2 Studionet recipe-registry deployment with three registered policies, three recipe-bound steps and deployed-source equality;
 - [x] live failed-workflow attribution/challenge/settlement flow;
 - [x] deployed-source equality / pinned source hashes;
 - [x] machine-readable proof manifest;
@@ -32,5 +34,7 @@ Verified production evidence:
 - provenance feature commit `5da51a7647dae310c551f4afcce49ea4c7e0b802`;
 - CI `36572374200` — SUCCESS;
 - production smoke `36572844244` — SUCCESS.
+
+V2 recipe registry evidence: run `36587816018` — SUCCESS; contract `0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1`; deployed-source equality true.
 
 Target achieved for this release: a complete ecosystem product, not a screenshot/demo submission.

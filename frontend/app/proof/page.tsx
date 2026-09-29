@@ -1,10 +1,13 @@
 import Link from "next/link";
 
 const contract = "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754";
+const v2Contract = "0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1";
 const canonicalCi = "36545373008";
 const canonicalStudionet = "36545373155";
-const firstProductionSmoke = "36572844244";
+const v2RecipeProof = "36587816018";
+const firstProductionSmoke = "36587466475";
 const sourceHash = "f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb";
+const v2SourceHash = "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673";
 
 export default function Proof() {
   const isProduction = process.env.VERCEL_ENV === "production";
@@ -15,12 +18,12 @@ export default function Proof() {
         <div>
           <div className="eyebrow">Reviewer Proof</div>
           <h1 style={{ fontSize: "56px" }}>
-            Contract, lifecycles, source and production surface are independently checkable.
+            Settlement, provenance and reusable policy are independently checkable.
           </h1>
           <p className="lede">
-            ResolveGraph passed deterministic tests, a real GenLayer success
-            lifecycle, a challenged failure lifecycle, deployed-source equality
-            and an automated production smoke test.
+            ResolveGraph verifies the canonical V1 settlement lifecycle and keeps
+            the new V2 immutable recipe registry isolated, source-matched and live
+            on Studionet so the proven V1 product is not replaced in place.
           </p>
         </div>
       </div>
@@ -28,18 +31,18 @@ export default function Proof() {
       <section className="grid3">
         <div className="metric">
           <span>Direct tests</span>
-          <strong>68 / 68 PASS</strong>
-          <span>Graph, escrow, challenge, fault and adversarial coverage</span>
+          <strong>74 / 74 PASS</strong>
+          <span>V1 graph/economics plus V2 recipe immutability coverage</span>
         </div>
         <div className="metric">
           <span>Studionet</span>
-          <strong>LIVE VERIFIED</strong>
-          <span>Success COMPLETED · failure FAILED_SETTLED</span>
+          <strong>V1 + V2 VERIFIED</strong>
+          <span>Settlement lifecycles plus immutable recipe registry</span>
         </div>
         <div className="metric">
           <span>Production UI</span>
           <strong>{isProduction ? "SMOKE VERIFIED" : "Preview"}</strong>
-          <span>Pages, asset, APIs and canonical workflows are checked automatically</span>
+          <span>Public product remains bound to canonical V1 settlement</span>
         </div>
       </section>
 
@@ -47,24 +50,42 @@ export default function Proof() {
         <div className="eyebrow">Verification chain</div>
         <h2>From source to public product</h2>
         <div className="flow verificationFlow">
-          <span>68 direct tests</span><b>→</b>
+          <span>74 direct tests</span><b>→</b>
           <span>14 SDK tests</span><b>→</b>
-          <span>Studionet lifecycles</span><b>→</b>
+          <span>V1 Studionet lifecycles</span><b>→</b>
+          <span>V2 recipe registry</span><b>→</b>
           <span>source equality</span><b>→</b>
-          <span>Vercel deployment</span><b>→</b>
           <span>production smoke</span>
         </div>
       </section>
 
       <section className="panel section">
-        <h2>Canonical evidence</h2>
+        <h2>Canonical V1 settlement evidence</h2>
         <div className="proofFacts">
-          <p><strong>Contract</strong><code>{contract}</code></p>
+          <p><strong>V1 contract</strong><code>{contract}</code></p>
           <p><strong>CI run</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + canonicalCi} target="_blank" rel="noreferrer">{canonicalCi} · SUCCESS ↗</a></p>
           <p><strong>Studionet run</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + canonicalStudionet} target="_blank" rel="noreferrer">{canonicalStudionet} · SUCCESS ↗</a></p>
           <p><strong>Production smoke baseline</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + firstProductionSmoke} target="_blank" rel="noreferrer">{firstProductionSmoke} · SUCCESS ↗</a></p>
-          <p><strong>Source SHA256</strong><code>{sourceHash}</code></p>
+          <p><strong>V1 source SHA256</strong><code>{sourceHash}</code></p>
           <p><strong>Deployed-source equality</strong><code>true</code></p>
+        </div>
+      </section>
+
+      <section className="panel section emphasisPanel">
+        <div className="eyebrow">V2 immutable recipe registry · LIVE VERIFIED</div>
+        <h2>Content-addressed policies are now a real Studionet contract surface</h2>
+        <div className="proofFacts">
+          <p><strong>V2 contract</strong><code>{v2Contract}</code></p>
+          <p><strong>Policy</strong><code>RG_V2_IMMUTABLE_RECIPES</code></p>
+          <p><strong>Proof run</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + v2RecipeProof} target="_blank" rel="noreferrer">{v2RecipeProof} · SUCCESS ↗</a></p>
+          <p><strong>Live workflow</strong><code>rg-v2-live-recipe-v1 · ACTIVE · 3 recipe-bound steps</code></p>
+          <p><strong>V2 source SHA256</strong><code>{v2SourceHash}</code></p>
+          <p><strong>Deployed-source equality</strong><code>true</code></p>
+        </div>
+        <div className="grid3 section">
+          <div className="card"><strong>software-delivery · v1</strong><code>200c7cf2a38dd134d815c493795a01c65610648cf701334366eb3ae46acd1e04</code></div>
+          <div className="card"><strong>research-verification · v1</strong><code>91602e091cce5964d300b3880bee3e5a7862fa4b17d1bac71ba2b3229e4a638f</code></div>
+          <div className="card"><strong>service-sla · v1</strong><code>9dca5c6c8790600ca6629e4a47eebb3f71374237f1f29732c45c7ef7512942f2</code></div>
         </div>
       </section>
 

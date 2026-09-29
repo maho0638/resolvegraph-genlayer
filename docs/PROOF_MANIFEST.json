@@ -1,7 +1,7 @@
 {
   "schema": "resolvegraph-proof-v1",
   "status": "LIVE_VERIFIED",
-  "verified_at": "2026-09-29T13:07:30Z",
+  "verified_at": "2026-09-29T15:16:51Z",
   "scope": {
     "project": "ResolveGraph — Multi-Agent Workflow Settlement",
     "network": "GenLayer Studionet"
@@ -9,7 +9,7 @@
   "canonical_commit": "43b1fc9c02a54b1859a84116121b0a287513730b",
   "direct_tests": {
     "status": "PASS",
-    "count": 68
+    "count": 74
   },
   "lint": {
     "genvm": "PASS"
@@ -148,5 +148,31 @@
     "ci_run_id": 36572374200,
     "production_smoke_run_id": 36572844244,
     "production_smoke_status": "SUCCESS"
+  },
+  "v2_recipe_registry": {
+    "status": "LIVE_VERIFIED",
+    "run_id": 36587816018,
+    "note": "The first expanded attempt encountered a transient GenLayer gateway 502; the rerun completed successfully.",
+    "contract": "0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1",
+    "policy_version": "RG_V2_IMMUTABLE_RECIPES",
+    "source_sha256": "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673",
+    "deployed_source_match": true,
+    "workflow": {
+      "id": "rg-v2-live-recipe-v1",
+      "status": "ACTIVE",
+      "recipe_bound_steps": 3
+    },
+    "recipes": {
+      "software-delivery@v1": "200c7cf2a38dd134d815c493795a01c65610648cf701334366eb3ae46acd1e04",
+      "research-verification@v1": "91602e091cce5964d300b3880bee3e5a7862fa4b17d1bac71ba2b3229e4a638f",
+      "service-sla@v1": "9dca5c6c8790600ca6629e4a47eebb3f71374237f1f29732c45c7ef7512942f2"
+    },
+    "guarantees": [
+      "content-addressed SHA-256 recipe identity",
+      "duplicate content cannot overwrite an existing recipe",
+      "version or policy changes produce a different hash",
+      "step state stores recipe id, version and hash",
+      "canonical V1 settlement deployment remains unchanged"
+    ]
   }
 }

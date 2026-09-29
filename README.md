@@ -20,6 +20,7 @@ ResolveGraph combines:
 - deterministic settlement;
 - portable adjudication receipts for downstream reputation / validation systems;
 - versioned workflow recipe starters;
+- a separate V2 content-addressed on-chain recipe registry whose steps persist the exact recipe ID, version and hash;
 - a reviewer-friendly Explorer, case room, proof dashboard, production read APIs and TypeScript SDK.
 
 ## Why GenLayer
@@ -47,7 +48,7 @@ Promotion order:
 
 ## Verified release
 
-- Direct tests: **68/68 PASS**
+- Direct tests: **74/74 PASS**
 - GenVM lint: **PASS**
 - SDK tests: **14/14 PASS**
 - Frontend typecheck/build: **PASS**
@@ -62,9 +63,15 @@ Promotion order:
 - Provenance feature production smoke: **36572844244 — SUCCESS**
 - Signed GitHub provenance verifier: wallet ↔ on-chain assignee ↔ frozen step policy ↔ GitHub account ↔ immutable commit SHA ↔ owner-controlled gist challenge.
 - Provenance feature verification commit: `5da51a7647dae310c551f4afcce49ea4c7e0b802`
+- V2 immutable recipe registry Studionet run: **36587816018 — SUCCESS**
+- V2 contract: `0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1`
+- V2 policy: `RG_V2_IMMUTABLE_RECIPES`
+- V2 live workflow: `rg-v2-live-recipe-v1 — ACTIVE — 3 recipe-bound steps`
+- V2 deployed/repository source SHA256: `2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673`
+- V2 deployed-source equality: **true**
 
 ## Status
 
 **LIVE_VERIFIED — SUBMISSION READY**
 
-The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable release record. The GitHub provenance adapter is an external verification receipt and does not modify the existing Studionet settlement contract.
+The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable release record. The GitHub provenance adapter is an external verification receipt. The V2 recipe registry is a separately deployed and source-matched Studionet contract; the production workflow UI intentionally keeps the canonical V1 settlement contract active until an explicit migration is chosen.

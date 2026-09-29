@@ -34,5 +34,16 @@
     "ci_run_id": 36572374200,
     "smoke_run_id": 36572844244,
     "smoke_status": "SUCCESS"
+  },
+  "v2_recipe_registry": {
+    "status": "LIVE_VERIFIED",
+    "run_id": 36587816018,
+    "contract": "0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1",
+    "policy_version": "RG_V2_IMMUTABLE_RECIPES",
+    "workflow": "rg-v2-live-recipe-v1",
+    "recipe_bound_steps": 3,
+    "source_sha256": "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673",
+    "source_match": true,
+    "production_v1_unchanged": true
   }
 }
