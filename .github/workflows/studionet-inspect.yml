@@ -1,0 +1,33 @@
+name: ResolveGraph Studionet Inspect
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/resolvegraph-inspect.trigger"
+
+jobs:
+  inspect-existing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.txt
+      - name: Install source verifier dependency
+        working-directory: scripts
+        run: npm install
+      - name: Pin contract source hash
+        run: sha256sum contracts/resolve_graph.py
+      - name: Inspect existing Studionet transaction and contract state
+        run: gltest tests/integration/test_resolvegraph_studionet_inspect.py -v -s --network studionet
+      - name: Verify deployed source equals repository source
+        run: |
+          CONTRACT_ADDRESS="$(cat artifacts/resolvegraph-live-address.txt)" \
+          CONTRACT_SOURCE_PATH="contracts/resolve_graph.py" \
+          node scripts/verify-deployed-source.mjs
