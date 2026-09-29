@@ -1,0 +1,12 @@
+{
+  "name": "resolvegraph-external-agent-consumer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "verify": "node agent.mjs"
+  },
+  "dependencies": {
+    "@resolvegraph/sdk": "file:./resolvegraph-sdk-0.1.0.tgz"
+  }
+}

@@ -1,0 +1,42 @@
+name: ResolveGraph External SDK Consumer Proof
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/resolvegraph-external-consumer-proof.trigger"
+
+jobs:
+  consumer-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build and pack exact SDK version
+        working-directory: sdk
+        run: |
+          npm install
+          npm run build
+          npm pack --pack-destination ../examples/external-agent-consumer
+
+      - name: Install package through external consumer boundary
+        working-directory: examples/external-agent-consumer
+        run: npm install
+
+      - name: Verify public workflow through installed SDK
+        working-directory: examples/external-agent-consumer
+        env:
+          RESOLVEGRAPH_BASE_URL: https://resolvegraph-genlayer.vercel.app
+          RESOLVEGRAPH_WORKFLOW: rg-live-success-v1
+          RESOLVEGRAPH_STEP: source-check
+        run: npm run verify
+
+      - name: Upload independent consumer receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: resolvegraph-external-consumer-proof
+          path: examples/external-agent-consumer/external-consumer-proof.json
