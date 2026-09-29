@@ -3,12 +3,14 @@ import assert from "node:assert/strict";
 import {
   buildAddStep,
   buildCreateWorkflow,
+  buildGithubProvenanceMessage,
   buildPortableReceipt,
   buildSubmitEvidence,
   formatGen,
   normalizeAgentRef,
   parseGen,
   requiredBond,
+  assertGithubProvenanceFresh,
 } from "../dist/index.js";
 
 test("GEN helpers preserve 18-decimal values", () => {
@@ -145,5 +147,61 @@ test("evidence builder rejects unsafe backslash URLs", () => {
         "https://support.example/b",
       ),
     /backslash/,
+  );
+});
+
+test("GitHub provenance message binds workflow, step, wallet, commit and expiry", () => {
+  const base = {
+    workflowId: "wf-1",
+    stepId: "build",
+    wallet: "0x1111111111111111111111111111111111111111",
+    githubLogin: "octocat",
+    commitUrl:
+      "https://github.com/example/project/commit/0123456789abcdef0123456789abcdef01234567",
+    policyDigest:
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    expiresAt: 2000000000,
+    claimId: "0123456789abcdef",
+  };
+  const message = buildGithubProvenanceMessage(base);
+  assert.match(message, /workflow:wf-1/);
+  assert.match(message, /step:build/);
+  assert.match(message, /repository:example\/project/);
+  assert.match(message, /commit:0123456789abcdef0123456789abcdef01234567/);
+
+  const replayed = buildGithubProvenanceMessage({
+    ...base,
+    stepId: "other-step",
+  });
+  assert.notEqual(message, replayed);
+});
+
+test("GitHub provenance requires full immutable commit SHA", () => {
+  assert.throws(
+    () =>
+      buildGithubProvenanceMessage({
+        workflowId: "wf",
+        stepId: "step",
+        wallet: "0x1111111111111111111111111111111111111111",
+        githubLogin: "octocat",
+        commitUrl: "https://github.com/example/project/commit/abc123",
+        policyDigest:
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        expiresAt: 2000000000,
+        claimId: "0123456789abcdef",
+      }),
+    /40-character hash/,
+  );
+});
+
+test("GitHub provenance expiry rejects expired and overlong claims", () => {
+  assert.doesNotThrow(() => assertGithubProvenanceFresh(1060, 1000, 100));
+  assert.throws(
+    () => assertGithubProvenanceFresh(999, 1000, 100),
+    /expired/,
+  );
+  assert.throws(
+    () => assertGithubProvenanceFresh(1200, 1000, 100),
+    /cannot exceed/,
   );
 });
