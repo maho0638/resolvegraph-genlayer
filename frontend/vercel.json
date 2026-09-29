@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/reviewer/case",
+      "destination": "/api/reviewer/case-live"
+    }
+  ]
+}
