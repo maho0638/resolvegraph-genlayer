@@ -2,12 +2,15 @@ import Link from "next/link";
 
 const contract = "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754";
 const v2Contract = "0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1";
+const evidenceRegistry = "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390";
 const canonicalCi = "36545373008";
 const canonicalStudionet = "36545373155";
 const v2RecipeProof = "36587816018";
+const evidenceArchiveProof = "36598129489";
 const firstProductionSmoke = "36587466475";
 const sourceHash = "f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb";
 const v2SourceHash = "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673";
+const evidenceSourceHash = "8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472";
 
 export default function Proof() {
   const isProduction = process.env.VERCEL_ENV === "production";
@@ -18,12 +21,13 @@ export default function Proof() {
         <div>
           <div className="eyebrow">Reviewer Proof</div>
           <h1 style={{ fontSize: "56px" }}>
-            Settlement, provenance and reusable policy are independently checkable.
+            Settlement, provenance, reusable policy and evidence history are independently checkable.
           </h1>
           <p className="lede">
-            ResolveGraph verifies the canonical V1 settlement lifecycle and keeps
-            the new V2 immutable recipe registry isolated, source-matched and live
-            on Studionet so the proven V1 product is not replaced in place.
+            ResolveGraph verifies the canonical V1 settlement lifecycle, the V2
+            immutable recipe registry and a separate typed evidence archive. Each
+            proof surface is isolated, source-matched and live on Studionet so new
+            verification layers do not silently replace the proven V1 settlement path.
           </p>
         </div>
       </div>
@@ -31,13 +35,13 @@ export default function Proof() {
       <section className="grid3">
         <div className="metric">
           <span>Direct tests</span>
-          <strong>74 / 74 PASS</strong>
-          <span>V1 graph/economics plus V2 recipe immutability coverage</span>
+          <strong>80 / 80 PASS</strong>
+          <span>V1 graph/economics, V2 recipes and typed evidence archive coverage</span>
         </div>
         <div className="metric">
           <span>Studionet</span>
-          <strong>V1 + V2 VERIFIED</strong>
-          <span>Settlement lifecycles plus immutable recipe registry</span>
+          <strong>3 LIVE SURFACES</strong>
+          <span>Settlement, immutable recipes and typed evidence archive</span>
         </div>
         <div className="metric">
           <span>Production UI</span>
@@ -50,10 +54,11 @@ export default function Proof() {
         <div className="eyebrow">Verification chain</div>
         <h2>From source to public product</h2>
         <div className="flow verificationFlow">
-          <span>74 direct tests</span><b>→</b>
+          <span>80 direct tests</span><b>→</b>
           <span>14 SDK tests</span><b>→</b>
           <span>V1 Studionet lifecycles</span><b>→</b>
           <span>V2 recipe registry</span><b>→</b>
+          <span>typed evidence archive</span><b>→</b>
           <span>source equality</span><b>→</b>
           <span>production smoke</span>
         </div>
@@ -86,6 +91,27 @@ export default function Proof() {
           <div className="card"><strong>software-delivery · v1</strong><code>200c7cf2a38dd134d815c493795a01c65610648cf701334366eb3ae46acd1e04</code></div>
           <div className="card"><strong>research-verification · v1</strong><code>91602e091cce5964d300b3880bee3e5a7862fa4b17d1bac71ba2b3229e4a638f</code></div>
           <div className="card"><strong>service-sla · v1</strong><code>9dca5c6c8790600ca6629e4a47eebb3f71374237f1f29732c45c7ef7512942f2</code></div>
+        </div>
+      </section>
+
+      <section className="panel section emphasisPanel">
+        <div className="eyebrow">Typed evidence archive · LIVE VERIFIED</div>
+        <h2>Remote evidence now has immutable round-by-round archive records</h2>
+        <div className="proofFacts">
+          <p><strong>Evidence registry</strong><code>{evidenceRegistry}</code></p>
+          <p><strong>Proof run</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + evidenceArchiveProof} target="_blank" rel="noreferrer">{evidenceArchiveProof} · SUCCESS ↗</a></p>
+          <p><strong>Canonical step</strong><code>rg-live-success-v1 / source-check</code></p>
+          <p><strong>Archived records</strong><code>round 1 PRIMARY + SUPPORT · round 2 CHALLENGE</code></p>
+          <p><strong>Registry source SHA256</strong><code>{evidenceSourceHash}</code></p>
+          <p><strong>Deployed-source equality</strong><code>true</code></p>
+        </div>
+        <div className="actions">
+          <Link className="button secondary" href="/evidence?workflow=rg-live-success-v1&step=source-check">
+            Open evidence archive
+          </Link>
+          <a className="button secondary" href="/api/evidence?workflow=rg-live-success-v1&step=source-check" target="_blank" rel="noreferrer">
+            Manifest v2 JSON
+          </a>
         </div>
       </section>
 
@@ -124,6 +150,8 @@ export default function Proof() {
           <a className="button secondary" href="/verification-status.json" target="_blank" rel="noreferrer">Verification snapshot</a>
           <a className="button secondary" href="/api/receipt?workflow=rg-live-success-v1" target="_blank" rel="noreferrer">Success receipt</a>
           <a className="button secondary" href="/api/receipt?workflow=rg-live-failure-v1" target="_blank" rel="noreferrer">Failure receipt</a>
+          <a className="button secondary" href="/api/evidence?workflow=rg-live-success-v1&step=source-check" target="_blank" rel="noreferrer">Evidence manifest v2</a>
+          <a className="button secondary" href="/api/evidence/archive?workflow=rg-live-success-v1&step=source-check" target="_blank" rel="noreferrer">Evidence archive JSON</a>
         </div>
       </section>
     </>
