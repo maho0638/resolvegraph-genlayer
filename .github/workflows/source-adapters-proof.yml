@@ -14,11 +14,6 @@ jobs:
   live-source-adapters-proof:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      BASE_URL: https://resolvegraph-genlayer.vercel.app
-      EXPECTED_SHA: ${{ github.sha }}
-      GH_TOKEN: ${{ github.token }}
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,16 +22,16 @@ jobs:
       - name: Build production frontend locally
         working-directory: frontend
         env:
-          NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS: 0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754
-          NEXT_PUBLIC_GENLAYER_RPC_URL: https://studio.genlayer.com/api
+          NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS: "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754"
+          NEXT_PUBLIC_GENLAYER_RPC_URL: "https://studio.genlayer.com/api"
         run: |
           npm install
           npm run build
       - name: Start production frontend
         working-directory: frontend
         env:
-          NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS: 0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754
-          NEXT_PUBLIC_GENLAYER_RPC_URL: https://studio.genlayer.com/api
+          NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS: "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754"
+          NEXT_PUBLIC_GENLAYER_RPC_URL: "https://studio.genlayer.com/api"
         run: |
           npm run start -- -p 3100 > /tmp/resolvegraph-next.log 2>&1 &
           echo $! > /tmp/resolvegraph-next.pid
