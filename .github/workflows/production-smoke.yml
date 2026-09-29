@@ -1,0 +1,134 @@
+name: Production Smoke
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: read
+
+jobs:
+  smoke:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: https://resolvegraph-genlayer.vercel.app
+      EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Wait for matching Vercel deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Waiting for Vercel status on $EXPECTED_SHA"
+          for attempt in $(seq 1 40); do
+            payload="$(curl -fsSL               -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json"               "https://api.github.com/repos/${{ github.repository }}/commits/$EXPECTED_SHA/status")"
+            state="$(python -c 'import json,sys; d=json.load(sys.stdin); xs=[x for x in d.get("statuses",[]) if x.get("context")=="Vercel"]; print(xs[0].get("state","missing") if xs else "missing")' <<<"$payload")"
+            echo "attempt=$attempt vercel=$state"
+            if [ "$state" = "success" ]; then
+              exit 0
+            fi
+            if [ "$state" = "failure" ] || [ "$state" = "error" ]; then
+              echo "Vercel deployment failed"
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for Vercel"
+          exit 1
+
+      - name: Verify public pages and assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          check_page() {
+            path="$1"
+            marker="$2"
+            echo "GET $path"
+            body="$(curl -fsSL --retry 3 --retry-delay 3 "$BASE_URL$path")"
+            grep -Fq "$marker" <<<"$body"
+          }
+
+          check_page "/" "ResolveGraph"
+          check_page "/explorer" "Public Explorer"
+          check_page "/operate" "Operator Console"
+          check_page "/participants" "Participant Ledger"
+          check_page "/developers" "Developer Surface"
+          check_page "/proof" "Reviewer Proof"
+          check_page "/workflows/rg-live-success-v1" "Workflow Case Room"
+
+          content_type="$(curl -fsSI "$BASE_URL/resolvegraph-logo.webp" | tr -d '\r' | awk -F': ' 'tolower($1)=="content-type"{print tolower($2)}')"
+          echo "logo content-type=$content_type"
+          [[ "$content_type" == image/webp* ]]
+
+      - name: Verify production API and canonical workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          health="$(curl -fsSL --retry 3 "$BASE_URL/api/health")"
+          python - "$EXPECTED_SHA" <<'PY' <<<"$health"
+          import json, sys
+          expected = sys.argv[1]
+          data = json.load(sys.stdin)
+          assert data["service"] == "ResolveGraph"
+          assert data["network"] == "studionet"
+          assert data["contractConfigured"] is True
+          assert data["rpcConfigured"] is True
+          assert data["production"] is True
+          commit = data.get("deploymentCommit")
+          if commit:
+              assert commit == expected, (commit, expected)
+          print("health ok", data.get("contract"), commit)
+          PY
+
+          workflows="$(curl -fsSL --retry 3 "$BASE_URL/api/workflows")"
+          python - <<'PY' <<<"$workflows"
+          import json, sys
+          data = json.load(sys.stdin)
+          ids = {str(x.get("id")) for x in data.get("workflows", [])}
+          assert "rg-live-success-v1" in ids, ids
+          assert "rg-live-failure-v1" in ids, ids
+          print("workflow count", data.get("count"), "canonical ids present")
+          PY
+
+          success="$(curl -fsSL --retry 3 "$BASE_URL/api/workflow?id=rg-live-success-v1")"
+          python - <<'PY' <<<"$success"
+          import json, sys
+          data = json.load(sys.stdin)
+          assert data["workflow"]["status"] == "COMPLETED"
+          assert len(data.get("steps", [])) == 2
+          print("success workflow ok")
+          PY
+
+          failure="$(curl -fsSL --retry 3 "$BASE_URL/api/workflow?id=rg-live-failure-v1")"
+          python - <<'PY' <<<"$failure"
+          import json, sys
+          data = json.load(sys.stdin)
+          wf = data["workflow"]
+          assert wf["status"] == "FAILED_SETTLED"
+          assert wf["fault_class"] == "EXTERNAL"
+          print("failure workflow ok")
+          PY
+
+          receipt="$(curl -fsSL --retry 3 "$BASE_URL/api/receipt?workflow=rg-live-success-v1")"
+          python - <<'PY' <<<"$receipt"
+          import json, sys
+          data = json.load(sys.stdin)
+          assert data["schema"] == "resolvegraph-receipt-v1"
+          assert data["outcome"] == "COMPLETED"
+          print("receipt ok")
+          PY
+
+          verification="$(curl -fsSL --retry 3 "$BASE_URL/verification-status.json")"
+          python - <<'PY' <<<"$verification"
+          import json, sys
+          data = json.load(sys.stdin)
+          assert data["canonical_studionet"]["status"] == "SUCCESS"
+          assert data["canonical_studionet"]["source_match"] is True
+          print("verification snapshot ok")
+          PY

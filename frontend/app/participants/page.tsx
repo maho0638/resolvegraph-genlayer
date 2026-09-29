@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { formatGen, readContract, short } from "@/lib/genlayer";
+import { formatGen, short } from "@/lib/genlayer";
+import { fetchJson } from "@/lib/http";
 
 type Stats = {
   steps_accepted?: unknown;
@@ -21,10 +22,19 @@ export default function Participants() {
 
   async function load(event: FormEvent) {
     event.preventDefault();
+    const value = address.trim();
+    if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+      setStats(null);
+      setNotice("Enter a valid 0x-prefixed 20-byte wallet address.");
+      return;
+    }
+
     try {
-      const value = await readContract("get_participant_stats", [address.trim()]);
-      setStats(value as Stats);
-      setNotice("Loaded " + short(address));
+      const data = await fetchJson<{ stats: Stats }>(
+        "/api/participant?address=" + encodeURIComponent(value),
+      );
+      setStats(data.stats);
+      setNotice("Live on-chain history loaded for " + short(value));
     } catch (error: any) {
       setStats(null);
       setNotice(error?.message || "Unable to read participant statistics.");
@@ -39,6 +49,10 @@ export default function Participants() {
           <h1 style={{ fontSize: "56px" }}>
             Settlement history without a subjective star rating.
           </h1>
+          <p className="lede">
+            Read only what the contract can prove: accepted work, paid work,
+            completed workflows, rewards and bond outcomes.
+          </p>
         </div>
       </div>
 
@@ -65,9 +79,7 @@ export default function Participants() {
         <section className="grid3 section">
           <div className="metric">
             <span>Accepted / paid steps</span>
-            <strong>
-              {String(stats.steps_accepted ?? 0)} / {String(stats.steps_paid ?? 0)}
-            </strong>
+            <strong>{String(stats.steps_accepted ?? 0)} / {String(stats.steps_paid ?? 0)}</strong>
             <span>Direct contract counters</span>
           </div>
           <div className="metric">
