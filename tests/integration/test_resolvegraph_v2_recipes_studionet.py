@@ -168,28 +168,35 @@ def test_resolvegraph_v2_recipe_registry_on_studionet():
     assert tx_execution_succeeded(tx)
 
     reward = 1_000_000_000_000
-    tx = sponsor.add_step_from_recipe(
-        args=[
-            workflow_id,
-            "delivery",
-            agent_account.address,
-            registered[0],
-            "eip155:1:0x0000000000000000000000000000000000000001#agent-42",
-            "https://agent.example/.well-known/agent-card.json",
-            "",
-            "",
-            int(time.time()) + 6 * 60 * 60,
-        ]
-    ).transact(value=reward, wait_interval=10000, wait_retries=60)
-    assert tx_execution_succeeded(tx)
+    step_ids = ["delivery", "research", "sla"]
+    now = int(time.time())
+    for index, step_id in enumerate(step_ids):
+        tx = sponsor.add_step_from_recipe(
+            args=[
+                workflow_id,
+                step_id,
+                agent_account.address,
+                registered[index],
+                "eip155:1:0x0000000000000000000000000000000000000001#agent-42",
+                "https://agent.example/.well-known/agent-card.json",
+                "",
+                "",
+                now + (6 + index) * 60 * 60,
+            ]
+        ).transact(value=reward, wait_interval=10000, wait_retries=60)
+        assert tx_execution_succeeded(tx)
 
-    step = contract.get_step(args=[workflow_id, "delivery"]).call()
-    assert str(_field(step, "recipe_id")) == "software-delivery"
-    assert str(_field(step, "recipe_version")) == "v1"
-    assert str(_field(step, "recipe_hash")) == registered[0]
-    assert str(_field(step, "requirement")) == RECIPES[0]["requirement"]
-    assert str(_field(step, "rubric")) == RECIPES[0]["rubric"]
-    assert int(_field(step, "bond_required")) == reward // 5
+        step = contract.get_step(args=[workflow_id, step_id]).call()
+        assert str(_field(step, "recipe_id")) == RECIPES[index]["id"]
+        assert str(_field(step, "recipe_version")) == "v1"
+        assert str(_field(step, "recipe_hash")) == registered[index]
+        assert str(_field(step, "requirement")) == RECIPES[index]["requirement"]
+        assert str(_field(step, "rubric")) == RECIPES[index]["rubric"]
+        assert int(_field(step, "bond_required")) == reward // 5
+        print(
+            "RG_V2_STEP_" + step_id.upper() + "_RECIPE_HASH=" + registered[index],
+            flush=True,
+        )
 
     tx = sponsor.seal_workflow(args=[workflow_id]).transact(
         wait_interval=10000,
@@ -203,4 +210,4 @@ def test_resolvegraph_v2_recipe_registry_on_studionet():
 
     print("RG_V2_WORKFLOW=" + workflow_id, flush=True)
     print("RG_V2_WORKFLOW_STATUS=" + str(_field(workflow, "status")), flush=True)
-    print("RG_V2_STEP_RECIPE_HASH=" + str(_field(step, "recipe_hash")), flush=True)
+    print("RG_V2_WORKFLOW_RECIPE_COUNT=3", flush=True)
