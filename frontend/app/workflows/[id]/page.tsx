@@ -222,6 +222,12 @@ export default function WorkflowCaseRoom() {
                     </a>
                     <a
                       className="textLink"
+                      href={"/evidence?workflow=" + encodeURIComponent(workflowId) + "&step=" + encodeURIComponent(String(step.id))}
+                    >
+                      Evidence archive & drift →
+                    </a>
+                    <a
+                      className="textLink"
                       href={"/api/evidence?workflow=" + encodeURIComponent(workflowId) + "&step=" + encodeURIComponent(String(step.id))}
                       target="_blank"
                       rel="noreferrer"
