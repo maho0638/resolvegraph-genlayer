@@ -18,6 +18,7 @@ const nav = [
   ["/recipes", "Recipes"],
   ["/operate", "Operate"],
   ["/explorer", "Explorer"],
+  ["/reviewer", "Review"],
   ["/participants", "Participants"],
   ["/provenance", "Provenance"],
   ["/developers", "Developers"],

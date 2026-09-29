@@ -61,6 +61,8 @@ jobs:
 
           check_page "/" "ResolveGraph"
           check_page "/explorer" "Public Explorer"
+          check_page "/reviewer" "Reviewer Mode"
+          check_page "/appeals" "Bounded Bonded Appeals"
           check_page "/operate" "Operator Console"
           check_page "/recipes" "Workflow Recipes"
           check_page "/participants" "Participant Ledger"
@@ -166,6 +168,32 @@ jobs:
           assert "9dca5c6c8790600ca6629e4a47eebb3f71374237f1f29732c45c7ef7512942f2" in hashes
           assert data["sourceMatch"] is True
           print("V2 live recipe registry api ok")
+          PY
+
+          appeal="$(curl -fsSL --retry 3 "$BASE_URL/api/appeals")"
+          APPEAL_JSON="$appeal" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["APPEAL_JSON"])
+          assert data["schema"] == "resolvegraph-bounded-appeal-proof-v1"
+          assert data["policyVersion"] == "RG_V3_BOUNDED_APPEALS"
+          assert data["sourceMatch"] is True
+          assert data["rules"]["maxStepAppeals"] == 1
+          step = data["live"]["step"]
+          assert int(step["resolution_round"]) == 2
+          assert int(step["challenge_count"]) == 1
+          assert step["decision_finalized"] is True
+          print("V3 bounded appeal api ok")
+          PY
+
+          reviewer="$(curl -fsSL --retry 3 "$BASE_URL/api/reviewer/case?workflow=rg-live-success-v1")"
+          REVIEWER_JSON="$reviewer" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["REVIEWER_JSON"])
+          assert data["schema"] == "resolvegraph-reviewer-case-v1"
+          assert data["terminalStatusMatches"] is True
+          assert data["reviewerChecks"]["transactionExplorerLinks"] is True
+          assert data["reviewerChecks"]["decisionVersionDiffAvailable"] is True
+          print("reviewer mode api ok")
           PY
 
           evidence="$(curl -fsSL --retry 3 "$BASE_URL/api/evidence?workflow=rg-live-success-v1&step=source-check")"

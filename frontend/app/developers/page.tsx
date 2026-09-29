@@ -77,6 +77,21 @@ export default function Developers() {
         </div>
       </section>
 
+      <section className="grid2 section">
+        <article className="card">
+          <div className="eyebrow">Verified external consumer</div>
+          <h3>SDK package boundary is tested independently</h3>
+          <p>A clean consumer installs the packed ResolveGraph SDK, calls the production public surface, validates the canonical workflow and emits its own proof receipt.</p>
+          <a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36601714919" target="_blank" rel="noreferrer">External consumer proof · SUCCESS ↗</a>
+        </article>
+        <article className="card">
+          <div className="eyebrow">Bounded appeals V3</div>
+          <h3>Finite challenge policy with economic finality</h3>
+          <p>The isolated V3 contract enforces one fresh-evidence appeal, an exact 5% appeal bond, explicit decision finalization and settlement gating.</p>
+          <a className="textLink" href="/appeals">Open V3 appeal proof →</a>
+        </article>
+      </section>
+
       <section className="panel section">
         <div className="eyebrow">Production read APIs</div>
         <h2>Reviewer-friendly, wallet-free inspection</h2>
@@ -101,6 +116,12 @@ export default function Developers() {
           </a>
           <a className="apiItem" href="/api/recipes" target="_blank" rel="noreferrer">
             <strong>GET /api/recipes</strong><span>live V2 content-addressed recipe registry from Studionet</span>
+          </a>
+          <a className="apiItem" href="/api/appeals" target="_blank" rel="noreferrer">
+            <strong>GET /api/appeals</strong><span>live V3 bounded bonded appeal proof state</span>
+          </a>
+          <a className="apiItem" href="/api/reviewer/case?workflow=rg-live-success-v1" target="_blank" rel="noreferrer">
+            <strong>GET /api/reviewer/case</strong><span>single-case graph, evidence, decision and transaction timeline</span>
           </a>
           <a className="apiItem" href="/adapters">
             <strong>GET /api/adapters/github</strong><span>GitHub commit, pull request and Actions run verification</span>

@@ -35,13 +35,13 @@ export default function Proof() {
       <section className="grid3">
         <div className="metric">
           <span>Direct tests</span>
-          <strong>80 / 80 PASS</strong>
+          <strong>89 / 89 PASS</strong>
           <span>V1 graph/economics, V2 recipes and typed evidence archive coverage</span>
         </div>
         <div className="metric">
           <span>Studionet</span>
-          <strong>3 LIVE SURFACES</strong>
-          <span>Settlement, immutable recipes and typed evidence archive</span>
+          <strong>4 LIVE SURFACES</strong>
+          <span>Settlement, immutable recipes, evidence archive and bounded appeals</span>
         </div>
         <div className="metric">
           <span>Production UI</span>
@@ -54,7 +54,7 @@ export default function Proof() {
         <div className="eyebrow">Verification chain</div>
         <h2>From source to public product</h2>
         <div className="flow verificationFlow">
-          <span>80 direct tests</span><b>→</b>
+          <span>89 direct tests</span><b>→</b>
           <span>14 SDK tests</span><b>→</b>
           <span>V1 Studionet lifecycles</span><b>→</b>
           <span>V2 recipe registry</span><b>→</b>
@@ -113,6 +113,38 @@ export default function Proof() {
             Manifest v2 JSON
           </a>
         </div>
+      </section>
+
+      <section className="panel section emphasisPanel">
+        <div className="eyebrow">V3 bounded bonded appeals · LIVE VERIFIED</div>
+        <h2>Appeal rounds are finite, bonded and explicitly finalized</h2>
+        <div className="proofFacts">
+          <p><strong>V3 contract</strong><code>0x14948AD5dCd317Ec49f5CEf7e08c72176C900214</code></p>
+          <p><strong>Policy</strong><code>RG_V3_BOUNDED_APPEALS</code></p>
+          <p><strong>Proof run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36604861578" target="_blank" rel="noreferrer">36604861578 · SUCCESS ↗</a></p>
+          <p><strong>Source SHA256</strong><code>4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee</code></p>
+          <p><strong>Deployed-source equality</strong><code>true</code></p>
+          <p><strong>Live decision</strong><code>PASS → appeal → PASS · finalized · 50,000,000,000 appeal bond</code></p>
+        </div>
+        <div className="actions">
+          <Link className="button secondary" href="/appeals">Open bounded appeals</Link>
+          <a className="button secondary" href="/api/appeals" target="_blank" rel="noreferrer">Live V3 JSON</a>
+        </div>
+      </section>
+
+      <section className="grid2 section">
+        <article className="card">
+          <div className="eyebrow">Source adapters · E2E VERIFIED</div>
+          <h3>GitHub + Ethereum + artifact facts</h3>
+          <p>Commit, PR, Actions, Ethereum receipt/event and bounded artifact adapters passed live external-source checks plus digest replay.</p>
+          <a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36604750863" target="_blank" rel="noreferrer">proof run 36604750863 · SUCCESS ↗</a>
+        </article>
+        <article className="card">
+          <div className="eyebrow">External SDK consumer · VERIFIED</div>
+          <h3>SDK works outside the application boundary</h3>
+          <p>A clean external consumer installs the packed SDK and verifies the canonical public workflow through the production API.</p>
+          <a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36601714919" target="_blank" rel="noreferrer">proof run 36601714919 · SUCCESS ↗</a>
+        </article>
       </section>
 
       <section className="grid2 section">
