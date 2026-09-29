@@ -109,11 +109,13 @@ jobs:
         run: |
           set -euo pipefail
           tx="0x1fe7aee1bf2d64e282ee143d557b5de011ef9430b5a751776ab6585ec88fd698"
-          payload="$(curl -fsSL --get \
+          http_code="$(curl -sS -o artifacts/source-adapters/ethereum-tx.json -w "%{http_code}" --get \
             --data-urlencode "chainId=1" \
             --data-urlencode "txHash=$tx" \
             "$BASE_URL/api/adapters/ethereum")"
-          printf '%s' "$payload" > artifacts/source-adapters/ethereum-tx.json
+          cat artifacts/source-adapters/ethereum-tx.json
+          test "$http_code" = "200"
+          payload="$(cat artifacts/source-adapters/ethereum-tx.json)"
           PAYLOAD="$payload" TX="$tx" python - <<'PY'
           import json, os, re
           data = json.loads(os.environ["PAYLOAD"])
