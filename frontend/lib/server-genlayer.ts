@@ -3,6 +3,8 @@ import { studionet } from "genlayer-js/chains";
 
 const VERIFIED_V2_RECIPE_CONTRACT =
   "0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1" as const;
+const VERIFIED_EVIDENCE_REGISTRY_CONTRACT =
+  "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390" as const;
 
 export function serverContractAddress(): `0x${string}` {
   const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
@@ -18,6 +20,16 @@ export function serverV2RecipeContractAddress(): `0x${string}` {
     VERIFIED_V2_RECIPE_CONTRACT;
   if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
     throw new Error("ResolveGraph V2 recipe contract address is invalid.");
+  }
+  return value as `0x${string}`;
+}
+
+export function serverEvidenceRegistryAddress(): `0x${string}` {
+  const value =
+    process.env.RESOLVEGRAPH_EVIDENCE_REGISTRY_ADDRESS?.trim() ||
+    VERIFIED_EVIDENCE_REGISTRY_CONTRACT;
+  if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+    throw new Error("ResolveGraph evidence registry address is invalid.");
   }
   return value as `0x${string}`;
 }
@@ -51,4 +63,12 @@ export async function serverReadV2Recipe(
   args: unknown[] = [],
 ) {
   return serverReadAt(serverV2RecipeContractAddress(), functionName, args);
+}
+
+
+export async function serverReadEvidenceRegistry(
+  functionName: string,
+  args: unknown[] = [],
+) {
+  return serverReadAt(serverEvidenceRegistryAddress(), functionName, args);
 }
