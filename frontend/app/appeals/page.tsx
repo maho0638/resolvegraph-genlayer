@@ -3,7 +3,27 @@ import {
   serverReadV3Appeal,
   serverV3AppealContractAddress,
 } from "@/lib/server-genlayer";
-import { formatGen, short } from "@/lib/genlayer";
+
+function formatGen(value: unknown): string {
+  try {
+    const n = BigInt(String(value));
+    const whole = n / 10n ** 18n;
+    const fraction = (n % 10n ** 18n)
+      .toString()
+      .padStart(18, "0")
+      .slice(0, 6)
+      .replace(/0+$/, "");
+    return String(whole) + "." + (fraction || "0") + " GEN";
+  } catch {
+    return String(value ?? "0");
+  }
+}
+
+function short(value?: string): string {
+  if (!value) return "—";
+  if (value.length <= 18) return value;
+  return value.slice(0, 8) + "…" + value.slice(-6);
+}
 
 const WORKFLOW_ID = "rg-v3-live-appeal-v1";
 const STEP_ID = "example-domain-proof";
