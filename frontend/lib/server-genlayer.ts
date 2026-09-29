@@ -7,6 +7,8 @@ const VERIFIED_EVIDENCE_REGISTRY_CONTRACT =
   "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390" as const;
 const VERIFIED_V3_APPEAL_CONTRACT =
   "0x14948AD5dCd317Ec49f5CEf7e08c72176C900214" as const;
+const VERIFIED_CROSS_CHAIN_SETTLEMENT_CONTRACT =
+  "0x0ca7432339C86ab01118f46D847A11EF94CB4BAA" as const;
 
 export function serverContractAddress(): `0x${string}` {
   const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
@@ -42,6 +44,16 @@ export function serverV3AppealContractAddress(): `0x${string}` {
     VERIFIED_V3_APPEAL_CONTRACT;
   if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
     throw new Error("ResolveGraph V3 appeal contract address is invalid.");
+  }
+  return value as `0x${string}`;
+}
+
+export function serverCrossChainSettlementAddress(): `0x${string}` {
+  const value =
+    process.env.RESOLVEGRAPH_CROSS_CHAIN_SETTLEMENT_ADDRESS?.trim() ||
+    VERIFIED_CROSS_CHAIN_SETTLEMENT_CONTRACT;
+  if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+    throw new Error("ResolveGraph cross-chain settlement address is invalid.");
   }
   return value as `0x${string}`;
 }
@@ -90,4 +102,11 @@ export async function serverReadV3Appeal(
   args: unknown[] = [],
 ) {
   return serverReadAt(serverV3AppealContractAddress(), functionName, args);
+}
+
+export async function serverReadCrossChainSettlement(
+  functionName: string,
+  args: unknown[] = [],
+) {
+  return serverReadAt(serverCrossChainSettlementAddress(), functionName, args);
 }
