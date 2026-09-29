@@ -239,37 +239,69 @@ export function parseEthereumExplorerUrl(value: string): {
   return { chainId, txHash };
 }
 
-const RPCS: Record<number, string> = {
-  1: process.env.ETHEREUM_MAINNET_RPC_URL || "https://ethereum-rpc.publicnode.com",
-  11155111:
-    process.env.ETHEREUM_SEPOLIA_RPC_URL ||
-    "https://ethereum-sepolia-rpc.publicnode.com",
-};
+function rpcEndpoints(chainId: number) {
+  if (chainId === 1) {
+    return [
+      process.env.ETHEREUM_MAINNET_RPC_URL,
+      "https://ethereum-rpc.publicnode.com",
+      "https://eth.llamarpc.com",
+      "https://cloudflare-eth.com",
+    ].filter(Boolean) as string[];
+  }
+  if (chainId === 11155111) {
+    return [
+      process.env.ETHEREUM_SEPOLIA_RPC_URL,
+      "https://ethereum-sepolia-rpc.publicnode.com",
+      "https://rpc.sepolia.org",
+    ].filter(Boolean) as string[];
+  }
+  throw new Error("Supported chain IDs are 1 (Ethereum) and 11155111 (Sepolia).");
+}
 
 async function rpc(chainId: number, method: string, params: unknown[]) {
-  const endpoint = RPCS[chainId];
-  if (!endpoint) {
-    throw new Error("Supported chain IDs are 1 (Ethereum) and 11155111 (Sepolia).");
+  const failures: string[] = [];
+  for (const endpoint of rpcEndpoints(chainId)) {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        cache: "no-store",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method,
+          params,
+        }),
+      });
+      if (!response.ok) {
+        failures.push(new URL(endpoint).hostname + ":HTTP_" + response.status);
+        continue;
+      }
+      const body = await response.json();
+      if (body?.error) {
+        failures.push(
+          new URL(endpoint).hostname +
+            ":RPC_" +
+            String(body.error?.code || "error"),
+        );
+        continue;
+      }
+      return body?.result;
+    } catch (error: any) {
+      failures.push(
+        new URL(endpoint).hostname +
+          ":" +
+          String(error?.name || "fetch_error"),
+      );
+    }
   }
-  const response = await fetch(endpoint, {
-    method: "POST",
-    cache: "no-store",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      id: 1,
-      method,
-      params,
-    }),
-  });
-  if (!response.ok) {
-    throw new Error("Ethereum RPC failed with HTTP " + response.status + ".");
-  }
-  const body = await response.json();
-  if (body?.error) {
-    throw new Error("Ethereum RPC error: " + String(body.error?.message || "unknown"));
-  }
-  return body?.result;
+  throw new Error(
+    "All allow-listed Ethereum RPCs failed for " +
+      method +
+      " (" +
+      failures.join(", ") +
+      ").",
+  );
 }
 
 function hexNumber(value: unknown) {
