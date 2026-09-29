@@ -150,6 +150,22 @@ jobs:
           print("participant api ok")
           PY
 
+          recipes="$(curl -fsSL --retry 3 "$BASE_URL/api/recipes")"
+          RECIPES_JSON="$recipes" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["RECIPES_JSON"])
+          assert data["schema"] == "resolvegraph-recipes-v2"
+          assert data["network"] == "studionet"
+          assert data["policyVersion"] == "RG_V2_IMMUTABLE_RECIPES"
+          assert data["count"] == 3
+          hashes = {str(x) for x in data.get("hashes", [])}
+          assert "200c7cf2a38dd134d815c493795a01c65610648cf701334366eb3ae46acd1e04" in hashes
+          assert "91602e091cce5964d300b3880bee3e5a7862fa4b17d1bac71ba2b3229e4a638f" in hashes
+          assert "9dca5c6c8790600ca6629e4a47eebb3f71374237f1f29732c45c7ef7512942f2" in hashes
+          assert data["sourceMatch"] is True
+          print("V2 live recipe registry api ok")
+          PY
+
           evidence="$(curl -fsSL --retry 3 "$BASE_URL/api/evidence?workflow=rg-live-success-v1&step=source-check")"
           EVIDENCE_JSON="$evidence" python - <<'PY'
           import json, os, re
