@@ -4,10 +4,12 @@ This workflow is manual-only. It is intentionally not triggered on every push.
 Run it only after direct tests, lint, SDK tests, and frontend production build pass.
 """
 
+import hashlib
 import time
 from pathlib import Path
 
 import pytest
+from genlayer_py import create_account
 from gltest import get_contract_factory
 from gltest.assertions import tx_execution_succeeded
 
@@ -18,13 +20,22 @@ def _field(value, name):
     return getattr(value, name)
 
 
-@pytest.mark.integration
-def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
-    assert len(accounts) >= 3
+_SECP256K1_N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
 
-    sponsor_account = default_account
-    agent_a = accounts[1]
-    agent_b = accounts[2]
+
+def _studionet_account(label: str):
+    """Stable public test identity for Studionet only; never use with real value."""
+    digest = hashlib.sha256(("resolvegraph-studionet-proof-v1:" + label).encode()).digest()
+    key_int = (int.from_bytes(digest, "big") % (_SECP256K1_N - 1)) + 1
+    return create_account("0x" + key_int.to_bytes(32, "big").hex())
+
+
+@pytest.mark.integration
+def test_resolvegraph_success_and_failure_lifecycles():
+    sponsor_account = _studionet_account("sponsor")
+    agent_a = _studionet_account("agent-a")
+    agent_b = _studionet_account("agent-b")
+    print("RESOLVEGRAPH_TEST_IDENTITY_MODE=deterministic-public-studionet-only", flush=True)
 
     factory = get_contract_factory("ResolveGraph")
     contract = factory.deploy(
@@ -138,7 +149,7 @@ def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
     tx = sponsor.resolve_step(args=[workflow_id, "source-check"]).transact(
         consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=80,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
     print("RG_SUCCESS_RESOLVE_STEP1_TX=" + str(tx.get("hash", "")), flush=True)
@@ -163,7 +174,7 @@ def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
     tx = sponsor.resolve_step_challenge(args=[workflow_id, "source-check"]).transact(
         consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=80,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
     print("RG_SUCCESS_RERESOLVE_STEP1_TX=" + str(tx.get("hash", "")), flush=True)
@@ -195,7 +206,7 @@ def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
     tx = sponsor.resolve_step(args=[workflow_id, "standards-check"]).transact(
         consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=80,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
     print("RG_SUCCESS_RESOLVE_STEP2_TX=" + str(tx.get("hash", "")), flush=True)
@@ -217,7 +228,7 @@ def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
     tx = sponsor.resolve_step_challenge(args=[workflow_id, "standards-check"]).transact(
         consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=80,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
     print("RG_SUCCESS_RERESOLVE_STEP2_TX=" + str(tx.get("hash", "")), flush=True)
@@ -303,7 +314,7 @@ def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
     tx = sponsor.resolve_step(args=[failed_workflow, "api-proof"]).transact(
         consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=80,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
     print("RG_FAIL_RESOLVE_TX=" + str(tx.get("hash", "")), flush=True)
@@ -325,7 +336,7 @@ def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
     tx = sponsor.resolve_step_challenge(args=[failed_workflow, "api-proof"]).transact(
         consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=80,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
     print("RG_FAIL_RERESOLVE_TX=" + str(tx.get("hash", "")), flush=True)
@@ -336,7 +347,7 @@ def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
     tx = sponsor.attribute_failure(args=[failed_workflow, "api-proof"]).transact(
         consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=100,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
     print("RG_FAIL_ATTRIBUTE_TX=" + str(tx.get("hash", "")), flush=True)
@@ -359,7 +370,7 @@ def test_resolvegraph_success_and_failure_lifecycles(default_account, accounts):
     tx = sponsor.resolve_attribution_challenge(args=[failed_workflow]).transact(
         consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=100,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
     print("RG_FAIL_ATTRIBUTION_RERESOLVE_TX=" + str(tx.get("hash", "")), flush=True)
