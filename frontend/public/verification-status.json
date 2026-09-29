@@ -1,6 +1,6 @@
 {
   "schema": "resolvegraph-verification-status-v1",
-  "status": "STUDIONET_VERIFIED",
+  "status": "LIVE_VERIFIED",
   "contract": "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754",
   "canonical_ci": {
     "run_id": 36545373008,
@@ -15,7 +15,14 @@
     "source_match": true
   },
   "production_deployment": {
-    "status": "PENDING_FINAL_CONTROLLED_DEPLOY"
+    "status": "LIVE_VERIFIED",
+    "url": "https://resolvegraph-genlayer.vercel.app",
+    "verified_commit": "94a61f7f4401eb84f321e13136404dd028279c5c",
+    "ci_run_id": 36568432075,
+    "ci_status": "SUCCESS",
+    "smoke_run_id": 36569042701,
+    "smoke_status": "SUCCESS",
+    "verified_at": "2026-09-29T12:35:10Z"
   },
-  "submission_ready": false
+  "submission_ready": true
 }

@@ -4,25 +4,32 @@ ResolveGraph is not considered submission-ready because a page renders or a cont
 
 Required gates:
 
-- bounded and documented Intelligent Contract state machine;
-- positive, negative, conflict and unavailable-evidence paths;
-- dependency graph tests;
-- role/authorization tests;
-- challenge-window enforcement;
-- validator-disagreement rejection;
-- low-confidence fail-closed behavior;
-- reward and bond accounting tests;
-- double-settlement prevention;
-- workflow fault-attribution tests;
-- deterministic slash threshold;
-- GenVM lint;
-- TypeScript SDK tests;
-- frontend typecheck and production build;
-- live Studionet create/fund/accept/submit/resolve/challenge/pay flow;
-- live failed-workflow attribution/challenge/settlement flow;
-- deployed-source equality or pinned source hashes;
-- machine-readable proof manifest;
-- reviewer walkthrough;
-- only then one controlled Vercel deployment and post-deploy smoke test.
+- [x] bounded and documented Intelligent Contract state machine;
+- [x] positive, negative, conflict and unavailable-evidence paths;
+- [x] dependency graph tests;
+- [x] role/authorization tests;
+- [x] challenge-window enforcement;
+- [x] validator-disagreement rejection;
+- [x] low-confidence fail-closed behavior;
+- [x] reward and bond accounting tests;
+- [x] double-settlement prevention;
+- [x] workflow fault-attribution tests;
+- [x] deterministic slash threshold;
+- [x] GenVM lint;
+- [x] TypeScript SDK tests;
+- [x] frontend typecheck and production build;
+- [x] live Studionet create/fund/accept/submit/resolve/challenge/pay flow;
+- [x] live failed-workflow attribution/challenge/settlement flow;
+- [x] deployed-source equality / pinned source hashes;
+- [x] machine-readable proof manifest;
+- [x] reviewer walkthrough;
+- [x] controlled Vercel production deployment;
+- [x] automated post-deploy smoke test.
 
-Target: a complete ecosystem product, not a screenshot/demo submission.
+Verified production evidence:
+
+- commit `94a61f7f4401eb84f321e13136404dd028279c5c`;
+- CI `36568432075` — SUCCESS;
+- production smoke `36569042701` — SUCCESS.
+
+Target achieved for this release: a complete ecosystem product, not a screenshot/demo submission.

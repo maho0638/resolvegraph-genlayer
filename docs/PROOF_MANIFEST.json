@@ -1,7 +1,7 @@
 {
   "schema": "resolvegraph-proof-v1",
-  "status": "STUDIONET_VERIFIED",
-  "verified_at": "2026-09-29T09:01:42Z",
+  "status": "LIVE_VERIFIED",
+  "verified_at": "2026-09-29T12:35:10Z",
   "scope": {
     "project": "ResolveGraph — Multi-Agent Workflow Settlement",
     "network": "GenLayer Studionet"
@@ -95,7 +95,33 @@
     "deployed_source_match": true
   },
   "production": {
-    "status": "PENDING_FINAL_CONTROLLED_VERCEL_DEPLOY"
+    "status": "LIVE_VERIFIED",
+    "url": "https://resolvegraph-genlayer.vercel.app",
+    "verified_commit": "94a61f7f4401eb84f321e13136404dd028279c5c",
+    "ci_run_id": 36568432075,
+    "ci_status": "SUCCESS",
+    "smoke_run_id": 36569042701,
+    "smoke_status": "SUCCESS",
+    "smoke_verified_at": "2026-09-29T12:35:10Z",
+    "smoke_scope": [
+      "overview",
+      "explorer",
+      "operator",
+      "recipes",
+      "participants",
+      "developers",
+      "proof",
+      "canonical case room",
+      "logo asset",
+      "health API",
+      "workflow API",
+      "step API",
+      "participant API",
+      "receipt API",
+      "evidence manifest API",
+      "canonical success/failure state",
+      "verification snapshot"
+    ]
   },
-  "submission_ready": false
+  "submission_ready": true
 }
