@@ -64,6 +64,7 @@ jobs:
           check_page "/operate" "Operator Console"
           check_page "/recipes" "Workflow Recipes"
           check_page "/participants" "Participant Ledger"
+          check_page "/provenance" "Signed Provenance"
           check_page "/developers" "Developer Surface"
           check_page "/proof" "Reviewer Proof"
           check_page "/workflows/rg-live-success-v1" "Workflow Case Room"
@@ -160,6 +161,15 @@ jobs:
           assert re.fullmatch(r"[a-f0-9]{64}", data["manifestDigest"])
           print("evidence manifest ok")
           PY
+
+          provenance_status="$(curl -sS -o /tmp/provenance.json -w "%{http_code}" \
+            -X POST \
+            -H "content-type: application/json" \
+            -d '{}' \
+            "$BASE_URL/api/provenance/github")"
+          test "$provenance_status" = "400"
+          grep -Fq "gistUrl and a 65-byte wallet signature are required" /tmp/provenance.json
+          echo "provenance validation endpoint ok"
 
           verification="$(curl -fsSL --retry 3 "$BASE_URL/verification-status.json")"
           VERIFY_JSON="$verification" python - <<'PY'
