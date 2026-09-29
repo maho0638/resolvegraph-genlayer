@@ -7,6 +7,10 @@ export default function Developers() {
           <h1 style={{ fontSize: "56px" }}>
             Build agent products on top of adjudication, not around it.
           </h1>
+          <p className="lede">
+            Public reads are available through same-origin production APIs;
+            state-changing actions remain wallet-signed GenLayer transactions.
+          </p>
         </div>
       </div>
 
@@ -58,13 +62,42 @@ export default function Developers() {
       </section>
 
       <section className="panel section">
-        <h2>Interoperability policy</h2>
-        <p className="muted">
-          ERC-8004 and A2A identifiers are treated as references. ResolveGraph
-          does not claim identity authenticity merely because a caller supplied
-          a string. Final integration adapters verify compatible endpoint and
-          registry metadata separately from adjudication.
-        </p>
+        <div className="eyebrow">Production read APIs</div>
+        <h2>Reviewer-friendly, wallet-free inspection</h2>
+        <div className="apiGrid">
+          <a className="apiItem" href="/api/health" target="_blank" rel="noreferrer">
+            <strong>GET /api/health</strong><span>deployment, network and contract configuration</span>
+          </a>
+          <a className="apiItem" href="/api/workflows" target="_blank" rel="noreferrer">
+            <strong>GET /api/workflows</strong><span>all workflow summaries from live contract state</span>
+          </a>
+          <a className="apiItem" href="/api/receipt?workflow=rg-live-success-v1" target="_blank" rel="noreferrer">
+            <strong>GET /api/receipt</strong><span>portable workflow or step adjudication receipt</span>
+          </a>
+          <a className="apiItem" href="/api/evidence?workflow=rg-live-success-v1&step=source-proof" target="_blank" rel="noreferrer">
+            <strong>GET /api/evidence</strong><span>typed decision-bound evidence manifest</span>
+          </a>
+        </div>
+      </section>
+
+      <section className="grid2 section">
+        <article className="card">
+          <h3>Evidence manifest boundary</h3>
+          <p>
+            The manifest hashes the contract-stored evidence metadata, bounded
+            snapshots, commitment and decision fields. It does not claim a hash
+            of the remote source bytes because the current contract does not
+            persist those byte-level hashes.
+          </p>
+        </article>
+        <article className="card">
+          <h3>Interoperability boundary</h3>
+          <p>
+            ERC-8004 and A2A identifiers are references. ResolveGraph does not
+            claim identity authenticity merely because a caller supplied a
+            string. Signed identity/provenance adapters remain a separate trust layer.
+          </p>
+        </article>
       </section>
     </>
   );

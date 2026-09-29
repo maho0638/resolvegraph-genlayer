@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resolvegraph.example/schemas/evidence-manifest.schema.json",
+  "title": "ResolveGraph Evidence Manifest",
+  "type": "object",
+  "required": [
+    "schema",
+    "workflowId",
+    "stepId",
+    "policyVersion",
+    "participant",
+    "commitment",
+    "sources",
+    "decision",
+    "provenance",
+    "manifestDigest"
+  ],
+  "properties": {
+    "schema": { "const": "resolvegraph-evidence-manifest-v1" },
+    "workflowId": { "type": "string", "minLength": 1 },
+    "stepId": { "type": "string", "minLength": 1 },
+    "policyVersion": { "type": "string" },
+    "participant": { "type": "object" },
+    "commitment": { "type": "object" },
+    "sources": { "type": "array" },
+    "decision": { "type": "object" },
+    "provenance": {
+      "type": "object",
+      "required": ["source", "digestScope", "remoteByteContentHashClaimed"]
+    },
+    "manifestDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

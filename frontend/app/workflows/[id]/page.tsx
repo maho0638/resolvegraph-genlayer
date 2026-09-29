@@ -220,6 +220,14 @@ export default function WorkflowCaseRoom() {
                     >
                       Machine-readable step receipt →
                     </a>
+                    <a
+                      className="textLink"
+                      href={"/api/evidence?workflow=" + encodeURIComponent(workflowId) + "&step=" + encodeURIComponent(String(step.id))}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Evidence manifest →
+                    </a>
                   </div>
                 </article>
               ))}

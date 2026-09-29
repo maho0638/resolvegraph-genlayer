@@ -5,7 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ResolveGraph — Multi-Agent Workflow Settlement",
   description:
-    "GenLayer-native fault attribution, evidence adjudication and GEN settlement for multi-agent workflows.",
+    "GenLayer-native dependency-aware adjudication, fault attribution and GEN settlement for multi-agent workflows.",
   icons: {
     icon: "/resolvegraph-icon.webp",
     shortcut: "/resolvegraph-icon.webp",
@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 
 const nav = [
   ["/", "Overview"],
-  ["/workflows/new", "Build workflow"],
+  ["/workflows/new", "Build"],
+  ["/recipes", "Recipes"],
   ["/operate", "Operate"],
   ["/explorer", "Explorer"],
   ["/participants", "Participants"],
@@ -23,6 +24,8 @@ const nav = [
 ] as const;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const production = process.env.VERCEL_ENV === "production";
+
   return (
     <html lang="en">
       <body>
@@ -34,12 +37,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               className="brandLogo"
             />
           </Link>
-          <nav>
+          <nav aria-label="Primary">
             {nav.map(([href, label]) => (
               <Link key={href} href={href}>{label}</Link>
             ))}
           </nav>
-          <span className="networkPill">GenLayer · pre-production</span>
+          <span className="networkPill">
+            <span className="liveDot" aria-hidden="true" />
+            {production ? "Production UI" : "Preview"} · Studionet
+          </span>
         </header>
         <main>{children}</main>
         <footer>
@@ -48,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             alt="ResolveGraph"
             className="footerLogo"
           />
-          <span>Multi-agent commitments · evidence · fault attribution · settlement</span>
+          <span>Dependency-aware evidence · causal fault attribution · deterministic settlement</span>
         </footer>
       </body>
     </html>

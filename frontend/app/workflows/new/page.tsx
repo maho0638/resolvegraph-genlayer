@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { parseGen, sendWrite, short, walletClient } from "@/lib/genlayer";
+import { WORKFLOW_RECIPES, recipeLabel } from "@/lib/recipes";
 
 function nowPlus(hours: number) {
   const d = new Date(Date.now() + hours * 3600_000);
@@ -30,6 +31,21 @@ export default function NewWorkflow() {
   const [depB, setDepB] = useState("");
   const [reward, setReward] = useState("0.001");
   const [deadline, setDeadline] = useState(nowPlus(24));
+  const [recipeId, setRecipeId] = useState("");
+
+  function applyRecipe(id: string) {
+    setRecipeId(id);
+    const recipe = WORKFLOW_RECIPES.find((item) => item.id === id);
+    if (!recipe) return;
+    setRoleLabel(recipe.roleLabel);
+    setRequirement(recipe.requirement);
+    setRubric(recipe.rubric);
+    setNotice(
+      "Recipe applied · " +
+        recipeLabel(recipe) +
+        ". Review and edit before committing on-chain.",
+    );
+  }
 
   async function connect() {
     try {
@@ -122,6 +138,30 @@ export default function NewWorkflow() {
       </div>
 
       <div className="status">{notice}</div>
+
+      <section className="panel section">
+        <div className="sectionHead">
+          <div>
+            <div className="eyebrow">Recipe starter</div>
+            <h2>Draft from a versioned policy pattern</h2>
+            <p className="muted">
+              Recipes only prefill editable fields. The exact commitment and
+              rubric you submit become the contract inputs.
+            </p>
+          </div>
+        </div>
+        <div className="field">
+          <label>Starter recipe</label>
+          <select value={recipeId} onChange={(e) => applyRecipe(e.target.value)}>
+            <option value="">Choose a recipe…</option>
+            {WORKFLOW_RECIPES.map((recipe) => (
+              <option key={recipe.id} value={recipe.id}>
+                {recipeLabel(recipe)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </section>
 
       <section className="grid2 section">
         <form className="panel" onSubmit={create}>
