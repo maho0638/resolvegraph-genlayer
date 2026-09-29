@@ -48,7 +48,9 @@ jobs:
         run: |
           set -euo pipefail
           commit_url="https://github.com/${{ github.repository }}/commit/$EXPECTED_SHA"
+          mkdir -p artifacts/source-adapters
           payload="$(curl -fsSL --get --data-urlencode "url=$commit_url" "$BASE_URL/api/adapters/github")"
+          printf '%s' "$payload" > artifacts/source-adapters/github-commit.json
           PAYLOAD="$payload" EXPECTED="$EXPECTED_SHA" python - <<'PY'
           import json, os, re
           data = json.loads(os.environ["PAYLOAD"])
@@ -63,6 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           payload="$(curl -fsSL --get --data-urlencode "url=https://github.com/vercel/next.js/pull/1" "$BASE_URL/api/adapters/github")"
+          printf '%s' "$payload" > artifacts/source-adapters/github-pr.json
           PAYLOAD="$payload" python - <<'PY'
           import json, os, re
           data = json.loads(os.environ["PAYLOAD"])
@@ -80,6 +83,7 @@ jobs:
           set -euo pipefail
           run_url="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36598129489"
           payload="$(curl -fsSL --get --data-urlencode "url=$run_url" "$BASE_URL/api/adapters/github")"
+          printf '%s' "$payload" > artifacts/source-adapters/github-ci.json
           PAYLOAD="$payload" python - <<'PY'
           import json, os, re
           data = json.loads(os.environ["PAYLOAD"])
@@ -100,6 +104,7 @@ jobs:
             --data-urlencode "chainId=1" \
             --data-urlencode "txHash=$tx" \
             "$BASE_URL/api/adapters/ethereum")"
+          printf '%s' "$payload" > artifacts/source-adapters/ethereum-tx.json
           PAYLOAD="$payload" TX="$tx" python - <<'PY'
           import json, os, re
           data = json.loads(os.environ["PAYLOAD"])
@@ -118,6 +123,7 @@ jobs:
         run: |
           set -euo pipefail
           payload="$(curl -fsSL --get --data-urlencode "url=https://example.com" "$BASE_URL/api/adapters/artifact")"
+          printf '%s' "$payload" > artifacts/source-adapters/artifact.json
           PAYLOAD="$payload" python - <<'PY'
           import json, os, re
           data = json.loads(os.environ["PAYLOAD"])
@@ -127,3 +133,26 @@ jobs:
           assert re.fullmatch(r"[a-f0-9]{64}", data["adapterDigest"])
           print("artifact adapter ok", data["contentType"], data["byteLength"])
           PY
+
+
+      - name: Replay captured adapter digests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          for path in sorted(Path("artifacts/source-adapters").glob("*.json")):
+              data = json.loads(path.read_text())
+              expected = data.pop("adapterDigest")
+              payload = json.dumps(data, separators=(",", ":"), ensure_ascii=False)
+              actual = hashlib.sha256(payload.encode()).hexdigest()
+              assert actual == expected, (path.name, actual, expected)
+              print("replay ok", path.name, expected)
+          PY
+
+      - name: Upload source adapter proof fixtures
+        uses: actions/upload-artifact@v4
+        with:
+          name: resolvegraph-source-adapters-proof
+          path: artifacts/source-adapters/
