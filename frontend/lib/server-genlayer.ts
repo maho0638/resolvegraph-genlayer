@@ -1,10 +1,23 @@
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
 
+const VERIFIED_V2_RECIPE_CONTRACT =
+  "0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1" as const;
+
 export function serverContractAddress(): `0x${string}` {
   const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
   if (!value || !/^0x[a-fA-F0-9]{40}$/.test(value)) {
     throw new Error("ResolveGraph contract address is not configured.");
+  }
+  return value as `0x${string}`;
+}
+
+export function serverV2RecipeContractAddress(): `0x${string}` {
+  const value =
+    process.env.RESOLVEGRAPH_V2_RECIPE_CONTRACT_ADDRESS?.trim() ||
+    VERIFIED_V2_RECIPE_CONTRACT;
+  if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+    throw new Error("ResolveGraph V2 recipe contract address is invalid.");
   }
   return value as `0x${string}`;
 }
@@ -16,11 +29,26 @@ export function serverReadClient() {
   return createClient(config);
 }
 
-export async function serverRead(functionName: string, args: unknown[] = []) {
+export async function serverReadAt(
+  address: `0x${string}`,
+  functionName: string,
+  args: unknown[] = [],
+) {
   const client: any = serverReadClient();
   return client.readContract({
-    address: serverContractAddress(),
+    address,
     functionName,
     args,
   });
+}
+
+export async function serverRead(functionName: string, args: unknown[] = []) {
+  return serverReadAt(serverContractAddress(), functionName, args);
+}
+
+export async function serverReadV2Recipe(
+  functionName: string,
+  args: unknown[] = [],
+) {
+  return serverReadAt(serverV2RecipeContractAddress(), functionName, args);
 }
