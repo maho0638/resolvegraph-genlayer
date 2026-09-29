@@ -101,3 +101,35 @@ export interface PortableAdjudicationReceipt {
     challenge?: string;
   };
 }
+
+export interface GithubProvenanceClaimInput {
+  workflowId: string;
+  stepId: string;
+  wallet: HexAddress;
+  githubLogin: string;
+  commitUrl: string;
+  policyDigest: string;
+  expiresAt: number;
+  claimId: string;
+}
+
+export interface GithubProvenanceReceipt {
+  schema: "resolvegraph-github-provenance-v1";
+  claimRelation: "DELIVERED_GITHUB_COMMIT";
+  workflowId: string;
+  stepId: string;
+  participantWallet: HexAddress;
+  githubLogin: string;
+  repository: string;
+  commitSha: string;
+  commitUrl: string;
+  gistUrl: string;
+  gistId: string;
+  policyDigest: string;
+  claimId: string;
+  expiresAt: number;
+  verifiedAt: number;
+  messageDigest: string;
+  signature: `0x${string}`;
+  provenanceDigest: string;
+}
