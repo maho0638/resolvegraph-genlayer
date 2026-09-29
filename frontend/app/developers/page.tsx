@@ -77,6 +77,9 @@ export default function Developers() {
           <a className="apiItem" href="/api/evidence?workflow=rg-live-success-v1&step=source-check" target="_blank" rel="noreferrer">
             <strong>GET /api/evidence</strong><span>typed decision-bound evidence manifest</span>
           </a>
+          <a className="apiItem" href="/api/recipes" target="_blank" rel="noreferrer">
+            <strong>GET /api/recipes</strong><span>live V2 content-addressed recipe registry from Studionet</span>
+          </a>
           <a className="apiItem" href="/provenance?workflow=rg-live-success-v1&step=source-check">
             <strong>POST /api/provenance/github</strong><span>wallet ↔ GitHub ↔ immutable commit ↔ on-chain step verification</span>
           </a>
