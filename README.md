@@ -48,9 +48,9 @@ Promotion order:
 
 ## Verified release
 
-- Direct tests: **89/89 PASS**
+- Direct tests: **97/97 PASS**
 - GenVM lint: **PASS**
-- SDK tests: **14/14 PASS**
+- SDK tests: **18/18 PASS**
 - Frontend typecheck/build: **PASS**
 - Canonical Studionet lifecycle run: **36545373155 — SUCCESS**
 - Canonical contract: `0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754`
@@ -80,6 +80,11 @@ Promotion order:
 - V3 contract: `0x14948AD5dCd317Ec49f5CEf7e08c72176C900214`
 - V3 source SHA256: `4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee`
 - V3 deployed-source equality: **true**
+- Cross-chain settlement proof: **36606957197 — SUCCESS**
+- Cross-chain settlement contract: `0x0ca7432339C86ab01118f46D847A11EF94CB4BAA`
+- Cross-chain source SHA256: `67af44ce57eb4c672b156372c7fd042a0896d24794b788c897915b7f7993a4d0`
+- External source adapter digest: `702b57448a292ae70ec6d7eb7ff11527df7d2391624ec78a919def40ac60133e`
+- Cross-chain trust boundary: sponsor-selected relayer attestation; no token-bridge claim.
 
 ## Status
 

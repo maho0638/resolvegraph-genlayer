@@ -33,7 +33,8 @@ Required gates:
 - [x] source adapter E2E proof with digest replay;
 - [x] independent SDK consumer proof;
 - [x] reviewer-mode case timeline;
-- [x] bounded bonded V3 appeal policy and live Studionet source-equality proof.
+- [x] bounded bonded V3 appeal policy and live Studionet source-equality proof;
+- [x] cross-chain conditioned settlement with relayer trust model, replay guard, confirmation threshold, reorg path, timeout/refund and live source-equality proof.
 
 Verified production evidence:
 

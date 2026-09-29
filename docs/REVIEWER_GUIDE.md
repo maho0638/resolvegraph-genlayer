@@ -31,9 +31,9 @@ Production: https://resolvegraph-genlayer.vercel.app
 
 ## Verified deterministic gate
 
-- 89/89 direct tests PASS.
+- 97/97 direct tests PASS.
 - GenVM lint PASS.
-- 14/14 SDK tests PASS.
+- 18/18 SDK tests PASS.
 - Frontend typecheck PASS.
 - Frontend production build PASS.
 - Canonical predeploy CI run: `36545373008`.
@@ -113,6 +113,20 @@ V3 source SHA256:
 
 The contract limits a step to one fresh-evidence appeal, requires an exact 5% appeal bond, performs a second consensus round, records decision lineage and blocks settlement until explicit finalization. Deployed-source equality is true.
 
+## Verified cross-chain conditioned settlement
+
+Studionet run: `36606957197` — SUCCESS.
+
+Contract:
+
+`0x0ca7432339C86ab01118f46D847A11EF94CB4BAA`
+
+Source SHA256:
+
+`67af44ce57eb4c672b156372c7fd042a0896d24794b788c897915b7f7993a4d0`
+
+The proof consumes the canonical Ethereum source-adapter digest from run `36604750863`, prevents chain+transaction replay across intents, enforces confirmation thresholds, provides a reorg dispute/refund path for shallow proofs, refunds expired unproven intents and deterministically settles GEN escrow after proof finality. The trust model is explicit: the sponsor chooses the relayer; this is not a token bridge and the settlement contract does not independently query Ethereum.
+
 ## Verified production surface
 
 Provenance feature verification commit:
@@ -137,6 +151,7 @@ Provenance feature verification commit:
 - Reviewer mode: https://resolvegraph-genlayer.vercel.app/reviewer
 - Source adapters: https://resolvegraph-genlayer.vercel.app/adapters
 - Bounded appeals: https://resolvegraph-genlayer.vercel.app/appeals
+- Cross-chain conditioned settlement: https://resolvegraph-genlayer.vercel.app/cross-chain
 - Proof: https://resolvegraph-genlayer.vercel.app/proof
 - Health JSON: https://resolvegraph-genlayer.vercel.app/api/health
 - Verification JSON: https://resolvegraph-genlayer.vercel.app/verification-status.json

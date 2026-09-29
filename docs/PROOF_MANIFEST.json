@@ -1,7 +1,7 @@
 {
   "schema": "resolvegraph-proof-v1",
   "status": "LIVE_VERIFIED",
-  "verified_at": "2026-09-29T17:32:14Z",
+  "verified_at": "2026-09-29T17:47:02Z",
   "scope": {
     "project": "ResolveGraph — Multi-Agent Workflow Settlement",
     "network": "GenLayer Studionet"
@@ -9,14 +9,14 @@
   "canonical_commit": "43b1fc9c02a54b1859a84116121b0a287513730b",
   "direct_tests": {
     "status": "PASS",
-    "count": 89
+    "count": 97
   },
   "lint": {
     "genvm": "PASS"
   },
   "sdk": {
     "status": "PASS",
-    "tests": 14
+    "tests": 18
   },
   "frontend": {
     "typecheck": "PASS",
@@ -277,5 +277,36 @@
       "bond/reward fields",
       "transaction explorer timeline"
     ]
+  },
+  "cross_chain_conditioned_settlement": {
+    "status": "LIVE_VERIFIED",
+    "run_id": 36606957197,
+    "contract": "0x0ca7432339C86ab01118f46D847A11EF94CB4BAA",
+    "policy_version": "RG_XCHAIN_RELAYER_V1",
+    "source_sha256": "67af44ce57eb4c672b156372c7fd042a0896d24794b788c897915b7f7993a4d0",
+    "deployed_source_match": true,
+    "intent_id": "rg-xchain-mainnet-proof-v1",
+    "final_status": "SETTLED",
+    "source_chain_id": 1,
+    "source_tx": "0x85d995eba9763907fdf35cd2034144dd9d53ce32cbec21349d4b12823c6860c5",
+    "source_adapter_run_id": 36604750863,
+    "source_adapter_digest": "702b57448a292ae70ec6d7eb7ff11527df7d2391624ec78a919def40ac60133e",
+    "guarantees": [
+      "sponsor-selected per-intent relayer",
+      "global source-chain plus transaction replay guard",
+      "minimum confirmation threshold",
+      "15-minute reorg dispute window for shallow proofs",
+      "deep-confirmation immediate finality",
+      "expired unproven sponsor refund",
+      "reorged proof sponsor refund",
+      "deterministic GEN escrow settlement"
+    ],
+    "trust_boundary": {
+      "token_bridge_claimed": false,
+      "contract_queries_ethereum_directly": false,
+      "relayer_attestation_required": true,
+      "source_adapter_verifies_public_ethereum_data": true,
+      "canonical_v1_unchanged": true
+    }
   }
 }

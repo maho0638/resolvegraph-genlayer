@@ -58,7 +58,7 @@
   },
   "direct_tests": {
     "status": "PASS",
-    "count": 89
+    "count": 97
   },
   "source_adapters": {
     "status": "E2E_VERIFIED",
@@ -83,5 +83,23 @@
     "status": "IMPLEMENTED",
     "wallet_required": false,
     "canonical_cases": 2
+  },
+  "sdk": {
+    "status": "PASS",
+    "tests": 18
+  },
+  "cross_chain_conditioned_settlement": {
+    "status": "LIVE_VERIFIED",
+    "run_id": 36606957197,
+    "contract": "0x0ca7432339C86ab01118f46D847A11EF94CB4BAA",
+    "policy_version": "RG_XCHAIN_RELAYER_V1",
+    "source_sha256": "67af44ce57eb4c672b156372c7fd042a0896d24794b788c897915b7f7993a4d0",
+    "source_match": true,
+    "intent": "rg-xchain-mainnet-proof-v1",
+    "final_status": "SETTLED",
+    "source_adapter_run_id": 36604750863,
+    "bridge_claimed": false,
+    "relayer_attestation_required": true,
+    "production_v1_unchanged": true
   }
 }
