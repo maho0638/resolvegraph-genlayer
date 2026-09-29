@@ -134,12 +134,15 @@ export default function Home() {
 
       <section className="grid2 section">
         <article className="card">
-          <h3>Portable agent references</h3>
+          <h3>Signed delivery provenance</h3>
           <p>
-            Each step can carry an ERC-8004-style registry reference, agent ID
-            and A2A endpoint. ResolveGraph treats these as references, not
-            identity proof by themselves.
+            A GitHub adapter can bind the on-chain assignee, wallet signature,
+            frozen step policy, GitHub account, immutable commit SHA, expiry and
+            an owner-controlled gist challenge into one portable verification receipt.
           </p>
+          <Link className="textLink" href="/provenance">
+            Open provenance verifier →
+          </Link>
         </article>
         <article className="card">
           <h3>Decision-bound evidence manifests</h3>
