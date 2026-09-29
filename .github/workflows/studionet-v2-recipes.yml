@@ -1,0 +1,35 @@
+name: ResolveGraph V2 Recipe Registry Proof
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/resolvegraph-v2-recipe-proof.trigger"
+
+jobs:
+  live-v2-recipe-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.txt
+      - name: Install source verifier dependency
+        working-directory: scripts
+        run: npm install
+      - name: Lint V2 contract
+        run: genvm-lint check contracts/resolve_graph_v2.py
+      - name: Pin V2 contract source hash
+        run: sha256sum contracts/resolve_graph_v2.py
+      - name: Run immutable recipe registry proof
+        run: gltest tests/integration/test_resolvegraph_v2_recipes_studionet.py -v -s --network studionet
+      - name: Verify deployed V2 source equals repository source
+        run: |
+          CONTRACT_ADDRESS="$(cat artifacts/resolvegraph-v2-live-address.txt)" \
+          CONTRACT_SOURCE_PATH="contracts/resolve_graph_v2.py" \
+          node scripts/verify-deployed-source.mjs
