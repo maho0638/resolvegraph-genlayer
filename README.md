@@ -49,7 +49,7 @@ Promotion order:
 
 - Direct tests: **68/68 PASS**
 - GenVM lint: **PASS**
-- SDK tests: **11/11 PASS**
+- SDK tests: **14/14 PASS**
 - Frontend typecheck/build: **PASS**
 - Canonical Studionet lifecycle run: **36545373155 — SUCCESS**
 - Canonical contract: `0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754`
@@ -58,12 +58,13 @@ Promotion order:
 - Final challenged failure attribution: **EXTERNAL**
 - Deployed source equality: **true**
 - Production URL: https://resolvegraph-genlayer.vercel.app
-- Production CI: **36568432075 — SUCCESS**
-- Production smoke: **36569042701 — SUCCESS**
-- Verified production commit: `94a61f7f4401eb84f321e13136404dd028279c5c`
+- Provenance feature CI: **36572374200 — SUCCESS**
+- Provenance feature production smoke: **36572844244 — SUCCESS**
+- Signed GitHub provenance verifier: wallet ↔ on-chain assignee ↔ frozen step policy ↔ GitHub account ↔ immutable commit SHA ↔ owner-controlled gist challenge.
+- Provenance feature verification commit: `5da51a7647dae310c551f4afcce49ea4c7e0b802`
 
 ## Status
 
 **LIVE_VERIFIED — SUBMISSION READY**
 
-The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable release record.
+The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable release record. The GitHub provenance adapter is an external verification receipt and does not modify the existing Studionet settlement contract.
