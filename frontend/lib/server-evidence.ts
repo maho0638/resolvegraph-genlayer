@@ -215,3 +215,37 @@ export async function captureEvidenceSource(args: {
     },
   };
 }
+
+
+export async function inspectPublicArtifact(
+  urlValue: string,
+  expectedSha256?: string,
+) {
+  const fetched = await fetchBounded(urlValue);
+  const contentHash = createHash("sha256").update(fetched.bytes).digest("hex");
+  const expected = expectedSha256?.trim().toLowerCase() || "";
+  if (expected && !/^[a-f0-9]{64}$/.test(expected)) {
+    throw new Error("Expected SHA-256 must be 64 lowercase hex characters.");
+  }
+
+  const body = {
+    schema: "resolvegraph-artifact-adapter-v1",
+    sourceType: "ARTIFACT",
+    sourceUrl: fetched.finalUrl,
+    contentType: fetched.contentType,
+    byteLength: fetched.bytes.byteLength,
+    immutableRefKind: "SHA256",
+    immutableRef: contentHash,
+    contentHash,
+    expectedSha256: expected || null,
+    expectedHashMatches: expected ? expected === contentHash : null,
+    fetchedAt: Math.floor(Date.now() / 1000),
+  };
+
+  return {
+    ...body,
+    adapterDigest: createHash("sha256")
+      .update(JSON.stringify(body))
+      .digest("hex"),
+  };
+}
