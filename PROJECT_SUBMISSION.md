@@ -37,6 +37,7 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - per-workflow case room with challenge decision lineage;
 - participant settlement ledger;
 - TypeScript SDK and portable receipt API;
+- signed GitHub delivery provenance verifier and portable provenance receipt;
 - typed decision-bound evidence manifest API;
 - reviewer proof page;
 - automated production smoke workflow.
@@ -46,7 +47,7 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - Predeploy CI run: `36545373008` — **SUCCESS**.
 - Direct tests: **68/68 PASS**.
 - GenVM lint: **PASS**.
-- SDK tests: **11/11 PASS**.
+- SDK tests: **14/14 PASS**.
 - Frontend typecheck/build: **PASS**.
 - Canonical Studionet run: `36545373155` — **SUCCESS**.
 - Contract: `0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754`.
@@ -56,19 +57,20 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - Normalized deployed source SHA256: `f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb`.
 - Normalized repository source SHA256: `f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb`.
 - Deployed-source equality: **true**.
-- Verified production commit: `94a61f7f4401eb84f321e13136404dd028279c5c`.
-- Production CI run: `36568432075` — **SUCCESS**.
-- Production smoke run: `36569042701` — **SUCCESS**.
-- Smoke coverage includes overview, Explorer, operator console, recipes, participant ledger, developer page, proof page, canonical case room, logo asset, health API, workflow API, step API, participant API, portable receipt, evidence manifest, canonical success/failure state and public verification snapshot.
+- Provenance feature verification commit: `5da51a7647dae310c551f4afcce49ea4c7e0b802`.
+- Provenance feature CI run: `36572374200` — **SUCCESS**.
+- Provenance feature production smoke run: `36572844244` — **SUCCESS**.
+- Smoke coverage includes overview, Explorer, operator console, recipes, participant ledger, provenance verifier, developer page, proof page, canonical case room, logo asset, health API, workflow API, step API, participant API, portable receipt, evidence manifest, provenance endpoint validation, canonical success/failure state and public verification snapshot.
 
 Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.
 
 ## Explicit trust boundaries
 
 - ERC-8004-style references and A2A endpoints are metadata references, not identity proof.
+- The GitHub provenance adapter independently verifies the on-chain assignee wallet signature, frozen step-policy digest, GitHub commit association and owner-controlled gist challenge. It emits an external receipt; it does not alter the current contract's payout rules and it does not maintain a global single-use nonce registry.
 - The evidence-manifest digest covers contract-stored evidence metadata, bounded snapshots, commitment fields and decision fields. It does **not** claim a byte-level hash of the remote web source.
 - The verified contract is on **GenLayer Studionet**; the frontend is a production web deployment, not a mainnet claim.
-- Cross-chain settlement, signed external identity provenance and a dedicated on-chain recipe registry are not claimed by this release.
+- Cross-chain settlement and a dedicated on-chain recipe registry are not claimed by this release. Signed GitHub provenance is implemented as an external verification layer, not as on-chain settlement enforcement.
 
 ## Release gate
 
