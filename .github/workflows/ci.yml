@@ -28,6 +28,7 @@ jobs:
           genvm-lint check contracts/resolve_graph_v2.py
           genvm-lint check contracts/evidence_registry.py
           genvm-lint check contracts/resolve_graph_v3.py
+          genvm-lint check contracts/cross_chain_settlement.py
       - name: Integration test syntax
         run: |
           python -m py_compile \
@@ -36,7 +37,8 @@ jobs:
             tests/integration/test_resolvegraph_studionet_inspect.py \
             tests/integration/test_resolvegraph_v2_recipes_studionet.py \
             tests/integration/test_resolvegraph_evidence_registry_studionet.py \
-            tests/integration/test_resolvegraph_v3_appeals_studionet.py
+            tests/integration/test_resolvegraph_v3_appeals_studionet.py \
+            tests/integration/test_cross_chain_settlement_studionet.py
       - name: SDK build and tests
         working-directory: sdk
         run: |

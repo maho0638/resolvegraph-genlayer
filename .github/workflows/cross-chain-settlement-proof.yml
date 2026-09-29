@@ -1,0 +1,40 @@
+name: ResolveGraph Cross-Chain Settlement Proof
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/resolvegraph-cross-chain-proof.trigger"
+
+jobs:
+  live-cross-chain-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.txt
+      - name: Install source verifier dependency
+        working-directory: scripts
+        run: npm install
+      - name: Lint cross-chain adapter contract
+        run: genvm-lint check contracts/cross_chain_settlement.py
+      - name: Pin source hash
+        run: sha256sum contracts/cross_chain_settlement.py
+      - name: Run relayer-attested settlement proof
+        run: gltest tests/integration/test_cross_chain_settlement_studionet.py -v -s --network studionet
+      - name: Verify deployed source equals repository source
+        run: |
+          CONTRACT_ADDRESS="$(cat artifacts/resolvegraph-xchain-live-address.txt)" \
+          CONTRACT_SOURCE_PATH="contracts/cross_chain_settlement.py" \
+          node scripts/verify-deployed-source.mjs
+      - name: Upload cross-chain proof artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: resolvegraph-cross-chain-settlement-proof
+          path: artifacts/
