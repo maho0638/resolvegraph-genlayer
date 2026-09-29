@@ -74,7 +74,7 @@ export default function Developers() {
           <a className="apiItem" href="/api/receipt?workflow=rg-live-success-v1" target="_blank" rel="noreferrer">
             <strong>GET /api/receipt</strong><span>portable workflow or step adjudication receipt</span>
           </a>
-          <a className="apiItem" href="/api/evidence?workflow=rg-live-success-v1&step=source-proof" target="_blank" rel="noreferrer">
+          <a className="apiItem" href="/api/evidence?workflow=rg-live-success-v1&step=source-check" target="_blank" rel="noreferrer">
             <strong>GET /api/evidence</strong><span>typed decision-bound evidence manifest</span>
           </a>
         </div>
