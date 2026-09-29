@@ -62,6 +62,7 @@ jobs:
           check_page "/" "ResolveGraph"
           check_page "/explorer" "Public Explorer"
           check_page "/operate" "Operator Console"
+          check_page "/recipes" "Workflow Recipes"
           check_page "/participants" "Participant Ledger"
           check_page "/developers" "Developer Surface"
           check_page "/proof" "Reviewer Proof"
@@ -128,6 +129,36 @@ jobs:
           assert data["schema"] == "resolvegraph-receipt-v1"
           assert data["outcome"] == "COMPLETED"
           print("receipt ok")
+          PY
+
+          step="$(curl -fsSL --retry 3 "$BASE_URL/api/step?workflow=rg-live-success-v1&step=source-check")"
+          STEP_JSON="$step" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["STEP_JSON"])
+          assert data["schema"] == "resolvegraph-step-v1"
+          assert data["step"]["status"] == "PAID"
+          print("step api ok")
+          PY
+
+          participant="$(curl -fsSL --retry 3 "$BASE_URL/api/participant?address=0xAEF841f024cC86d952f27486480b1109244676f3")"
+          PARTICIPANT_JSON="$participant" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["PARTICIPANT_JSON"])
+          assert data["schema"] == "resolvegraph-participant-v1"
+          assert int(data["stats"]["steps_accepted"]) >= 1
+          print("participant api ok")
+          PY
+
+          evidence="$(curl -fsSL --retry 3 "$BASE_URL/api/evidence?workflow=rg-live-success-v1&step=source-check")"
+          EVIDENCE_JSON="$evidence" python - <<'PY'
+          import json, os, re
+          data = json.loads(os.environ["EVIDENCE_JSON"])
+          assert data["schema"] == "resolvegraph-evidence-manifest-v1"
+          assert data["stepId"] == "source-check"
+          assert data["decision"]["status"] == "PAID"
+          assert data["provenance"]["remoteByteContentHashClaimed"] is False
+          assert re.fullmatch(r"[a-f0-9]{64}", data["manifestDigest"])
+          print("evidence manifest ok")
           PY
 
           verification="$(curl -fsSL --retry 3 "$BASE_URL/verification-status.json")"
