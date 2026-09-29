@@ -310,3 +310,68 @@ export function assertGithubProvenanceFresh(
     throw new Error("Provenance claim expiry cannot exceed seven days.");
   }
 }
+
+
+export type GithubSourceRef =
+  | { kind: "GITHUB_COMMIT"; owner: string; repo: string; sha: string }
+  | { kind: "GITHUB_PR"; owner: string; repo: string; number: number }
+  | { kind: "GITHUB_CI"; owner: string; repo: string; runId: number };
+
+export function parseGithubSourceUrl(value: string): GithubSourceRef {
+  const url = new URL(value);
+  if (
+    url.protocol !== "https:" ||
+    url.hostname.toLowerCase() !== "github.com" ||
+    url.username ||
+    url.password
+  ) {
+    throw new Error("Source must be a canonical HTTPS github.com URL.");
+  }
+
+  const parts = url.pathname.split("/").filter(Boolean);
+  if (parts.length === 4 && parts[2] === "commit") {
+    const sha = parts[3].toLowerCase();
+    if (!/^[a-f0-9]{40}$/.test(sha)) {
+      throw new Error("GitHub commit URL must contain a full 40-character SHA.");
+    }
+    return { kind: "GITHUB_COMMIT", owner: parts[0], repo: parts[1], sha };
+  }
+
+  if (parts.length === 4 && parts[2] === "pull") {
+    const number = Number(parts[3]);
+    if (!Number.isSafeInteger(number) || number < 1) {
+      throw new Error("GitHub pull request number is invalid.");
+    }
+    return { kind: "GITHUB_PR", owner: parts[0], repo: parts[1], number };
+  }
+
+  if (
+    parts.length === 5 &&
+    parts[2] === "actions" &&
+    parts[3] === "runs"
+  ) {
+    const runId = Number(parts[4]);
+    if (!Number.isSafeInteger(runId) || runId < 1) {
+      throw new Error("GitHub Actions run ID is invalid.");
+    }
+    return { kind: "GITHUB_CI", owner: parts[0], repo: parts[1], runId };
+  }
+
+  throw new Error(
+    "Supported GitHub sources are commit, pull request and Actions run URLs.",
+  );
+}
+
+export function normalizeEthereumTxRef(
+  chainId: number,
+  txHash: string,
+): { chainId: 1 | 11155111; txHash: `0x${string}` } {
+  if (chainId !== 1 && chainId !== 11155111) {
+    throw new Error("Supported chain IDs are 1 and 11155111.");
+  }
+  const clean = txHash.trim().toLowerCase();
+  if (!/^0x[a-f0-9]{64}$/.test(clean)) {
+    throw new Error("Ethereum transaction hash must be 32-byte 0x hex.");
+  }
+  return { chainId, txHash: clean as `0x${string}` };
+}
