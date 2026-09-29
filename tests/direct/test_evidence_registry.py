@@ -137,7 +137,7 @@ def test_challenge_round_creates_distinct_digest(direct_vm, direct_deploy, direc
 def test_git_commit_requires_full_sha(direct_vm, direct_deploy, direct_alice):
     contract = direct_deploy("contracts/evidence_registry.py")
     direct_vm.sender = direct_alice
-    with direct_vm.expect_revert("40"):
+    with direct_vm.expect_revert("invalid length"):
         contract.register_evidence(
             SUBJECT,
             WORKFLOW,
