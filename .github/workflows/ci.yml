@@ -22,7 +22,10 @@ jobs:
           node-version: "22"
       - run: pip install -r requirements.txt
       - run: pytest tests/direct -v
-      - run: genvm-lint check contracts/resolve_graph.py
+      - name: GenVM lint contracts
+        run: |
+          genvm-lint check contracts/resolve_graph.py
+          genvm-lint check contracts/resolve_graph_v2.py
       - name: Integration test syntax
         run: |
           python -m py_compile \
