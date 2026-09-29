@@ -64,8 +64,10 @@ export async function walletClient() {
   return { client, account: accounts[0] as string };
 }
 
-export async function sendWrite(request: WriteRequest) {
-  const address = contractAddress();
+export async function sendWriteAt(
+  address: `0x${string}`,
+  request: WriteRequest,
+) {
   const { client } = await walletClient();
 
   const estimate = await client.estimateTransactionFeesForWrite({
@@ -108,6 +110,10 @@ export async function sendWrite(request: WriteRequest) {
   }
 
   return hash as string;
+}
+
+export async function sendWrite(request: WriteRequest) {
+  return sendWriteAt(contractAddress(), request);
 }
 
 export async function readContract(
