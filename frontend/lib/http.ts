@@ -1,5 +1,11 @@
-export async function fetchJson<T>(url: string): Promise<T> {
-  const response = await fetch(url, { cache: "no-store" });
+export async function fetchJson<T>(
+  url: string,
+  init?: RequestInit,
+): Promise<T> {
+  const response = await fetch(url, {
+    cache: "no-store",
+    ...init,
+  });
   let body: any = null;
   try {
     body = await response.json();
