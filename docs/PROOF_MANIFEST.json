@@ -1,16 +1,101 @@
 {
   "schema": "resolvegraph-proof-v1",
-  "status": "DEVELOPMENT",
+  "status": "STUDIONET_VERIFIED",
+  "verified_at": "2026-09-29T09:01:42Z",
   "scope": {
     "project": "ResolveGraph — Multi-Agent Workflow Settlement",
-    "network": null
+    "network": "GenLayer Studionet"
   },
-  "direct_tests": null,
-  "lint": null,
-  "sdk": null,
-  "frontend": null,
-  "studionet": null,
-  "source_hash": null,
-  "production": null,
+  "canonical_commit": "43b1fc9c02a54b1859a84116121b0a287513730b",
+  "direct_tests": {
+    "status": "PASS",
+    "count": 68
+  },
+  "lint": {
+    "genvm": "PASS"
+  },
+  "sdk": {
+    "status": "PASS",
+    "tests": 11
+  },
+  "frontend": {
+    "typecheck": "PASS",
+    "production_build": "PASS"
+  },
+  "canonical_ci": {
+    "run_id": 36545373008,
+    "status": "SUCCESS",
+    "commit": "43b1fc9c02a54b1859a84116121b0a287513730b"
+  },
+  "studionet": {
+    "run_id": 36545373155,
+    "status": "SUCCESS",
+    "contract": "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754",
+    "identities": {
+      "mode": "deterministic-public-studionet-only",
+      "sponsor": "0x47E835f09b64776EDAb974276E30b23060Cf999e",
+      "agent_a": "0xAEF841f024cC86d952f27486480b1109244676f3",
+      "agent_b": "0x7159c51097FD38eaE9dc2e72486B2de55D84829c"
+    },
+    "success_workflow": {
+      "id": "rg-live-success-v1",
+      "final_status": "COMPLETED",
+      "step_1_final_decision_hash": "7e7f81ae864920b34fe87674f73ec3b0c750db653d8d45e73cd949d24cea46e4",
+      "transactions": {
+        "create": "0x024d7e8df56be71e98743c432f102371c40fa627b7875ff13d4375e9518af14f",
+        "add_step_1": "0x4e4b65aeb96aeb13c86a15a345a04e6ffe877c542b1df0938f758ce31ef46e5a",
+        "add_step_2": "0xcb6440bec18d59aa7974cb7a89fa23898ef451e474d0bbd02bccdf59ed5c4116",
+        "seal": "0x1a2b8fb09e9ee9920b9e93e2891525e1febc08825b0ade3ae807e54502e52bb3",
+        "accept_step_1": "0xb4071e602ae7fc9cea9ff2c7a44451a42ab6adb28a6cfe9b6f1cda960f1da761",
+        "accept_step_2": "0x5d563f6b3b977742938b22463ea6cbe7315c0f3e558b3c137ea904454189f25e",
+        "submit_step_1": "0x893ceeef63aaf7e12321f3602ed6ccd02bd9664e08b50a7beee1d0283425bbfd",
+        "resolve_step_1": "0xdd5708b0bdb199fcb1f5ca4daaa5719da3fabc81ffaf9fa8eee2c28d7bcc8d96",
+        "challenge_step_1": "0xac9418d0c2745fb1b7eeeea1552cac9c61a9f6c395942f3fa33ad4cd40204e22",
+        "reresolve_step_1": "0x2104747c3590223b0794c70aa01abcadd9538d5952e7cfeadc6caa2dfec80227",
+        "settle_step_1": "0xf011b02d1cf3f076b03a63e2369604064130e4ea39a796d4d3d27568e5d4295f",
+        "submit_step_2": "0x5d6ef489983e5ca6de750427ce07bbbd54a80e07bae7bde461e56e61c0d34d68",
+        "resolve_step_2": "0xa8bf780a01943c3b7f9659508504a10de87464acafdfa9352c2c1447d8003f8c",
+        "challenge_step_2": "0x31a0bd3d840245075635b456bb406d853bb13c73289b93c2b3f9c316c3e317da",
+        "reresolve_step_2": "0xebeb4809eaed0732105ac93bada82128b437800244b4bbffa84f9b18a0d5df44",
+        "settle_step_2": "0xdc751736766d2a1525eb13c08a7f58f70c17f41626773267932a5b323f071bc7",
+        "complete": "0xf9e3dd65b91e38117a7e8644239f743fe0e5993fd889ae1023362fbeddeb0cf5"
+      }
+    },
+    "failure_workflow": {
+      "id": "rg-live-failure-v1",
+      "step_id": "api-proof",
+      "initial_verdict": "FAIL",
+      "initial_attribution": {
+        "fault_class": "PARTICIPANT",
+        "fault_step": "api-proof",
+        "confidence": 97
+      },
+      "attribution_challenged": true,
+      "final_status": "FAILED_SETTLED",
+      "final_fault_class": "EXTERNAL",
+      "final_fault_step": "",
+      "final_decision_hash": "e1d87201e5b70ab509cb03ea6bc3979b178af0e9f3c3744d61ff456ed6bb537c",
+      "transactions": {
+        "create": "0xa53601662b0c464fdfb0124fb73878097b3339baa521de3114dc6e8696889f99",
+        "add_step": "0xc50be8fdd082ba761fbd3076fd3b882e7d2f506a0eeccb9d1b461916b27ebbe7",
+        "submit": "0x69676427d0b03f5a1e19cb9a3c0ecea5a2fdc37038e91c68205b61c732f0cddb",
+        "initial_resolve": "0x49be48376f28e4d13b181f930730e8bf09868add51b529b6ba891f3bfa93498e",
+        "challenge_reresolve": "0xbea4e2a16436bb3a46f9c104220613955cdac42063ba8546993482e125e484bb",
+        "attribute_failure": "0x2d5a71b2ec56c0910a39967bd65d4ab579ec319786c3df15b4969370ea7c111d",
+        "challenge_attribution": "0x974ef192212b615cd45e8031db265e38f0627242f730d1055e657adde527ca38",
+        "reresolve_attribution": "0xcd2606df400716036c8dbfa88d8c869fa42cd8d66da4a1e13906411a3f9f6cb2",
+        "settle_failed_workflow": "0x5c304469825e36a9e6097cdda4711533052240e33129eaadfc39f5c9c6b2e63c"
+      }
+    }
+  },
+  "source_hash": {
+    "raw_repository_sha256": "5ad50abedcb329d3c64a3a018344305b0282113712396a1d5ba816e82dc66727",
+    "normalized_repository_sha256": "f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb",
+    "normalized_deployed_sha256": "f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb",
+    "deployed_source_match": true
+  },
+  "production": {
+    "status": "PENDING_FINAL_CONTROLLED_VERCEL_DEPLOY"
+  },
   "submission_ready": false
 }
