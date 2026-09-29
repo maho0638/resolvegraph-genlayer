@@ -77,6 +77,9 @@ export default function Developers() {
           <a className="apiItem" href="/api/evidence?workflow=rg-live-success-v1&step=source-check" target="_blank" rel="noreferrer">
             <strong>GET /api/evidence</strong><span>typed decision-bound evidence manifest</span>
           </a>
+          <a className="apiItem" href="/provenance?workflow=rg-live-success-v1&step=source-check">
+            <strong>POST /api/provenance/github</strong><span>wallet ↔ GitHub ↔ immutable commit ↔ on-chain step verification</span>
+          </a>
         </div>
       </section>
 
@@ -91,11 +94,14 @@ export default function Developers() {
           </p>
         </article>
         <article className="card">
-          <h3>Interoperability boundary</h3>
+          <h3>Identity / provenance boundary</h3>
           <p>
-            ERC-8004 and A2A identifiers are references. ResolveGraph does not
-            claim identity authenticity merely because a caller supplied a
-            string. Signed identity/provenance adapters remain a separate trust layer.
+            ERC-8004 and A2A identifiers remain metadata references. The GitHub
+            provenance adapter adds a separate verifiable chain: the on-chain
+            assignee signs a scope- and expiry-bound message, GitHub must
+            associate the claimed account with the immutable commit, and an
+            owner-controlled gist must bind the exact claim digest. This is an
+            external verification receipt, not a change to contract settlement.
           </p>
         </article>
       </section>
