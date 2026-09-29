@@ -42,7 +42,7 @@ export default function Home() {
       </section>
 
       <section className="proofStrip" aria-label="Verified release facts">
-        <div><strong>68/68</strong><span>direct tests</span></div>
+        <div><strong>80/80</strong><span>direct tests</span></div>
         <div><strong>14/14</strong><span>SDK tests</span></div>
         <div><strong>2</strong><span>canonical live lifecycles</span></div>
         <div><strong>TRUE</strong><span>deployed source match</span></div>
@@ -145,12 +145,15 @@ export default function Home() {
           </Link>
         </article>
         <article className="card">
-          <h3>Decision-bound evidence manifests</h3>
+          <h3>Immutable typed evidence history</h3>
           <p>
-            Every settled step can be exported as a typed JSON manifest containing
-            contract-stored evidence URLs, bounded snapshots, commitment fields,
-            decision lineage and a deterministic manifest digest.
+            Each step can expose contract snapshots, round-by-round archive
+            records, remote-byte SHA-256 captures, source/MIME type, author,
+            immutable reference, rubric relation and decision lineage.
           </p>
+          <Link className="textLink" href="/evidence?workflow=rg-live-success-v1&step=source-check">
+            Inspect evidence archive →
+          </Link>
         </article>
       </section>
     </>

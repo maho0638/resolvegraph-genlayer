@@ -1,7 +1,7 @@
 {
   "schema": "resolvegraph-proof-v1",
   "status": "LIVE_VERIFIED",
-  "verified_at": "2026-09-29T15:16:51Z",
+  "verified_at": "2026-09-29T16:33:30Z",
   "scope": {
     "project": "ResolveGraph — Multi-Agent Workflow Settlement",
     "network": "GenLayer Studionet"
@@ -9,7 +9,7 @@
   "canonical_commit": "43b1fc9c02a54b1859a84116121b0a287513730b",
   "direct_tests": {
     "status": "PASS",
-    "count": 74
+    "count": 80
   },
   "lint": {
     "genvm": "PASS"
@@ -174,5 +174,50 @@
       "step state stores recipe id, version and hash",
       "canonical V1 settlement deployment remains unchanged"
     ]
+  },
+  "evidence_archive": {
+    "status": "LIVE_VERIFIED",
+    "run_id": 36598129489,
+    "contract": "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390",
+    "source_sha256": "8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472",
+    "deployed_source_match": true,
+    "schema": "resolvegraph-evidence-archive-v1",
+    "manifest_schema": "resolvegraph-evidence-manifest-v2",
+    "canonical_subject": {
+      "contract": "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754",
+      "workflow_id": "rg-live-success-v1",
+      "step_id": "source-check",
+      "records": [
+        {
+          "round": 1,
+          "role": "PRIMARY",
+          "digest": "21218dd5bc60f3a89e0de8f4bcc29b5fd90b9ff543aceae74a343c6253e76f46"
+        },
+        {
+          "round": 1,
+          "role": "SUPPORT",
+          "digest": "a713c7456add7d374facc99ac941332a79840ffaf4dd57de957cda74ca4b6845"
+        },
+        {
+          "round": 2,
+          "role": "CHALLENGE",
+          "digest": "0ee972d915140461f2cf392ebf133dd327811a58d0286faedc1eb6000e47ddcc"
+        }
+      ]
+    },
+    "guarantees": [
+      "typed source and evidence role",
+      "MIME type and SHA-256 remote-byte capture metadata",
+      "immutable reference and author field",
+      "rubric relation and fetch timestamp",
+      "publisher identity and immutable round/role slot",
+      "challenge evidence produces a distinct archive digest",
+      "production capture endpoint blocks private-network SSRF targets and caps response bytes"
+    ],
+    "trust_boundary": {
+      "registry_fetches_remote_bytes": false,
+      "registry_records_publisher": true,
+      "capture_endpoint_fetches_remote_bytes": true
+    }
   }
 }

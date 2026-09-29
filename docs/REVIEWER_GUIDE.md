@@ -19,17 +19,19 @@ Production: https://resolvegraph-genlayer.vercel.app
 7. `tests/integration/test_resolvegraph_studionet.py` — canonical live success/failure proof.
 8. `tests/integration/test_resolvegraph_studionet_resume.py` — state-aware continuation for interrupted consensus transactions.
 9. `tests/integration/test_resolvegraph_v2_recipes_studionet.py` — live V2 registry proof.
-10. `sdk/` — integration helpers and portable receipt.
-11. `schemas/evidence-manifest.schema.json` — typed evidence-manifest surface.
-12. `schemas/github-provenance.schema.json` — portable signed GitHub provenance receipt schema.
-13. `frontend/app/provenance/` + `frontend/app/api/provenance/github/` — wallet/GitHub/commit provenance flow.
-14. `frontend/` — builder, recipes, Explorer, operator console, case room, APIs and proof page.
-15. `.github/workflows/production-smoke.yml` — production verification.
-16. `docs/PROOF_MANIFEST.json` — canonical transaction-level and release evidence.
+10. `contracts/evidence_registry.py` + `tests/direct/test_evidence_registry.py` — append-only typed evidence archive and immutable round/role slots.
+11. `tests/integration/test_resolvegraph_evidence_registry_studionet.py` — live evidence archive and source-equality proof.
+12. `sdk/` — integration helpers and portable receipt.
+13. `schemas/evidence-manifest.schema.json` + `schemas/evidence-manifest-v2.schema.json` — legacy and current evidence-manifest surfaces.
+14. `schemas/github-provenance.schema.json` — portable signed GitHub provenance receipt schema.
+15. `frontend/app/provenance/` + `frontend/app/api/provenance/github/` — wallet/GitHub/commit provenance flow.
+16. `frontend/` — builder, recipes, Explorer, operator console, case room, APIs and proof page.
+17. `.github/workflows/production-smoke.yml` — production verification.
+18. `docs/PROOF_MANIFEST.json` — canonical transaction-level and release evidence.
 
 ## Verified deterministic gate
 
-- 74/74 direct tests PASS.
+- 80/80 direct tests PASS.
 - GenVM lint PASS.
 - 14/14 SDK tests PASS.
 - Frontend typecheck PASS.
@@ -71,6 +73,20 @@ V2 source SHA256:
 
 The run registered software-delivery, research-verification and service-sla v1 policies, instantiated all three in one workflow, verified every step retained the expected recipe hash, sealed the workflow ACTIVE, and proved deployed-source equality.
 
+## Verified typed evidence archive
+
+Studionet run: `36598129489` — SUCCESS.
+
+Evidence registry:
+
+`0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390`
+
+Evidence registry source SHA256:
+
+`8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472`
+
+The proof archived PRIMARY and SUPPORT evidence for decision round 1 and fresh CHALLENGE evidence for round 2 of `rg-live-success-v1/source-check`. Every record stores source type, MIME type, SHA-256 content hash, immutable reference, author field, rubric relation, fetch time, publisher and a content-addressed archive digest. Deployed-source equality is true.
+
 ## Verified production surface
 
 Provenance feature verification commit:
@@ -91,10 +107,11 @@ Provenance feature verification commit:
 - Failure case: https://resolvegraph-genlayer.vercel.app/workflows/rg-live-failure-v1
 - Provenance verifier: https://resolvegraph-genlayer.vercel.app/provenance
 - Recipes / V2 registry proof: https://resolvegraph-genlayer.vercel.app/recipes
+- Evidence archive / drift review: https://resolvegraph-genlayer.vercel.app/evidence?workflow=rg-live-success-v1&step=source-check
 - Proof: https://resolvegraph-genlayer.vercel.app/proof
 - Health JSON: https://resolvegraph-genlayer.vercel.app/api/health
 - Verification JSON: https://resolvegraph-genlayer.vercel.app/verification-status.json
 
 ## Boundaries
 
-Do not interpret agent registry/A2A strings as authenticated identity. The GitHub provenance adapter adds a separate signed verification chain that binds the on-chain assignee to a GitHub account and immutable commit through an owner-controlled gist challenge, but it is not enforced by the current settlement contract and it does not provide a global single-use nonce registry. Do not interpret the evidence-manifest digest as a byte-level hash of remote web content.
+Do not interpret agent registry/A2A strings as authenticated identity. The GitHub provenance adapter adds a separate signed verification chain that binds the on-chain assignee to a GitHub account and immutable commit through an owner-controlled gist challenge, but it is not enforced by the current settlement contract and it does not provide a global single-use nonce registry. Evidence manifest v2 clearly separates bounded contract snapshots, current server-side byte capture, and publisher-anchored immutable archive records; the archive contract does not independently fetch the web source.

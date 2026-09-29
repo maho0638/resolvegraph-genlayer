@@ -39,14 +39,14 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - participant settlement ledger;
 - TypeScript SDK and portable receipt API;
 - signed GitHub delivery provenance verifier and portable provenance receipt;
-- typed decision-bound evidence manifest API;
+- typed evidence manifest v2, bounded remote-byte capture, immutable Studionet evidence archive and drift-review UI;
 - reviewer proof page;
 - automated production smoke workflow.
 
 ## Canonical verification
 
 - Predeploy CI run: `36545373008` — **SUCCESS**.
-- Direct tests: **74/74 PASS**.
+- Direct tests: **80/80 PASS**.
 - GenVM lint: **PASS**.
 - SDK tests: **14/14 PASS**.
 - Frontend typecheck/build: **PASS**.
@@ -66,6 +66,11 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - V2 source SHA256: `2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673`.
 - V2 deployed-source equality: **true**.
 - V2 live workflow `rg-v2-live-recipe-v1`: **ACTIVE**, with software-delivery, research-verification and service-sla steps each bound to its immutable recipe hash.
+- Typed evidence registry Studionet run: `36598129489` — **SUCCESS**.
+- Evidence registry: `0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390`.
+- Evidence registry source SHA256: `8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472`.
+- Evidence registry deployed-source equality: **true**.
+- Canonical archive proof: `rg-live-success-v1/source-check` has round-1 PRIMARY/SUPPORT and round-2 CHALLENGE archive records with distinct content-addressed digests.
 - Smoke coverage includes overview, Explorer, operator console, recipes, participant ledger, provenance verifier, developer page, proof page, canonical case room, logo asset, health API, workflow API, step API, participant API, portable receipt, evidence manifest, provenance endpoint validation, canonical success/failure state and public verification snapshot.
 
 Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.
@@ -74,7 +79,7 @@ Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.
 
 - ERC-8004-style references and A2A endpoints are metadata references, not identity proof.
 - The GitHub provenance adapter independently verifies the on-chain assignee wallet signature, frozen step-policy digest, GitHub commit association and owner-controlled gist challenge. It emits an external receipt; it does not alter the current contract's payout rules and it does not maintain a global single-use nonce registry.
-- The evidence-manifest digest covers contract-stored evidence metadata, bounded snapshots, commitment fields and decision fields. It does **not** claim a byte-level hash of the remote web source.
+- Evidence manifest v2 distinguishes contract snapshots from remote-byte captures. The capture API performs a bounded public-HTTPS fetch and computes SHA-256; the evidence-registry contract makes submitted capture metadata immutable and records its publisher, but the registry contract itself does not fetch the remote bytes. Reviewers can therefore distinguish a byte-capture claim from the publisher that anchored it.
 - The verified contract is on **GenLayer Studionet**; the frontend is a production web deployment, not a mainnet claim.
 - Cross-chain settlement is not claimed by this release. The dedicated on-chain recipe registry is implemented and live-verified in the separate V2 contract; it is not silently substituted for the canonical V1 settlement contract used by the production builder. Signed GitHub provenance remains an external verification layer, not on-chain settlement enforcement.
 

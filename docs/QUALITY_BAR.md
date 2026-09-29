@@ -8,6 +8,7 @@ Required gates:
 - [x] positive, negative, conflict and unavailable-evidence paths;
 - [x] dependency graph tests;
 - [x] immutable V2 recipe registry tests: duplicate rejection, version/hash separation, unknown-hash rejection and frozen step binding;
+- [x] typed evidence registry tests: content-addressed digest, immutable round/role slot, challenge-round separation, typed immutable references and fetch-time validation;
 - [x] role/authorization tests;
 - [x] challenge-window enforcement;
 - [x] validator-disagreement rejection;
@@ -21,6 +22,7 @@ Required gates:
 - [x] frontend typecheck and production build;
 - [x] live Studionet create/fund/accept/submit/resolve/challenge/pay flow;
 - [x] separate V2 Studionet recipe-registry deployment with three registered policies, three recipe-bound steps and deployed-source equality;
+- [x] separate Studionet typed evidence-registry deployment with live remote-byte SHA-256 captures, round-1/round-2 archive lineage and deployed-source equality;
 - [x] live failed-workflow attribution/challenge/settlement flow;
 - [x] deployed-source equality / pinned source hashes;
 - [x] machine-readable proof manifest;
@@ -36,5 +38,7 @@ Verified production evidence:
 - production smoke `36572844244` — SUCCESS.
 
 V2 recipe registry evidence: run `36587816018` — SUCCESS; contract `0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1`; deployed-source equality true.
+
+Typed evidence archive evidence: run `36598129489` — SUCCESS; contract `0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390`; deployed-source equality true.
 
 Target achieved for this release: a complete ecosystem product, not a screenshot/demo submission.

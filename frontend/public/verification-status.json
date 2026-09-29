@@ -45,5 +45,15 @@
     "source_sha256": "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673",
     "source_match": true,
     "production_v1_unchanged": true
+  },
+  "evidence_archive": {
+    "status": "LIVE_VERIFIED",
+    "run_id": 36598129489,
+    "contract": "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390",
+    "source_sha256": "8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472",
+    "source_match": true,
+    "manifest_schema": "resolvegraph-evidence-manifest-v2",
+    "canonical_archived_records": 3,
+    "initial_and_final_archive_digests_differ": true
   }
 }
