@@ -31,7 +31,8 @@ jobs:
           python -m py_compile \
             tests/integration/test_resolvegraph_studionet.py \
             tests/integration/test_resolvegraph_studionet_resume.py \
-            tests/integration/test_resolvegraph_studionet_inspect.py
+            tests/integration/test_resolvegraph_studionet_inspect.py \
+            tests/integration/test_resolvegraph_v2_recipes_studionet.py
       - name: SDK build and tests
         working-directory: sdk
         run: |
