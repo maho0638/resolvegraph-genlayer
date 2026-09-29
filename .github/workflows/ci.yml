@@ -26,13 +26,15 @@ jobs:
         run: |
           genvm-lint check contracts/resolve_graph.py
           genvm-lint check contracts/resolve_graph_v2.py
+          genvm-lint check contracts/evidence_registry.py
       - name: Integration test syntax
         run: |
           python -m py_compile \
             tests/integration/test_resolvegraph_studionet.py \
             tests/integration/test_resolvegraph_studionet_resume.py \
             tests/integration/test_resolvegraph_studionet_inspect.py \
-            tests/integration/test_resolvegraph_v2_recipes_studionet.py
+            tests/integration/test_resolvegraph_v2_recipes_studionet.py \
+            tests/integration/test_resolvegraph_evidence_registry_studionet.py
       - name: SDK build and tests
         working-directory: sdk
         run: |
