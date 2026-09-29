@@ -35,7 +35,7 @@ export default function Proof() {
       <section className="grid3">
         <div className="metric">
           <span>Direct tests</span>
-          <strong>89 / 89 PASS</strong>
+          <strong>97 / 97 PASS</strong>
           <span>V1 graph/economics, V2 recipes and typed evidence archive coverage</span>
         </div>
         <div className="metric">
@@ -54,8 +54,8 @@ export default function Proof() {
         <div className="eyebrow">Verification chain</div>
         <h2>From source to public product</h2>
         <div className="flow verificationFlow">
-          <span>89 direct tests</span><b>→</b>
-          <span>14 SDK tests</span><b>→</b>
+          <span>97 direct tests</span><b>→</b>
+          <span>18 SDK tests</span><b>→</b>
           <span>V1 Studionet lifecycles</span><b>→</b>
           <span>V2 recipe registry</span><b>→</b>
           <span>typed evidence archive</span><b>→</b>
@@ -145,6 +145,23 @@ export default function Proof() {
           <p>A clean external consumer installs the packed SDK and verifies the canonical public workflow through the production API.</p>
           <a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36601714919" target="_blank" rel="noreferrer">proof run 36601714919 · SUCCESS ↗</a>
         </article>
+      </section>
+
+      <section className="panel section emphasisPanel">
+        <div className="eyebrow">Cross-chain conditioned settlement · LIVE VERIFIED</div>
+        <h2>Ethereum proof can condition replay-safe GEN settlement without pretending to be a bridge</h2>
+        <div className="proofFacts">
+          <p><strong>Contract</strong><code>0x0ca7432339C86ab01118f46D847A11EF94CB4BAA</code></p>
+          <p><strong>Policy</strong><code>RG_XCHAIN_RELAYER_V1</code></p>
+          <p><strong>Proof run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36606957197" target="_blank" rel="noreferrer">36606957197 · SUCCESS ↗</a></p>
+          <p><strong>Source adapter proof</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36604750863" target="_blank" rel="noreferrer">36604750863 · SUCCESS ↗</a></p>
+          <p><strong>Source SHA256</strong><code>67af44ce57eb4c672b156372c7fd042a0896d24794b788c897915b7f7993a4d0</code></p>
+          <p><strong>Final intent</strong><code>rg-xchain-mainnet-proof-v1 · SETTLED</code></p>
+        </div>
+        <div className="actions">
+          <Link className="button secondary" href="/cross-chain">Open cross-chain proof</Link>
+          <a className="button secondary" href="/api/cross-chain" target="_blank" rel="noreferrer">Live settlement JSON</a>
+        </div>
       </section>
 
       <section className="grid2 section">

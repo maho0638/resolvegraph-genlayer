@@ -120,6 +120,9 @@ export default function Developers() {
           <a className="apiItem" href="/api/appeals" target="_blank" rel="noreferrer">
             <strong>GET /api/appeals</strong><span>live V3 bounded bonded appeal proof state</span>
           </a>
+          <a className="apiItem" href="/api/cross-chain" target="_blank" rel="noreferrer">
+            <strong>GET /api/cross-chain</strong><span>live replay-safe cross-chain-conditioned settlement intent</span>
+          </a>
           <a className="apiItem" href="/api/reviewer/case?workflow=rg-live-success-v1" target="_blank" rel="noreferrer">
             <strong>GET /api/reviewer/case</strong><span>single-case graph, evidence, decision and transaction timeline</span>
           </a>
@@ -135,6 +138,21 @@ export default function Developers() {
           <a className="apiItem" href="/provenance?workflow=rg-live-success-v1&step=source-check">
             <strong>POST /api/provenance/github</strong><span>wallet ↔ GitHub ↔ immutable commit ↔ on-chain step verification</span>
           </a>
+        </div>
+      </section>
+
+      <section className="panel section">
+        <div className="sectionHead">
+          <div>
+            <div className="eyebrow">Cross-chain conditioned settlement</div>
+            <h2>External-chain facts can gate GEN escrow with explicit relayer trust</h2>
+            <p className="muted">
+              The isolated adapter binds a verified Ethereum transaction digest to a
+              sponsor-selected relayer proof, confirmation threshold, replay guard,
+              reorg dispute path and timeout refund. It does not claim to bridge tokens.
+            </p>
+          </div>
+          <a className="button secondary" href="/cross-chain">Open proof</a>
         </div>
       </section>
 

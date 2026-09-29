@@ -63,6 +63,7 @@ jobs:
           check_page "/explorer" "Public Explorer"
           check_page "/reviewer" "Reviewer Mode"
           check_page "/appeals" "Bounded Bonded Appeals"
+          check_page "/cross-chain" "Cross-Chain Conditioned Settlement"
           check_page "/operate" "Operator Console"
           check_page "/recipes" "Workflow Recipes"
           check_page "/participants" "Participant Ledger"
@@ -168,6 +169,20 @@ jobs:
           assert "9dca5c6c8790600ca6629e4a47eebb3f71374237f1f29732c45c7ef7512942f2" in hashes
           assert data["sourceMatch"] is True
           print("V2 live recipe registry api ok")
+          PY
+
+          xchain="$(curl -fsSL --retry 3 "$BASE_URL/api/cross-chain")"
+          XCHAIN_JSON="$xchain" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["XCHAIN_JSON"])
+          assert data["schema"] == "resolvegraph-cross-chain-settlement-proof-v1"
+          assert data["policyVersion"] == "RG_XCHAIN_RELAYER_V1"
+          assert data["sourceMatch"] is True
+          assert data["live"]["intent"]["status"] == "SETTLED"
+          assert data["live"]["externalTxConsumed"] is True
+          assert data["guarantees"]["externalTxReplayGuard"] is True
+          assert data["trustBoundary"]["bridgeClaimed"] is False
+          print("cross-chain conditioned settlement api ok")
           PY
 
           appeal="$(curl -fsSL --retry 3 "$BASE_URL/api/appeals")"
