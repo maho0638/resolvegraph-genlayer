@@ -5,6 +5,12 @@ import {
   canonicalEvidenceArchivePayload,
   type EvidenceArchiveInput,
 } from "@/lib/evidence-archive";
+import {
+  inspectEthereumTransaction,
+  inspectGithubSource,
+  parseEthereumExplorerUrl,
+  parseGithubSourceUrl,
+} from "@/lib/server-source-adapters";
 
 const MAX_BYTES = 2 * 1024 * 1024;
 const MAX_REDIRECTS = 3;
@@ -171,11 +177,44 @@ export async function captureEvidenceSource(args: {
 }) {
   const fetched = await fetchBounded(args.sourceUrl);
   const contentHash = createHash("sha256").update(fetched.bytes).digest("hex");
-  const github = inferGithubCommit(fetched.finalUrl);
-  const inferredAuthor =
-    htmlAuthor(fetched.bytes, fetched.contentType) ||
+  const metaAuthor = htmlAuthor(fetched.bytes, fetched.contentType);
+  const fallbackAuthor =
+    metaAuthor ||
     args.base.authorHint?.trim() ||
     new URL(fetched.finalUrl).hostname.toLowerCase();
+
+  let sourceType: EvidenceArchiveInput["sourceType"] = "WEB";
+  let immutableRefKind: EvidenceArchiveInput["immutableRefKind"] = "SHA256";
+  let immutableRef = contentHash;
+  let author = fallbackAuthor;
+  let sourceAdapter: any = null;
+
+  if (new URL(fetched.finalUrl).hostname.toLowerCase() === "github.com") {
+    try {
+      parseGithubSourceUrl(fetched.finalUrl);
+      sourceAdapter = await inspectGithubSource(fetched.finalUrl);
+      sourceType = sourceAdapter.sourceType as EvidenceArchiveInput["sourceType"];
+      immutableRefKind =
+        sourceAdapter.immutableRefKind as EvidenceArchiveInput["immutableRefKind"];
+      immutableRef = String(sourceAdapter.immutableRef || contentHash);
+      author = String(
+        sourceAdapter.author || sourceAdapter.actor || fallbackAuthor,
+      );
+    } catch (error: any) {
+      if (!String(error?.message || "").includes("Supported GitHub sources")) {
+        throw error;
+      }
+    }
+  }
+
+  const ethereumRef = parseEthereumExplorerUrl(fetched.finalUrl);
+  if (ethereumRef) {
+    sourceAdapter = await inspectEthereumTransaction(ethereumRef);
+    sourceType = "ETHEREUM_TX";
+    immutableRefKind = "ETH_TX_HASH";
+    immutableRef = ethereumRef.txHash;
+    author = String(sourceAdapter.from || fallbackAuthor);
+  }
 
   const record: EvidenceArchiveInput = {
     subjectContract: args.base.subjectContract,
@@ -183,13 +222,13 @@ export async function captureEvidenceSource(args: {
     stepId: args.base.stepId,
     decisionRound: args.base.decisionRound,
     role: args.base.role,
-    sourceType: github ? "GITHUB_COMMIT" : "WEB",
+    sourceType,
     sourceUrl: fetched.finalUrl,
     contentType: fetched.contentType,
     contentHash,
-    immutableRefKind: github ? "GIT_COMMIT_SHA" : "SHA256",
-    immutableRef: github?.sha || contentHash,
-    author: inferredAuthor.slice(0, 160),
+    immutableRefKind,
+    immutableRef,
+    author: author.slice(0, 160),
     rubricRelation: args.base.rubricRelation,
     fetchedAt: Math.floor(Date.now() / 1000),
   };
@@ -209,9 +248,7 @@ export async function captureEvidenceSource(args: {
         : args.base.authorHint?.trim()
           ? "caller-author-hint"
           : "hostname-fallback",
-      githubCommitParsed: github
-        ? { owner: github.owner, repo: github.repo, sha: github.sha }
-        : null,
+      sourceAdapter,
     },
   };
 }
