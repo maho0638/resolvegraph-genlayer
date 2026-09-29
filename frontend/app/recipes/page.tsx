@@ -1,19 +1,60 @@
 import Link from "next/link";
 import { WORKFLOW_RECIPES, recipeLabel } from "@/lib/recipes";
+import {
+  serverReadV2Recipe,
+  serverV2RecipeContractAddress,
+} from "@/lib/server-genlayer";
 
-const registry = {
-  contract: "0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1",
+const proof = {
   run: "36587816018",
   workflow: "rg-v2-live-recipe-v1",
-  sourceHash: "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673",
-  hashes: {
-    "software-delivery": "200c7cf2a38dd134d815c493795a01c65610648cf701334366eb3ae46acd1e04",
-    "research-verification": "91602e091cce5964d300b3880bee3e5a7862fa4b17d1bac71ba2b3229e4a638f",
-    "service-sla": "9dca5c6c8790600ca6629e4a47eebb3f71374237f1f29732c45c7ef7512942f2",
-  } as Record<string, string>,
+  sourceHash:
+    "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673",
 };
 
-export default function Recipes() {
+function asText(value: unknown) {
+  return String(value ?? "");
+}
+
+async function loadRegistry() {
+  const count = Number(await serverReadV2Recipe("get_recipe_count"));
+  const hashes = await Promise.all(
+    Array.from({ length: count }, (_, index) =>
+      serverReadV2Recipe("get_recipe_hash_by_index", [index]),
+    ),
+  );
+  const recipes = await Promise.all(
+    hashes.map((hash) => serverReadV2Recipe("get_recipe", [hash])),
+  );
+
+  return recipes.map((recipe: any, index) => ({
+    id: asText(recipe?.id),
+    version: asText(recipe?.version),
+    name: asText(recipe?.name),
+    roleLabel: asText(recipe?.role_label),
+    requirement: asText(recipe?.requirement),
+    rubric: asText(recipe?.rubric),
+    evidenceType: asText(recipe?.evidence_type),
+    challengeWindowSeconds: Number(recipe?.challenge_window_seconds ?? 0),
+    bondDivisor: Number(recipe?.bond_divisor ?? 0),
+    payoutMode: asText(recipe?.payout_mode),
+    publisher: asText(recipe?.publisher),
+    recipeHash: asText(recipe?.recipe_hash || hashes[index]),
+  }));
+}
+
+export default async function Recipes() {
+  let liveRecipes: Awaited<ReturnType<typeof loadRegistry>> = [];
+  let registryError = "";
+
+  try {
+    liveRecipes = await loadRegistry();
+  } catch (error: any) {
+    registryError = error?.message || "Live V2 registry read unavailable.";
+  }
+
+  const liveById = new Map(liveRecipes.map((recipe) => [recipe.id, recipe]));
+
   return (
     <>
       <div className="sectionHead">
@@ -24,55 +65,125 @@ export default function Recipes() {
           </h1>
           <p className="lede">
             ResolveGraph V2 adds a separate content-addressed Studionet recipe
-            registry. Recipe ID, version, role, requirement, rubric, evidence type
-            and fixed challenge/bond policy are hashed into an immutable registry entry.
+            registry. Recipe ID, version, role, requirement, rubric, evidence
+            type and fixed challenge/bond policy are hashed into an immutable
+            registry entry.
           </p>
         </div>
-        <Link className="button" href="/workflows/new">Use in V1 builder</Link>
+        <div className="actions compactActions">
+          <Link className="button" href="/workflows/new">
+            Use in V1 builder
+          </Link>
+          <a
+            className="button secondary"
+            href="/api/recipes"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Live registry JSON
+          </a>
+        </div>
       </div>
 
       <section className="panel section emphasisPanel">
         <div className="eyebrow">V2 immutable registry · LIVE VERIFIED</div>
-        <h2>Three reusable policies are registered on GenLayer Studionet</h2>
+        <h2>Registry state is read directly from the verified Studionet contract</h2>
         <div className="proofFacts">
-          <p><strong>V2 contract</strong><code>{registry.contract}</code></p>
-          <p><strong>Policy version</strong><code>RG_V2_IMMUTABLE_RECIPES</code></p>
-          <p><strong>Live workflow</strong><code>{registry.workflow} · ACTIVE · 3 recipe-bound steps</code></p>
-          <p><strong>Source equality</strong><code>true · {registry.sourceHash}</code></p>
+          <p>
+            <strong>V2 contract</strong>
+            <code>{serverV2RecipeContractAddress()}</code>
+          </p>
+          <p>
+            <strong>Policy version</strong>
+            <code>RG_V2_IMMUTABLE_RECIPES</code>
+          </p>
+          <p>
+            <strong>Live registry read</strong>
+            <code>
+              {registryError
+                ? "temporarily unavailable"
+                : liveRecipes.length + " recipes · RPC verified"}
+            </code>
+          </p>
+          <p>
+            <strong>Live workflow</strong>
+            <code>{proof.workflow} · ACTIVE · 3 recipe-bound steps</code>
+          </p>
+          <p>
+            <strong>Source equality</strong>
+            <code>true · {proof.sourceHash}</code>
+          </p>
           <p>
             <strong>Studionet proof</strong>
             <a
               className="textLink"
-              href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + registry.run}
+              href={
+                "https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" +
+                proof.run
+              }
               target="_blank"
               rel="noreferrer"
             >
-              run {registry.run} · SUCCESS ↗
+              run {proof.run} · SUCCESS ↗
             </a>
           </p>
         </div>
+        {registryError ? (
+          <div className="status warn">
+            The static verified proof remains visible, but the live registry RPC
+            read failed: {registryError}
+          </div>
+        ) : null}
       </section>
 
       <section className="grid3">
-        {WORKFLOW_RECIPES.map((recipe) => (
-          <article className="card recipeCard" key={recipe.id}>
-            <div className="eyebrow">{recipeLabel(recipe)}</div>
-            <h3>{recipe.name}</h3>
-            <p>{recipe.summary}</p>
-            <div className="recipeBlock">
-              <strong>Immutable V2 recipe hash</strong>
-              <code>{registry.hashes[recipe.id]}</code>
-            </div>
-            <div className="recipeBlock">
-              <strong>Commitment</strong>
-              <span>{recipe.requirement}</span>
-            </div>
-            <div className="recipeBlock">
-              <strong>Rubric</strong>
-              <span>{recipe.rubric}</span>
-            </div>
-          </article>
-        ))}
+        {WORKFLOW_RECIPES.map((starter) => {
+          const live = liveById.get(starter.id);
+          return (
+            <article className="card recipeCard" key={starter.id}>
+              <div className="eyebrow">
+                {live
+                  ? live.name + " · " + live.version
+                  : recipeLabel(starter)}
+              </div>
+              <h3>{starter.name}</h3>
+              <p>{starter.summary}</p>
+
+              <div className="recipeBlock">
+                <strong>Immutable V2 recipe hash</strong>
+                <code>
+                  {live?.recipeHash || "Live registry read unavailable"}
+                </code>
+              </div>
+
+              {live ? (
+                <>
+                  <div className="recipeBlock">
+                    <strong>Registry policy</strong>
+                    <span>
+                      Evidence: {live.evidenceType} · challenge{" "}
+                      {live.challengeWindowSeconds}s · bond 1/
+                      {live.bondDivisor} · {live.payoutMode}
+                    </span>
+                  </div>
+                  <div className="recipeBlock">
+                    <strong>Publisher</strong>
+                    <code>{live.publisher}</code>
+                  </div>
+                </>
+              ) : null}
+
+              <div className="recipeBlock">
+                <strong>Commitment</strong>
+                <span>{live?.requirement || starter.requirement}</span>
+              </div>
+              <div className="recipeBlock">
+                <strong>Rubric</strong>
+                <span>{live?.rubric || starter.rubric}</span>
+              </div>
+            </article>
+          );
+        })}
       </section>
 
       <section className="panel section">
@@ -84,9 +195,9 @@ export default function Recipes() {
           migrated. The separate V2 contract proves the immutable recipe-registry
           design on Studionet: duplicate content cannot overwrite an existing
           recipe, a version change produces a different content hash, and each
-          instantiated step stores the exact recipe ID, version and hash. A later
-          migration can opt workflows into V2 explicitly rather than replacing
-          the already verified V1 contract in place.
+          instantiated step stores the exact recipe ID, version and hash. A
+          later migration can opt workflows into V2 explicitly rather than
+          replacing the already verified V1 contract in place.
         </p>
       </section>
     </>
