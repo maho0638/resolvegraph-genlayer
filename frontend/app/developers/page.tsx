@@ -62,6 +62,22 @@ export default function Developers() {
       </section>
 
       <section className="panel section">
+        <div className="sectionHead">
+          <div>
+            <div className="eyebrow">Source adapters</div>
+            <h2>Deterministic facts before semantic judgment</h2>
+            <p className="muted">
+              Normalize GitHub commits/PRs/CI runs, Ethereum transactions/events
+              and bounded public artifacts before they enter an evidence claim.
+            </p>
+          </div>
+          <a className="button secondary" href="/adapters">
+            Open adapter workbench
+          </a>
+        </div>
+      </section>
+
+      <section className="panel section">
         <div className="eyebrow">Production read APIs</div>
         <h2>Reviewer-friendly, wallet-free inspection</h2>
         <div className="apiGrid">
@@ -85,6 +101,15 @@ export default function Developers() {
           </a>
           <a className="apiItem" href="/api/recipes" target="_blank" rel="noreferrer">
             <strong>GET /api/recipes</strong><span>live V2 content-addressed recipe registry from Studionet</span>
+          </a>
+          <a className="apiItem" href="/adapters">
+            <strong>GET /api/adapters/github</strong><span>GitHub commit, pull request and Actions run verification</span>
+          </a>
+          <a className="apiItem" href="/adapters">
+            <strong>GET /api/adapters/ethereum</strong><span>Ethereum/Sepolia tx receipt, block and optional event verification</span>
+          </a>
+          <a className="apiItem" href="/adapters">
+            <strong>GET /api/adapters/artifact</strong><span>SSRF-safe bounded artifact SHA-256 capture/equality check</span>
           </a>
           <a className="apiItem" href="/provenance?workflow=rg-live-success-v1&step=source-check">
             <strong>POST /api/provenance/github</strong><span>wallet ↔ GitHub ↔ immutable commit ↔ on-chain step verification</span>
