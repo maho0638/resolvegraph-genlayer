@@ -228,6 +228,12 @@ export default function WorkflowCaseRoom() {
                     >
                       Evidence manifest →
                     </a>
+                    <a
+                      className="textLink"
+                      href={"/provenance?workflow=" + encodeURIComponent(workflowId) + "&step=" + encodeURIComponent(String(step.id))}
+                    >
+                      Verify GitHub provenance →
+                    </a>
                   </div>
                 </article>
               ))}
