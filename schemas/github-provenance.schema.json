@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resolvegraph.example/schemas/github-provenance.schema.json",
+  "title": "ResolveGraph GitHub Provenance Receipt",
+  "type": "object",
+  "required": [
+    "schema",
+    "claimRelation",
+    "workflowId",
+    "stepId",
+    "participantWallet",
+    "githubLogin",
+    "repository",
+    "commitSha",
+    "commitUrl",
+    "gistUrl",
+    "policyDigest",
+    "claimId",
+    "expiresAt",
+    "verifiedAt",
+    "messageDigest",
+    "signature",
+    "checks",
+    "trustBoundary",
+    "provenanceDigest"
+  ],
+  "properties": {
+    "schema": { "const": "resolvegraph-github-provenance-v1" },
+    "claimRelation": { "const": "DELIVERED_GITHUB_COMMIT" },
+    "workflowId": { "type": "string", "minLength": 1 },
+    "stepId": { "type": "string", "minLength": 1 },
+    "participantWallet": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$"
+    },
+    "githubLogin": { "type": "string", "minLength": 1 },
+    "repository": { "type": "string", "minLength": 3 },
+    "commitSha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "commitUrl": { "type": "string", "format": "uri" },
+    "gistUrl": { "type": "string", "format": "uri" },
+    "policyDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "claimId": { "type": "string", "minLength": 16 },
+    "expiresAt": { "type": "integer", "minimum": 1 },
+    "verifiedAt": { "type": "integer", "minimum": 1 },
+    "messageDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{130}$"
+    },
+    "checks": { "type": "object" },
+    "trustBoundary": { "type": "object" },
+    "provenanceDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}
