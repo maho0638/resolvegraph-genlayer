@@ -65,6 +65,7 @@ jobs:
           check_page "/recipes" "Workflow Recipes"
           check_page "/participants" "Participant Ledger"
           check_page "/provenance" "Signed Provenance"
+          check_page "/evidence?workflow=rg-live-success-v1&step=source-check" "Typed Evidence Archive"
           check_page "/developers" "Developer Surface"
           check_page "/proof" "Reviewer Proof"
           check_page "/workflows/rg-live-success-v1" "Workflow Case Room"
@@ -170,13 +171,42 @@ jobs:
           EVIDENCE_JSON="$evidence" python - <<'PY'
           import json, os, re
           data = json.loads(os.environ["EVIDENCE_JSON"])
-          assert data["schema"] == "resolvegraph-evidence-manifest-v1"
+          assert data["schema"] == "resolvegraph-evidence-manifest-v2"
           assert data["stepId"] == "source-check"
           assert data["decision"]["status"] == "PAID"
-          assert data["provenance"]["remoteByteContentHashClaimed"] is False
+          assert data["evidenceVersioning"]["archivedRecordCount"] == 3
+          assert data["evidenceVersioning"]["initialArchiveDigest"]
+          assert data["evidenceVersioning"]["finalArchiveDigest"]
+          assert data["evidenceVersioning"]["initialArchiveDigest"] != data["evidenceVersioning"]["finalArchiveDigest"]
           assert re.fullmatch(r"[a-f0-9]{64}", data["manifestDigest"])
-          print("evidence manifest ok")
+          print("evidence manifest v2 ok")
           PY
+
+          archive="$(curl -fsSL --retry 3 "$BASE_URL/api/evidence/archive?workflow=rg-live-success-v1&step=source-check")"
+          ARCHIVE_JSON="$archive" python - <<'PY'
+          import json, os, re
+          data = json.loads(os.environ["ARCHIVE_JSON"])
+          assert data["schema"] == "resolvegraph-evidence-archive-v1"
+          assert data["archivedCount"] == 3
+          assert data["registryContract"].lower() == "0xb5b0dd5e454590fcb4fcefd85b11d16774552390"
+          roles = {(x["decisionRound"], x["role"]) for x in data["records"]}
+          assert (1, "PRIMARY") in roles
+          assert (1, "SUPPORT") in roles
+          assert (2, "CHALLENGE") in roles
+          for item in data["records"]:
+              assert re.fullmatch(r"[a-f0-9]{64}", item["digest"])
+              assert re.fullmatch(r"[a-f0-9]{64}", item["record"]["content_hash"])
+          print("immutable evidence archive ok")
+          PY
+
+          capture_status="$(curl -sS -o /tmp/evidence-capture.json -w "%{http_code}" \
+            -X POST \
+            -H "content-type: application/json" \
+            -d '{}' \
+            "$BASE_URL/api/evidence/capture")"
+          test "$capture_status" = "400"
+          grep -Fq "workflowId and stepId are required" /tmp/evidence-capture.json
+          echo "evidence capture validation endpoint ok"
 
           provenance_status="$(curl -sS -o /tmp/provenance.json -w "%{http_code}" \
             -X POST \
