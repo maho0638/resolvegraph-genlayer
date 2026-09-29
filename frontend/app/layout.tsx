@@ -19,6 +19,7 @@ const nav = [
   ["/operate", "Operate"],
   ["/explorer", "Explorer"],
   ["/participants", "Participants"],
+  ["/provenance", "Provenance"],
   ["/developers", "Developers"],
   ["/proof", "Proof"],
 ] as const;
