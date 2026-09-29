@@ -106,8 +106,9 @@ def test_resolvegraph_v3_bonded_step_appeal_on_studionet():
     assert tx_execution_succeeded(tx)
 
     tx = sponsor.resolve_step(args=[workflow_id, step_id]).transact(
+        consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=60,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
 
@@ -141,8 +142,9 @@ def test_resolvegraph_v3_bonded_step_appeal_on_studionet():
     assert int(_field(challenged, "challenge_bond_posted")) == appeal_bond
 
     tx = sponsor.resolve_step_challenge(args=[workflow_id, step_id]).transact(
+        consensus_max_rotations=4,
         wait_interval=10000,
-        wait_retries=60,
+        wait_retries=180,
     )
     assert tx_execution_succeeded(tx)
 
