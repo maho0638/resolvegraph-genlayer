@@ -1,9 +1,21 @@
 {
   "schema": "resolvegraph-verification-status-v1",
-  "status": "DEVELOPMENT",
-  "contract": null,
-  "canonical_ci": null,
-  "canonical_studionet": null,
-  "production_deployment": null,
+  "status": "STUDIONET_VERIFIED",
+  "contract": "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754",
+  "canonical_ci": {
+    "run_id": 36545373008,
+    "status": "SUCCESS"
+  },
+  "canonical_studionet": {
+    "run_id": 36545373155,
+    "status": "SUCCESS",
+    "success_workflow": "COMPLETED",
+    "failure_workflow": "FAILED_SETTLED",
+    "final_failure_fault_class": "EXTERNAL",
+    "source_match": true
+  },
+  "production_deployment": {
+    "status": "PENDING_FINAL_CONTROLLED_DEPLOY"
+  },
   "submission_ready": false
 }
