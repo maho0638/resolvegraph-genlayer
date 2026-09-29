@@ -1,0 +1,40 @@
+name: ResolveGraph V3 Bounded Appeals Proof
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/resolvegraph-v3-appeals-proof.trigger"
+
+jobs:
+  live-v3-appeal-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.txt
+      - name: Install source verifier dependency
+        working-directory: scripts
+        run: npm install
+      - name: Lint V3 contract
+        run: genvm-lint check contracts/resolve_graph_v3.py
+      - name: Pin V3 source hash
+        run: sha256sum contracts/resolve_graph_v3.py
+      - name: Run bounded bonded appeal proof
+        run: gltest tests/integration/test_resolvegraph_v3_appeals_studionet.py -v -s --network studionet
+      - name: Verify deployed V3 source equals repository source
+        run: |
+          CONTRACT_ADDRESS="$(cat artifacts/resolvegraph-v3-live-address.txt)" \
+          CONTRACT_SOURCE_PATH="contracts/resolve_graph_v3.py" \
+          node scripts/verify-deployed-source.mjs
+      - name: Upload V3 appeal proof artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: resolvegraph-v3-bounded-appeals-proof
+          path: artifacts/
