@@ -27,7 +27,13 @@ jobs:
           echo "Waiting for Vercel status on $EXPECTED_SHA"
           for attempt in $(seq 1 40); do
             payload="$(curl -fsSL               -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json"               "https://api.github.com/repos/${{ github.repository }}/commits/$EXPECTED_SHA/status")"
-            state="$(python -c 'import json,sys; d=json.load(sys.stdin); xs=[x for x in d.get("statuses",[]) if x.get("context")=="Vercel"]; print(xs[0].get("state","missing") if xs else "missing")' <<<"$payload")"
+            state="$(STATUS_JSON="$payload" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["STATUS_JSON"])
+          statuses = [x for x in data.get("statuses", []) if x.get("context") == "Vercel"]
+          print(statuses[0].get("state", "missing") if statuses else "missing")
+          PY
+          )"
             echo "attempt=$attempt vercel=$state"
             if [ "$state" = "success" ]; then
               exit 0
@@ -71,10 +77,10 @@ jobs:
           set -euo pipefail
 
           health="$(curl -fsSL --retry 3 "$BASE_URL/api/health")"
-          python - "$EXPECTED_SHA" <<'PY' <<<"$health"
-          import json, sys
-          expected = sys.argv[1]
-          data = json.load(sys.stdin)
+          HEALTH_JSON="$health" EXPECTED="$EXPECTED_SHA" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["HEALTH_JSON"])
+          expected = os.environ["EXPECTED"]
           assert data["service"] == "ResolveGraph"
           assert data["network"] == "studionet"
           assert data["contractConfigured"] is True
@@ -87,9 +93,9 @@ jobs:
           PY
 
           workflows="$(curl -fsSL --retry 3 "$BASE_URL/api/workflows")"
-          python - <<'PY' <<<"$workflows"
-          import json, sys
-          data = json.load(sys.stdin)
+          WORKFLOWS_JSON="$workflows" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["WORKFLOWS_JSON"])
           ids = {str(x.get("id")) for x in data.get("workflows", [])}
           assert "rg-live-success-v1" in ids, ids
           assert "rg-live-failure-v1" in ids, ids
@@ -97,18 +103,18 @@ jobs:
           PY
 
           success="$(curl -fsSL --retry 3 "$BASE_URL/api/workflow?id=rg-live-success-v1")"
-          python - <<'PY' <<<"$success"
-          import json, sys
-          data = json.load(sys.stdin)
+          SUCCESS_JSON="$success" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["SUCCESS_JSON"])
           assert data["workflow"]["status"] == "COMPLETED"
           assert len(data.get("steps", [])) == 2
           print("success workflow ok")
           PY
 
           failure="$(curl -fsSL --retry 3 "$BASE_URL/api/workflow?id=rg-live-failure-v1")"
-          python - <<'PY' <<<"$failure"
-          import json, sys
-          data = json.load(sys.stdin)
+          FAILURE_JSON="$failure" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["FAILURE_JSON"])
           wf = data["workflow"]
           assert wf["status"] == "FAILED_SETTLED"
           assert wf["fault_class"] == "EXTERNAL"
@@ -116,18 +122,18 @@ jobs:
           PY
 
           receipt="$(curl -fsSL --retry 3 "$BASE_URL/api/receipt?workflow=rg-live-success-v1")"
-          python - <<'PY' <<<"$receipt"
-          import json, sys
-          data = json.load(sys.stdin)
+          RECEIPT_JSON="$receipt" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["RECEIPT_JSON"])
           assert data["schema"] == "resolvegraph-receipt-v1"
           assert data["outcome"] == "COMPLETED"
           print("receipt ok")
           PY
 
           verification="$(curl -fsSL --retry 3 "$BASE_URL/verification-status.json")"
-          python - <<'PY' <<<"$verification"
-          import json, sys
-          data = json.load(sys.stdin)
+          VERIFY_JSON="$verification" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["VERIFY_JSON"])
           assert data["canonical_studionet"]["status"] == "SUCCESS"
           assert data["canonical_studionet"]["source_match"] is True
           print("verification snapshot ok")
