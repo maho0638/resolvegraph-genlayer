@@ -286,7 +286,11 @@ async function rpc(chainId: number, method: string, params: unknown[]) {
         );
         continue;
       }
-      return body?.result;
+      if (body?.result === null || body?.result === undefined) {
+        failures.push(new URL(endpoint).hostname + ":NULL_RESULT");
+        continue;
+      }
+      return body.result;
     } catch (error: any) {
       failures.push(
         new URL(endpoint).hostname +
