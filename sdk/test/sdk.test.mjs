@@ -11,6 +11,8 @@ import {
   parseGen,
   requiredBond,
   assertGithubProvenanceFresh,
+  parseGithubSourceUrl,
+  normalizeEthereumTxRef,
 } from "../dist/index.js";
 
 test("GEN helpers preserve 18-decimal values", () => {
@@ -204,4 +206,53 @@ test("GitHub provenance expiry rejects expired and overlong claims", () => {
     () => assertGithubProvenanceFresh(1200, 1000, 100),
     /cannot exceed/,
   );
+});
+
+
+test("source adapter parser recognizes immutable GitHub commit URLs", () => {
+  assert.deepEqual(
+    parseGithubSourceUrl(
+      "https://github.com/example/repo/commit/0123456789abcdef0123456789abcdef01234567",
+    ),
+    {
+      kind: "GITHUB_COMMIT",
+      owner: "example",
+      repo: "repo",
+      sha: "0123456789abcdef0123456789abcdef01234567",
+    },
+  );
+});
+
+test("source adapter parser recognizes GitHub pull requests", () => {
+  assert.deepEqual(
+    parseGithubSourceUrl("https://github.com/vercel/next.js/pull/1"),
+    {
+      kind: "GITHUB_PR",
+      owner: "vercel",
+      repo: "next.js",
+      number: 1,
+    },
+  );
+});
+
+test("source adapter parser recognizes GitHub Actions runs", () => {
+  assert.deepEqual(
+    parseGithubSourceUrl(
+      "https://github.com/example/repo/actions/runs/36598129489",
+    ),
+    {
+      kind: "GITHUB_CI",
+      owner: "example",
+      repo: "repo",
+      runId: 36598129489,
+    },
+  );
+});
+
+test("Ethereum source adapter reference validates chain and full transaction hash", () => {
+  const tx =
+    "0x1fe7aee1bf2d64e282ee143d557b5de011ef9430b5a751776ab6585ec88fd698";
+  assert.deepEqual(normalizeEthereumTxRef(1, tx), { chainId: 1, txHash: tx });
+  assert.throws(() => normalizeEthereumTxRef(10, tx), /Supported chain IDs/);
+  assert.throws(() => normalizeEthereumTxRef(1, "0x1234"), /32-byte/);
 });
