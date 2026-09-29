@@ -1,0 +1,46 @@
+name: ResolveGraph Studionet Resume
+
+on:
+  workflow_dispatch:
+    inputs:
+      contract_address:
+        description: "Existing ResolveGraph Studionet contract address"
+        required: true
+        type: string
+  push:
+    paths:
+      - ".github/resolvegraph-resume.trigger"
+
+jobs:
+  resume-failure-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.txt
+      - name: Install source verifier dependency
+        working-directory: scripts
+        run: npm install
+      - name: Resolve existing contract address
+        env:
+          INPUT_CONTRACT_ADDRESS: ${{ github.event.inputs.contract_address }}
+        run: |
+          ADDRESS="$INPUT_CONTRACT_ADDRESS"
+          if [ -z "$ADDRESS" ] && [ -f ".github/resolvegraph-resume-address.txt" ]; then
+            ADDRESS="$(tr -d '[:space:]' < .github/resolvegraph-resume-address.txt)"
+          fi
+          test -n "$ADDRESS"
+          echo "RESOLVEGRAPH_CONTRACT_ADDRESS=$ADDRESS" >> "$GITHUB_ENV"
+      - name: Resume failure lifecycle without redeploying
+        run: gltest tests/integration/test_resolvegraph_studionet_resume.py -v -s --network studionet
+      - name: Verify deployed source equals repository source
+        run: |
+          CONTRACT_ADDRESS="$RESOLVEGRAPH_CONTRACT_ADDRESS" \
+          CONTRACT_SOURCE_PATH="contracts/resolve_graph.py" \
+          node scripts/verify-deployed-source.mjs
