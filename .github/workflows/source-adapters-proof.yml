@@ -108,7 +108,7 @@ jobs:
           BASE_URL: http://127.0.0.1:3100
         run: |
           set -euo pipefail
-          tx="0xd737e9c0f1c5ac269ba6227b8cda287dd946de1b3af61ac4761b7e28fd5b7498"
+          tx="0x85d995eba9763907fdf35cd2034144dd9d53ce32cbec21349d4b12823c6860c5"
           http_code="$(curl -sS -o artifacts/source-adapters/ethereum-tx.json -w "%{http_code}" --get \
             --data-urlencode "chainId=1" \
             --data-urlencode "txHash=$tx" \

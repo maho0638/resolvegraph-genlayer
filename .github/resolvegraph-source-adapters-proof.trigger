@@ -6,3 +6,5 @@ diagnostic-retry
 null-fallback-retry
 
 retry-valid-mainnet-tx-2026-09-29
+
+retry-ethereum-docs-canonical-receipt-2026-09-29
