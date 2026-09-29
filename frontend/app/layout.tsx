@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "ResolveGraph — Multi-Agent Workflow Settlement",
   description:
     "GenLayer-native fault attribution, evidence adjudication and GEN settlement for multi-agent workflows.",
+  icons: {
+    icon: "/resolvegraph-icon.webp",
+    shortcut: "/resolvegraph-icon.webp",
+  },
 };
 
 const nav = [
@@ -23,9 +27,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <header className="topbar">
-          <Link href="/" className="brand">
-            <span className="brandMark">RG</span>
-            <span>ResolveGraph</span>
+          <Link href="/" className="brand" aria-label="ResolveGraph home">
+            <img
+              src="/resolvegraph-logo.webp"
+              alt="ResolveGraph"
+              className="brandLogo"
+            />
           </Link>
           <nav>
             {nav.map(([href, label]) => (
@@ -36,7 +43,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
         <main>{children}</main>
         <footer>
-          <strong>ResolveGraph</strong>
+          <img
+            src="/resolvegraph-logo.webp"
+            alt="ResolveGraph"
+            className="footerLogo"
+          />
           <span>Multi-agent commitments · evidence · fault attribution · settlement</span>
         </footer>
       </body>
