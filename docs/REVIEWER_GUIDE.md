@@ -31,7 +31,7 @@ Production: https://resolvegraph-genlayer.vercel.app
 
 ## Verified deterministic gate
 
-- 80/80 direct tests PASS.
+- 89/89 direct tests PASS.
 - GenVM lint PASS.
 - 14/14 SDK tests PASS.
 - Frontend typecheck PASS.
@@ -87,6 +87,32 @@ Evidence registry source SHA256:
 
 The proof archived PRIMARY and SUPPORT evidence for decision round 1 and fresh CHALLENGE evidence for round 2 of `rg-live-success-v1/source-check`. Every record stores source type, MIME type, SHA-256 content hash, immutable reference, author field, rubric relation, fetch time, publisher and a content-addressed archive digest. Deployed-source equality is true.
 
+## Verified source adapters
+
+E2E run: `36604750863` — SUCCESS.
+
+The proof checks a real GitHub commit, public pull request, GitHub Actions run, Ethereum mainnet transaction receipt and bounded public artifact, then replays each adapter digest deterministically.
+
+## Verified external SDK consumer
+
+Run: `36601714919` — SUCCESS.
+
+A clean consumer installs the packed SDK through the package boundary, verifies the canonical public workflow through production APIs and emits an independent consumer receipt.
+
+## Verified V3 bounded appeals
+
+Studionet run: `36604861578` — SUCCESS.
+
+V3 contract:
+
+`0x14948AD5dCd317Ec49f5CEf7e08c72176C900214`
+
+V3 source SHA256:
+
+`4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee`
+
+The contract limits a step to one fresh-evidence appeal, requires an exact 5% appeal bond, performs a second consensus round, records decision lineage and blocks settlement until explicit finalization. Deployed-source equality is true.
+
 ## Verified production surface
 
 Provenance feature verification commit:
@@ -108,6 +134,9 @@ Provenance feature verification commit:
 - Provenance verifier: https://resolvegraph-genlayer.vercel.app/provenance
 - Recipes / V2 registry proof: https://resolvegraph-genlayer.vercel.app/recipes
 - Evidence archive / drift review: https://resolvegraph-genlayer.vercel.app/evidence?workflow=rg-live-success-v1&step=source-check
+- Reviewer mode: https://resolvegraph-genlayer.vercel.app/reviewer
+- Source adapters: https://resolvegraph-genlayer.vercel.app/adapters
+- Bounded appeals: https://resolvegraph-genlayer.vercel.app/appeals
 - Proof: https://resolvegraph-genlayer.vercel.app/proof
 - Health JSON: https://resolvegraph-genlayer.vercel.app/api/health
 - Verification JSON: https://resolvegraph-genlayer.vercel.app/verification-status.json

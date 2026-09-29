@@ -48,7 +48,7 @@ Promotion order:
 
 ## Verified release
 
-- Direct tests: **80/80 PASS**
+- Direct tests: **89/89 PASS**
 - GenVM lint: **PASS**
 - SDK tests: **14/14 PASS**
 - Frontend typecheck/build: **PASS**
@@ -74,6 +74,12 @@ Promotion order:
 - Evidence registry deployed/repository source SHA256: `8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472`
 - Evidence registry deployed-source equality: **true**
 - Canonical archived evidence: round 1 PRIMARY + SUPPORT, round 2 CHALLENGE for `rg-live-success-v1/source-check`
+- Source adapters proof: **36604750863 — SUCCESS** (GitHub commit/PR/CI, Ethereum receipt, artifact capture, digest replay)
+- External SDK consumer proof: **36601714919 — SUCCESS**
+- V3 bounded appeals proof: **36604861578 — SUCCESS**
+- V3 contract: `0x14948AD5dCd317Ec49f5CEf7e08c72176C900214`
+- V3 source SHA256: `4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee`
+- V3 deployed-source equality: **true**
 
 ## Status
 

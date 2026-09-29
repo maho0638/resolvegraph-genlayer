@@ -1,7 +1,7 @@
 {
   "schema": "resolvegraph-proof-v1",
   "status": "LIVE_VERIFIED",
-  "verified_at": "2026-09-29T16:33:30Z",
+  "verified_at": "2026-09-29T17:32:14Z",
   "scope": {
     "project": "ResolveGraph — Multi-Agent Workflow Settlement",
     "network": "GenLayer Studionet"
@@ -9,7 +9,7 @@
   "canonical_commit": "43b1fc9c02a54b1859a84116121b0a287513730b",
   "direct_tests": {
     "status": "PASS",
-    "count": 80
+    "count": 89
   },
   "lint": {
     "genvm": "PASS"
@@ -219,5 +219,63 @@
       "registry_records_publisher": true,
       "capture_endpoint_fetches_remote_bytes": true
     }
+  },
+  "source_adapters": {
+    "status": "E2E_VERIFIED",
+    "run_id": 36604750863,
+    "checks": [
+      "GitHub commit",
+      "GitHub pull request",
+      "GitHub Actions run",
+      "Ethereum mainnet transaction receipt",
+      "bounded public artifact",
+      "deterministic adapter digest replay"
+    ]
+  },
+  "external_sdk_consumer": {
+    "status": "VERIFIED",
+    "run_id": 36601714919,
+    "boundary": "packed @resolvegraph/sdk installed by clean external consumer",
+    "target_workflow": "rg-live-success-v1",
+    "target_step": "source-check"
+  },
+  "v3_bounded_appeals": {
+    "status": "LIVE_VERIFIED",
+    "run_id": 36604861578,
+    "contract": "0x14948AD5dCd317Ec49f5CEf7e08c72176C900214",
+    "policy_version": "RG_V3_BOUNDED_APPEALS",
+    "source_sha256": "4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee",
+    "deployed_source_match": true,
+    "workflow": "rg-v3-live-appeal-v1",
+    "step": "example-domain-proof",
+    "rules": {
+      "max_step_appeals": 1,
+      "appeal_bond_divisor": 20,
+      "challenge_window_seconds": 3600,
+      "fresh_evidence_required": true,
+      "explicit_finalization_required": true
+    },
+    "initial_decision_hash": "bf5d47297b33995a1a50bb3c79b8e6c0302fa9aaf8da6bc7111b3761d217a94f",
+    "final_decision_hash": "8e8329b9ed4dae5699137bc0e4f8b138aa3fd0d944d00833d5d4994308409ae5",
+    "initial_verdict": "PASS",
+    "final_verdict": "PASS",
+    "appeal_outcome_changed": false,
+    "appeal_bond": "50000000000"
+  },
+  "reviewer_mode": {
+    "status": "IMPLEMENTED",
+    "canonical_cases": [
+      "rg-live-success-v1",
+      "rg-live-failure-v1"
+    ],
+    "wallet_required": false,
+    "surfaces": [
+      "dependency graph",
+      "evidence archive",
+      "decision version diff",
+      "fault attribution",
+      "bond/reward fields",
+      "transaction explorer timeline"
+    ]
   }
 }

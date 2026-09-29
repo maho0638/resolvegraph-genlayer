@@ -29,7 +29,11 @@ Required gates:
 - [x] reviewer walkthrough;
 - [x] signed GitHub provenance verifier with on-chain assignee match, wallet signature, immutable commit SHA, gist ownership challenge, scoped expiry and portable receipt schema;
 - [x] controlled Vercel production deployment;
-- [x] automated post-deploy smoke test.
+- [x] automated post-deploy smoke test;
+- [x] source adapter E2E proof with digest replay;
+- [x] independent SDK consumer proof;
+- [x] reviewer-mode case timeline;
+- [x] bounded bonded V3 appeal policy and live Studionet source-equality proof.
 
 Verified production evidence:
 

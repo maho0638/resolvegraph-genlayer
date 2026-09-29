@@ -40,13 +40,15 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - TypeScript SDK and portable receipt API;
 - signed GitHub delivery provenance verifier and portable provenance receipt;
 - typed evidence manifest v2, bounded remote-byte capture, immutable Studionet evidence archive and drift-review UI;
-- reviewer proof page;
+- reviewer proof page with a single-case graph/evidence/decision/transaction timeline;
+- GitHub commit/PR/CI, Ethereum transaction/event and artifact source adapters;
+- isolated V3 bounded bonded appeal policy;
 - automated production smoke workflow.
 
 ## Canonical verification
 
 - Predeploy CI run: `36545373008` — **SUCCESS**.
-- Direct tests: **80/80 PASS**.
+- Direct tests: **89/89 PASS**.
 - GenVM lint: **PASS**.
 - SDK tests: **14/14 PASS**.
 - Frontend typecheck/build: **PASS**.
@@ -71,6 +73,12 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - Evidence registry source SHA256: `8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472`.
 - Evidence registry deployed-source equality: **true**.
 - Canonical archive proof: `rg-live-success-v1/source-check` has round-1 PRIMARY/SUPPORT and round-2 CHALLENGE archive records with distinct content-addressed digests.
+- Source adapter E2E proof: `36604750863` — **SUCCESS**.
+- External SDK consumer proof: `36601714919` — **SUCCESS**.
+- V3 bounded appeals proof: `36604861578` — **SUCCESS**.
+- V3 contract: `0x14948AD5dCd317Ec49f5CEf7e08c72176C900214`.
+- V3 source SHA256: `4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee`.
+- V3 deployed-source equality: **true**.
 - Smoke coverage includes overview, Explorer, operator console, recipes, participant ledger, provenance verifier, developer page, proof page, canonical case room, logo asset, health API, workflow API, step API, participant API, portable receipt, evidence manifest, provenance endpoint validation, canonical success/failure state and public verification snapshot.
 
 Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.

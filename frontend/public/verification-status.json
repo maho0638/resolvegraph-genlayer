@@ -55,5 +55,33 @@
     "manifest_schema": "resolvegraph-evidence-manifest-v2",
     "canonical_archived_records": 3,
     "initial_and_final_archive_digests_differ": true
+  },
+  "direct_tests": {
+    "status": "PASS",
+    "count": 89
+  },
+  "source_adapters": {
+    "status": "E2E_VERIFIED",
+    "run_id": 36604750863
+  },
+  "external_sdk_consumer": {
+    "status": "VERIFIED",
+    "run_id": 36601714919
+  },
+  "v3_bounded_appeals": {
+    "status": "LIVE_VERIFIED",
+    "run_id": 36604861578,
+    "contract": "0x14948AD5dCd317Ec49f5CEf7e08c72176C900214",
+    "policy_version": "RG_V3_BOUNDED_APPEALS",
+    "source_sha256": "4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee",
+    "source_match": true,
+    "max_step_appeals": 1,
+    "appeal_bond_divisor": 20,
+    "production_v1_unchanged": true
+  },
+  "reviewer_mode": {
+    "status": "IMPLEMENTED",
+    "wallet_required": false,
+    "canonical_cases": 2
   }
 }
