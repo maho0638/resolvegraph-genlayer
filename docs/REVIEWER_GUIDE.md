@@ -19,15 +19,17 @@ Production: https://resolvegraph-genlayer.vercel.app
 7. `tests/integration/test_resolvegraph_studionet_resume.py` — state-aware continuation for interrupted consensus transactions.
 8. `sdk/` — integration helpers and portable receipt.
 9. `schemas/evidence-manifest.schema.json` — typed evidence-manifest surface.
-10. `frontend/` — builder, recipes, Explorer, operator console, case room, APIs and proof page.
-11. `.github/workflows/production-smoke.yml` — production verification.
-12. `docs/PROOF_MANIFEST.json` — canonical transaction-level and release evidence.
+10. `schemas/github-provenance.schema.json` — portable signed GitHub provenance receipt schema.
+11. `frontend/app/provenance/` + `frontend/app/api/provenance/github/` — wallet/GitHub/commit provenance flow.
+12. `frontend/` — builder, recipes, Explorer, operator console, case room, APIs and proof page.
+13. `.github/workflows/production-smoke.yml` — production verification.
+14. `docs/PROOF_MANIFEST.json` — canonical transaction-level and release evidence.
 
 ## Verified deterministic gate
 
 - 68/68 direct tests PASS.
 - GenVM lint PASS.
-- 11/11 SDK tests PASS.
+- 14/14 SDK tests PASS.
 - Frontend typecheck PASS.
 - Frontend production build PASS.
 - Canonical predeploy CI run: `36545373008`.
@@ -55,15 +57,15 @@ Normalized deployed/repository SHA256:
 
 ## Verified production surface
 
-Verified production commit:
+Provenance feature verification commit:
 
-`94a61f7f4401eb84f321e13136404dd028279c5c`
+`5da51a7647dae310c551f4afcce49ea4c7e0b802`
 
-- Production CI run: `36568432075` — SUCCESS.
+- CI run: `36572374200` — SUCCESS.
 - Vercel Git deployment: SUCCESS.
-- Production smoke run: `36569042701` — SUCCESS.
+- Production smoke run: `36572844244` — SUCCESS.
 - Production URL: https://resolvegraph-genlayer.vercel.app
-- Public pages, logo asset, read APIs, canonical success/failure workflows, participant read, receipt API, evidence manifest and verification snapshot all passed.
+- Public pages, logo asset, read APIs, canonical success/failure workflows, participant read, receipt API, evidence manifest, provenance verifier page, provenance validation endpoint and verification snapshot all passed.
 
 ## Reviewer shortcuts
 
@@ -71,10 +73,11 @@ Verified production commit:
 - Explorer: https://resolvegraph-genlayer.vercel.app/explorer
 - Success case: https://resolvegraph-genlayer.vercel.app/workflows/rg-live-success-v1
 - Failure case: https://resolvegraph-genlayer.vercel.app/workflows/rg-live-failure-v1
+- Provenance verifier: https://resolvegraph-genlayer.vercel.app/provenance
 - Proof: https://resolvegraph-genlayer.vercel.app/proof
 - Health JSON: https://resolvegraph-genlayer.vercel.app/api/health
 - Verification JSON: https://resolvegraph-genlayer.vercel.app/verification-status.json
 
 ## Boundaries
 
-Do not interpret agent registry/A2A strings as authenticated identity. Do not interpret the evidence-manifest digest as a byte-level hash of remote web content. Those boundaries are explicit in the product and submission dossier.
+Do not interpret agent registry/A2A strings as authenticated identity. The GitHub provenance adapter adds a separate signed verification chain that binds the on-chain assignee to a GitHub account and immutable commit through an owner-controlled gist challenge, but it is not enforced by the current settlement contract and it does not provide a global single-use nonce registry. Do not interpret the evidence-manifest digest as a byte-level hash of remote web content.
