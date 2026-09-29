@@ -1,0 +1,129 @@
+name: ResolveGraph Source Adapters Proof
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/resolvegraph-source-adapters-proof.trigger"
+
+permissions:
+  contents: read
+  statuses: read
+
+jobs:
+  live-source-adapters-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BASE_URL: https://resolvegraph-genlayer.vercel.app
+      EXPECTED_SHA: ${{ github.sha }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Wait for matching Vercel deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 40); do
+            payload="$(curl -fsSL \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/commits/$EXPECTED_SHA/status")"
+            state="$(STATUS_JSON="$payload" python - <<'PY'
+          import json, os
+          data = json.loads(os.environ["STATUS_JSON"])
+          statuses = [x for x in data.get("statuses", []) if x.get("context") == "Vercel"]
+          print(statuses[0].get("state", "missing") if statuses else "missing")
+          PY
+          )"
+            echo "attempt=$attempt vercel=$state"
+            if [ "$state" = "success" ]; then exit 0; fi
+            if [ "$state" = "failure" ] || [ "$state" = "error" ]; then exit 1; fi
+            sleep 10
+          done
+          exit 1
+
+      - name: Verify GitHub commit adapter against this repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          commit_url="https://github.com/${{ github.repository }}/commit/$EXPECTED_SHA"
+          payload="$(curl -fsSL --get --data-urlencode "url=$commit_url" "$BASE_URL/api/adapters/github")"
+          PAYLOAD="$payload" EXPECTED="$EXPECTED_SHA" python - <<'PY'
+          import json, os, re
+          data = json.loads(os.environ["PAYLOAD"])
+          assert data["sourceType"] == "GITHUB_COMMIT"
+          assert data["immutableRef"] == os.environ["EXPECTED"].lower()
+          assert re.fullmatch(r"[a-f0-9]{64}", data["adapterDigest"])
+          print("github commit adapter ok", data["repository"], data["author"])
+          PY
+
+      - name: Verify GitHub pull-request adapter
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload="$(curl -fsSL --get --data-urlencode "url=https://github.com/vercel/next.js/pull/1" "$BASE_URL/api/adapters/github")"
+          PAYLOAD="$payload" python - <<'PY'
+          import json, os, re
+          data = json.loads(os.environ["PAYLOAD"])
+          assert data["sourceType"] == "GITHUB_PR"
+          assert data["repository"].lower() == "vercel/next.js"
+          assert data["pullNumber"] == 1
+          assert re.fullmatch(r"[a-f0-9]{40}", data["headSha"])
+          assert re.fullmatch(r"[a-f0-9]{64}", data["adapterDigest"])
+          print("github PR adapter ok", data["state"], data["author"])
+          PY
+
+      - name: Verify GitHub Actions adapter
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_url="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36598129489"
+          payload="$(curl -fsSL --get --data-urlencode "url=$run_url" "$BASE_URL/api/adapters/github")"
+          PAYLOAD="$payload" python - <<'PY'
+          import json, os, re
+          data = json.loads(os.environ["PAYLOAD"])
+          assert data["sourceType"] == "GITHUB_CI"
+          assert data["runId"] == 36598129489
+          assert data["status"] == "completed"
+          assert data["conclusion"] == "success"
+          assert re.fullmatch(r"[a-f0-9]{40}", data["headSha"])
+          print("github CI adapter ok")
+          PY
+
+      - name: Verify Ethereum transaction adapter
+        shell: bash
+        run: |
+          set -euo pipefail
+          tx="0x1fe7aee1bf2d64e282ee143d557b5de011ef9430b5a751776ab6585ec88fd698"
+          payload="$(curl -fsSL --get \
+            --data-urlencode "chainId=1" \
+            --data-urlencode "txHash=$tx" \
+            "$BASE_URL/api/adapters/ethereum")"
+          PAYLOAD="$payload" TX="$tx" python - <<'PY'
+          import json, os, re
+          data = json.loads(os.environ["PAYLOAD"])
+          assert data["sourceType"] == "ETHEREUM_TX"
+          assert data["chainId"] == 1
+          assert data["txHash"] == os.environ["TX"]
+          assert data["status"] == "SUCCESS"
+          assert data["blockNumber"] > 0
+          assert data["confirmations"] > 0
+          assert re.fullmatch(r"[a-f0-9]{64}", data["adapterDigest"])
+          print("ethereum adapter ok", data["blockNumber"], data["confirmations"])
+          PY
+
+      - name: Verify artifact adapter
+        shell: bash
+        run: |
+          set -euo pipefail
+          payload="$(curl -fsSL --get --data-urlencode "url=https://example.com" "$BASE_URL/api/adapters/artifact")"
+          PAYLOAD="$payload" python - <<'PY'
+          import json, os, re
+          data = json.loads(os.environ["PAYLOAD"])
+          assert data["sourceType"] == "ARTIFACT"
+          assert data["byteLength"] > 0
+          assert re.fullmatch(r"[a-f0-9]{64}", data["contentHash"])
+          assert re.fullmatch(r"[a-f0-9]{64}", data["adapterDigest"])
+          print("artifact adapter ok", data["contentType"], data["byteLength"])
+          PY
