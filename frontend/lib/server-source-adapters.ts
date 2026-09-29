@@ -216,6 +216,29 @@ export async function inspectGithubSource(value: string) {
   return { ...body, adapterDigest: digest(body) };
 }
 
+export function parseEthereumExplorerUrl(value: string): {
+  chainId: 1 | 11155111;
+  txHash: string;
+} | null {
+  const url = new URL(value);
+  if (url.protocol !== "https:" || url.username || url.password) return null;
+
+  const hostname = url.hostname.toLowerCase();
+  const chainId =
+    hostname === "etherscan.io"
+      ? 1
+      : hostname === "sepolia.etherscan.io"
+        ? 11155111
+        : null;
+  if (!chainId) return null;
+
+  const parts = url.pathname.split("/").filter(Boolean);
+  if (parts.length !== 2 || parts[0] !== "tx") return null;
+  const txHash = parts[1].toLowerCase();
+  if (!/^0x[a-f0-9]{64}$/.test(txHash)) return null;
+  return { chainId, txHash };
+}
+
 const RPCS: Record<number, string> = {
   1: process.env.ETHEREUM_MAINNET_RPC_URL || "https://ethereum-rpc.publicnode.com",
   11155111:
