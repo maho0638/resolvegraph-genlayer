@@ -2,7 +2,7 @@
 
 ## Current status
 
-DEVELOPMENT — do not treat this repository as a finished Portal submission until the proof manifest says `LIVE_VERIFIED` and `submission_ready` is true.
+The canonical contract and both live Studionet lifecycles are verified. Production promotion is the final gate; treat the project as submission-ready only after the proof manifest is marked `LIVE_VERIFIED` with `submission_ready: true`.
 
 ## Review order
 
@@ -11,37 +11,42 @@ DEVELOPMENT — do not treat this repository as a finished Portal submission unt
 3. `docs/THREAT_MODEL.md` — attack surface and explicit limitations.
 4. `docs/INTEROPERABILITY.md` — ERC-8004 / A2A boundaries.
 5. `tests/direct/test_resolve_graph.py` — deterministic and adversarial coverage.
-6. `sdk/` — integration helpers and portable receipt.
-7. `frontend/` — complete product surface.
-8. `docs/PROOF_MANIFEST.json` — canonical evidence after live verification.
+6. `tests/integration/test_resolvegraph_studionet.py` — canonical live success/failure proof.
+7. `tests/integration/test_resolvegraph_studionet_resume.py` — state-aware continuation for interrupted consensus transactions.
+8. `sdk/` — integration helpers and portable receipt.
+9. `frontend/` — product surface and reviewer proof page.
+10. `docs/PROOF_MANIFEST.json` — canonical transaction-level evidence.
 
-## Predeploy verification
+## Verified predeploy gate
 
-```bash
-python -m pip install -r requirements.txt
-pytest tests/direct -v
-genvm-lint check contracts/resolve_graph.py
+- 68/68 direct tests PASS.
+- GenVM lint PASS.
+- 11/11 SDK tests PASS.
+- Frontend typecheck PASS.
+- Frontend production build PASS.
+- Canonical CI run: `36545373008`.
 
-cd sdk
-npm install
-npm test
+## Verified live proof
 
-cd ../frontend
-npm install
-npm run typecheck
-npm run build
-```
+Canonical Studionet run: `36545373155`.
 
-## Live verification
+Contract:
 
-The Studionet workflow is intentionally manual-only:
+`0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754`
 
-```bash
-gltest tests/integration/test_resolvegraph_studionet.py -v -s --network studionet
-```
+The run completed:
+- a two-agent dependent success workflow with two challenged consensus rounds and terminal `COMPLETED`;
+- a deliberately false commitment that failed;
+- workflow-level fault attribution to `PARTICIPANT` at 97% confidence;
+- a fresh attribution challenge;
+- a second attribution consensus round changing final fault class to `EXTERNAL`;
+- deterministic terminal `FAILED_SETTLED`;
+- deployed contract source equality with repository source.
 
-It exercises both a successful dependent workflow and a failed workflow with challenge, fault attribution, re-attribution and terminal settlement.
+Normalized deployed/repository SHA256:
+
+`f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb`
 
 ## Production promotion
 
-Vercel is the final step, not the development environment. A production URL is added only after the complete contract/SDK/frontend/live-proof gate succeeds.
+Vercel remains the final controlled step. After production deployment, smoke-test the overview, explorer, workflow case room, operator console, participant ledger, developer page, proof page and read-only APIs before marking the dossier submission-ready.
