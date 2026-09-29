@@ -3,3 +3,4 @@ retry-after-local-proof
 workflow-schema-retry
 rpc-fallback-retry
 diagnostic-retry
+null-fallback-retry
