@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resolvegraph.example/schemas/evidence-manifest-v2.schema.json",
+  "title": "ResolveGraph Evidence Manifest v2",
+  "type": "object",
+  "required": [
+    "schema",
+    "workflowId",
+    "stepId",
+    "policyVersion",
+    "subjectContract",
+    "archiveRegistry",
+    "participant",
+    "commitment",
+    "contractSources",
+    "archiveRecords",
+    "evidenceVersioning",
+    "decision",
+    "provenance",
+    "manifestDigest",
+    "generatedAt",
+    "digestScope"
+  ],
+  "properties": {
+    "schema": { "const": "resolvegraph-evidence-manifest-v2" },
+    "workflowId": { "type": "string", "minLength": 1 },
+    "stepId": { "type": "string", "minLength": 1 },
+    "policyVersion": { "type": "string" },
+    "subjectContract": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$"
+    },
+    "archiveRegistry": {
+      "type": "string",
+      "pattern": "^0x[a-fA-F0-9]{40}$"
+    },
+    "participant": { "type": "object" },
+    "commitment": { "type": "object" },
+    "contractSources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "url",
+          "host",
+          "transport",
+          "boundedSnapshot",
+          "boundedSnapshotHash"
+        ]
+      }
+    },
+    "archiveRecords": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["decisionRound", "role", "digest", "record"]
+      }
+    },
+    "evidenceVersioning": {
+      "type": "object",
+      "required": [
+        "initialArchiveDigest",
+        "finalArchiveDigest",
+        "archivedRecordCount",
+        "finalDecisionRound"
+      ]
+    },
+    "decision": { "type": "object" },
+    "provenance": { "type": "object" },
+    "manifestDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "generatedAt": { "type": "integer", "minimum": 1 },
+    "digestScope": { "type": "string", "minLength": 1 }
+  }
+}
