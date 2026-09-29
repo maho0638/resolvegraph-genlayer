@@ -65,6 +65,7 @@ jobs:
           check_page "/recipes" "Workflow Recipes"
           check_page "/participants" "Participant Ledger"
           check_page "/provenance" "Signed Provenance"
+          check_page "/adapters" "Source Adapters"
           check_page "/evidence?workflow=rg-live-success-v1&step=source-check" "Typed Evidence Archive"
           check_page "/developers" "Developer Surface"
           check_page "/proof" "Reviewer Proof"
@@ -207,6 +208,19 @@ jobs:
           test "$capture_status" = "400"
           grep -Fq "workflowId and stepId are required" /tmp/evidence-capture.json
           echo "evidence capture validation endpoint ok"
+
+          github_adapter_status="$(curl -sS -o /tmp/github-adapter.json -w "%{http_code}" "$BASE_URL/api/adapters/github")"
+          test "$github_adapter_status" = "400"
+          grep -Fq "url query parameter is required" /tmp/github-adapter.json
+
+          ethereum_adapter_status="$(curl -sS -o /tmp/ethereum-adapter.json -w "%{http_code}" "$BASE_URL/api/adapters/ethereum")"
+          test "$ethereum_adapter_status" = "400"
+          grep -Fq "Ethereum transaction hash must be 32-byte" /tmp/ethereum-adapter.json
+
+          artifact_adapter_status="$(curl -sS -o /tmp/artifact-adapter.json -w "%{http_code}" "$BASE_URL/api/adapters/artifact")"
+          test "$artifact_adapter_status" = "400"
+          grep -Fq "url query parameter is required" /tmp/artifact-adapter.json
+          echo "source adapter validation endpoints ok"
 
           provenance_status="$(curl -sS -o /tmp/provenance.json -w "%{http_code}" \
             -X POST \
