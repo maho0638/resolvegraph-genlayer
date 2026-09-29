@@ -75,7 +75,13 @@ export default function Developers() {
             <strong>GET /api/receipt</strong><span>portable workflow or step adjudication receipt</span>
           </a>
           <a className="apiItem" href="/api/evidence?workflow=rg-live-success-v1&step=source-check" target="_blank" rel="noreferrer">
-            <strong>GET /api/evidence</strong><span>typed decision-bound evidence manifest</span>
+            <strong>GET /api/evidence</strong><span>v2 manifest with contract snapshots, immutable archive records and decision lineage</span>
+          </a>
+          <a className="apiItem" href="/api/evidence/archive?workflow=rg-live-success-v1&step=source-check" target="_blank" rel="noreferrer">
+            <strong>GET /api/evidence/archive</strong><span>append-only Studionet evidence archive history by round and role</span>
+          </a>
+          <a className="apiItem" href="/evidence?workflow=rg-live-success-v1&step=source-check">
+            <strong>POST /api/evidence/capture</strong><span>SSRF-safe bounded HTTPS byte capture and SHA-256 verification</span>
           </a>
           <a className="apiItem" href="/api/recipes" target="_blank" rel="noreferrer">
             <strong>GET /api/recipes</strong><span>live V2 content-addressed recipe registry from Studionet</span>
@@ -90,10 +96,13 @@ export default function Developers() {
         <article className="card">
           <h3>Evidence manifest boundary</h3>
           <p>
-            The manifest hashes the contract-stored evidence metadata, bounded
-            snapshots, commitment and decision fields. It does not claim a hash
-            of the remote source bytes because the current contract does not
-            persist those byte-level hashes.
+            Manifest v2 separates three layers: contract-stored URLs and bounded
+            snapshots, current bounded remote-byte capture, and immutable archive
+            records stored by the evidence-registry contract. Archived records
+            include source/MIME type, SHA-256 content hash, immutable reference,
+            author field, rubric relation, fetch time, round, role and publisher.
+            The registry records the submitted capture; it does not fetch the
+            remote bytes itself.
           </p>
         </article>
         <article className="card">
