@@ -3,7 +3,7 @@ import Link from "next/link";
 const contract = "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754";
 const canonicalCi = "36545373008";
 const canonicalStudionet = "36545373155";
-const firstProductionSmoke = "36567720266";
+const firstProductionSmoke = "36572844244";
 const sourceHash = "f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb";
 
 export default function Proof() {
@@ -48,7 +48,7 @@ export default function Proof() {
         <h2>From source to public product</h2>
         <div className="flow verificationFlow">
           <span>68 direct tests</span><b>→</b>
-          <span>11 SDK tests</span><b>→</b>
+          <span>14 SDK tests</span><b>→</b>
           <span>Studionet lifecycles</span><b>→</b>
           <span>source equality</span><b>→</b>
           <span>Vercel deployment</span><b>→</b>
