@@ -1,0 +1,1 @@
+Final production deployment requested by the repository owner on 2026-09-30. Source code and prior CI were verified; this marker triggers one GitHub-to-Vercel deployment of the consolidated fixes.
