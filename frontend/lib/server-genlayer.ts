@@ -10,6 +10,29 @@ const VERIFIED_V3_APPEAL_CONTRACT =
 const VERIFIED_CROSS_CHAIN_SETTLEMENT_CONTRACT =
   "0x0ca7432339C86ab01118f46D847A11EF94CB4BAA" as const;
 
+const READ_RETRY_DELAYS_MS = [250, 750, 1500, 3000] as const;
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function retryableReadError(error: unknown) {
+  const message =
+    error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+
+  return (
+    /\b(429|500|502|503|504)\b/.test(message) ||
+    message.includes("timeout") ||
+    message.includes("timed out") ||
+    message.includes("fetch failed") ||
+    message.includes("network") ||
+    message.includes("socket") ||
+    message.includes("econnreset") ||
+    message.includes("econnrefused") ||
+    message.includes("gateway")
+  );
+}
+
 export function serverContractAddress(): `0x${string}` {
   const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
   if (!value || !/^0x[a-fA-F0-9]{40}$/.test(value)) {
@@ -70,12 +93,25 @@ export async function serverReadAt(
   functionName: string,
   args: unknown[] = [],
 ) {
-  const client: any = serverReadClient();
-  return client.readContract({
-    address,
-    functionName,
-    args,
-  });
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= READ_RETRY_DELAYS_MS.length; attempt += 1) {
+    try {
+      const client: any = serverReadClient();
+      return await client.readContract({
+        address,
+        functionName,
+        args,
+      });
+    } catch (error) {
+      lastError = error;
+      const hasRetry = attempt < READ_RETRY_DELAYS_MS.length;
+      if (!hasRetry || !retryableReadError(error)) throw error;
+      await sleep(READ_RETRY_DELAYS_MS[attempt]);
+    }
+  }
+
+  throw lastError;
 }
 
 export async function serverRead(functionName: string, args: unknown[] = []) {
@@ -88,7 +124,6 @@ export async function serverReadV2Recipe(
 ) {
   return serverReadAt(serverV2RecipeContractAddress(), functionName, args);
 }
-
 
 export async function serverReadEvidenceRegistry(
   functionName: string,
