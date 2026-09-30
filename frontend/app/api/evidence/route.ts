@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
+  canonicalEvidenceSnapshot,
+  CANONICAL_EVIDENCE_SNAPSHOT_RUN_ID,
+} from "@/lib/canonical-evidence-snapshot";
+import {
   serverContractAddress,
   serverEvidenceRegistryAddress,
   serverRead,
@@ -80,26 +84,35 @@ export async function GET(request: NextRequest) {
       digest: string;
       record: unknown;
     }> = [];
+    let archiveReadMode = "LIVE_REGISTRY";
 
-    for (let round = 1; round <= finalRound; round += 1) {
-      for (const role of roles) {
-        const digest = s(
-          await serverReadEvidenceRegistry("get_record_hash_for_slot", [
-            subjectContract,
-            workflowId,
-            stepId,
-            round,
+    try {
+      for (let round = 1; round <= finalRound; round += 1) {
+        for (const role of roles) {
+          const digest = s(
+            await serverReadEvidenceRegistry("get_record_hash_for_slot", [
+              subjectContract,
+              workflowId,
+              stepId,
+              round,
+              role,
+            ]),
+          );
+          if (!digest) continue;
+          archived.push({
+            decisionRound: round,
             role,
-          ]),
-        );
-        if (!digest) continue;
-        archived.push({
-          decisionRound: round,
-          role,
-          digest,
-          record: await serverReadEvidenceRegistry("get_record", [digest]),
-        });
+            digest,
+            record: await serverReadEvidenceRegistry("get_record", [digest]),
+          });
+        }
       }
+    } catch (error) {
+      const snapshot = canonicalEvidenceSnapshot(workflowId, stepId);
+      if (!snapshot) throw error;
+      archived.length = 0;
+      archived.push(...snapshot);
+      archiveReadMode = "VERIFIED_CANONICAL_SNAPSHOT";
     }
 
     const contractSources = [
@@ -176,6 +189,11 @@ export async function GET(request: NextRequest) {
       provenance: {
         contractStateSource: "GenLayer Studionet",
         immutableArchiveSource: "ResolveGraphEvidenceRegistry on GenLayer Studionet",
+        archiveReadMode,
+        canonicalSnapshotVerificationRun:
+          archiveReadMode === "VERIFIED_CANONICAL_SNAPSHOT"
+            ? CANONICAL_EVIDENCE_SNAPSHOT_RUN_ID
+            : null,
         remoteByteHashScope:
           "Only archive records with content_hash claim a captured remote-byte SHA-256. Contract bounded snapshots have their own separate snapshot hash.",
         registryFetchBoundary:
