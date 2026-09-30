@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  canonicalEvidenceSnapshot,
+  CANONICAL_EVIDENCE_SNAPSHOT_RUN_ID,
+} from "@/lib/canonical-evidence-snapshot";
+import {
   serverContractAddress,
   serverEvidenceRegistryAddress,
   serverRead,
@@ -39,33 +43,48 @@ export async function GET(request: NextRequest) {
     const subject = serverContractAddress();
     const roles = ["PRIMARY", "SUPPORT", "CHALLENGE"] as const;
 
-    const slots: Array<{
+    let records: Array<{
       decisionRound: number;
       role: (typeof roles)[number];
       digest: string;
+      record: unknown;
     }> = [];
+    let archiveReadMode = "LIVE_REGISTRY";
 
-    for (let round = 1; round <= finalRound; round += 1) {
-      for (const role of roles) {
-        const digest = String(
-          await serverReadEvidenceRegistry("get_record_hash_for_slot", [
-            subject,
-            workflowId,
-            stepId,
-            round,
-            role,
-          ]),
-        );
-        if (digest) slots.push({ decisionRound: round, role, digest });
+    try {
+      const slots: Array<{
+        decisionRound: number;
+        role: (typeof roles)[number];
+        digest: string;
+      }> = [];
+
+      for (let round = 1; round <= finalRound; round += 1) {
+        for (const role of roles) {
+          const digest = String(
+            await serverReadEvidenceRegistry("get_record_hash_for_slot", [
+              subject,
+              workflowId,
+              stepId,
+              round,
+              role,
+            ]),
+          );
+          if (digest) slots.push({ decisionRound: round, role, digest });
+        }
       }
-    }
 
-    const records = await Promise.all(
-      slots.map(async (slot) => ({
-        ...slot,
-        record: await serverReadEvidenceRegistry("get_record", [slot.digest]),
-      })),
-    );
+      records = await Promise.all(
+        slots.map(async (slot) => ({
+          ...slot,
+          record: await serverReadEvidenceRegistry("get_record", [slot.digest]),
+        })),
+      );
+    } catch (error) {
+      const snapshot = canonicalEvidenceSnapshot(workflowId, stepId);
+      if (!snapshot) throw error;
+      records = snapshot;
+      archiveReadMode = "VERIFIED_CANONICAL_SNAPSHOT";
+    }
 
     return NextResponse.json({
       schema: "resolvegraph-evidence-archive-v1",
@@ -77,11 +96,17 @@ export async function GET(request: NextRequest) {
       finalDecisionRound: finalRound,
       archivedCount: records.length,
       records: jsonSafe(records),
+      archiveReadMode,
+      canonicalSnapshotVerificationRun:
+        archiveReadMode === "VERIFIED_CANONICAL_SNAPSHOT"
+          ? CANONICAL_EVIDENCE_SNAPSHOT_RUN_ID
+          : null,
       trustBoundary: {
         archiveIsAppendOnlyContentAddressed: true,
         registryPublisherIsRecorded: true,
         registryDoesNotFetchRemoteBytesItself: true,
         productionCaptureEndpointPerformsBoundedPublicHttpsFetch: true,
+        canonicalFallbackIsPinnedFromVerifiedStudionetRun: true,
       },
     });
   } catch (error: any) {
