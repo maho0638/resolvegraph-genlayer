@@ -1,0 +1,24 @@
+name: Debug Production Evidence
+
+on:
+  push:
+    branches:
+      - fix/evidence-rpc-resilience-20260930
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect evidence endpoints
+        shell: bash
+        run: |
+          set -u
+          BASE_URL="https://resolvegraph-genlayer.vercel.app"
+          for path in             "/api/evidence?workflow=rg-live-success-v1&step=source-check"             "/api/evidence/archive?workflow=rg-live-success-v1&step=source-check"
+          do
+            echo "=== $path ==="
+            code="$(curl -sS --max-time 90 -o /tmp/body.txt -w "%{http_code}" "$BASE_URL$path" || true)"
+            echo "HTTP $code"
+            cat /tmp/body.txt || true
+            echo
+          done
