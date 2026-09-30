@@ -16,23 +16,6 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function retryableReadError(error: unknown) {
-  const message =
-    error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-
-  return (
-    /\b(429|500|502|503|504)\b/.test(message) ||
-    message.includes("timeout") ||
-    message.includes("timed out") ||
-    message.includes("fetch failed") ||
-    message.includes("network") ||
-    message.includes("socket") ||
-    message.includes("econnreset") ||
-    message.includes("econnrefused") ||
-    message.includes("gateway")
-  );
-}
-
 export function serverContractAddress(): `0x${string}` {
   const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
   if (!value || !/^0x[a-fA-F0-9]{40}$/.test(value)) {
@@ -105,8 +88,7 @@ export async function serverReadAt(
       });
     } catch (error) {
       lastError = error;
-      const hasRetry = attempt < READ_RETRY_DELAYS_MS.length;
-      if (!hasRetry || !retryableReadError(error)) throw error;
+      if (attempt >= READ_RETRY_DELAYS_MS.length) throw error;
       await sleep(READ_RETRY_DELAYS_MS[attempt]);
     }
   }
