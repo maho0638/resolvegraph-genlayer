@@ -38,9 +38,24 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const step: any = await serverRead("get_step", [workflowId, stepId]);
-    const finalRound = Math.max(1, Number(step?.resolution_round ?? 1));
+    const snapshot = canonicalEvidenceSnapshot(workflowId, stepId);
     const subject = serverContractAddress();
+
+    let finalRound = 1;
+    let finalDecisionRoundSource = "LIVE_WORKFLOW_CONTRACT";
+
+    try {
+      const step: any = await serverRead("get_step", [workflowId, stepId]);
+      finalRound = Math.max(1, Number(step?.resolution_round ?? 1));
+    } catch (error) {
+      if (!snapshot) throw error;
+      finalRound = Math.max(
+        1,
+        ...snapshot.map((item) => Number(item.decisionRound) || 1),
+      );
+      finalDecisionRoundSource = "VERIFIED_CANONICAL_SNAPSHOT";
+    }
+
     const roles = ["PRIMARY", "SUPPORT", "CHALLENGE"] as const;
 
     let records: Array<{
@@ -80,7 +95,6 @@ export async function GET(request: NextRequest) {
         })),
       );
     } catch (error) {
-      const snapshot = canonicalEvidenceSnapshot(workflowId, stepId);
       if (!snapshot) throw error;
       records = snapshot;
       archiveReadMode = "VERIFIED_CANONICAL_SNAPSHOT";
@@ -94,11 +108,13 @@ export async function GET(request: NextRequest) {
       workflowId,
       stepId,
       finalDecisionRound: finalRound,
+      finalDecisionRoundSource,
       archivedCount: records.length,
       records: jsonSafe(records),
       archiveReadMode,
       canonicalSnapshotVerificationRun:
-        archiveReadMode === "VERIFIED_CANONICAL_SNAPSHOT"
+        archiveReadMode === "VERIFIED_CANONICAL_SNAPSHOT" ||
+        finalDecisionRoundSource === "VERIFIED_CANONICAL_SNAPSHOT"
           ? CANONICAL_EVIDENCE_SNAPSHOT_RUN_ID
           : null,
       trustBoundary: {
