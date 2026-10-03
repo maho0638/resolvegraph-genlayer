@@ -1,6 +1,8 @@
 import { createClient } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
 
+const VERIFIED_V1_CONTRACT =
+  "0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0" as const;
 const VERIFIED_V2_RECIPE_CONTRACT =
   "0x58De3354F739D6E1C9DBe1857B072262D96e5EE2" as const;
 const VERIFIED_EVIDENCE_REGISTRY_CONTRACT =
@@ -17,9 +19,11 @@ function sleep(ms: number) {
 }
 
 export function serverContractAddress(): `0x${string}` {
-  const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
-  if (!value || !/^0x[a-fA-F0-9]{40}$/.test(value)) {
-    throw new Error("ResolveGraph contract address is not configured.");
+  const value =
+    process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS_V4?.trim() ||
+    VERIFIED_V1_CONTRACT;
+  if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+    throw new Error("ResolveGraph contract address is invalid.");
   }
   return value as `0x${string}`;
 }
