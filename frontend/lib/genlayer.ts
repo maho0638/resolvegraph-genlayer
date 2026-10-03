@@ -44,8 +44,8 @@ export function v3ContractAddress(): `0x${string}` {
 
 export function evidenceRegistryAddress(): `0x${string}` {
   const value =
-    process.env.NEXT_PUBLIC_RESOLVEGRAPH_EVIDENCE_REGISTRY_ADDRESS?.trim() ||
-    "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390";
+    process.env.NEXT_PUBLIC_RESOLVEGRAPH_EVIDENCE_REGISTRY_ADDRESS_V4?.trim() ||
+    "0x7436623f5bc064179546344b587fe9BF30B71004";
   if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
     throw new Error("ResolveGraph evidence registry address is invalid.");
   }
