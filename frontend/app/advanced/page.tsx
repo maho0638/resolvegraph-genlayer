@@ -483,19 +483,19 @@ export default function AdvancedV3() {
           <div className="formGrid">
             <div className="field"><label>Step ID</label><input value={stepId} onChange={(e) => { setStepId(e.target.value); setLoadedStep(null); }} required /></div>
             <div className="field"><label>Assignee wallet</label><input value={assignee} onChange={(e) => setAssignee(e.target.value)} required /></div>
-            <div className="field"><label>Role</label><input value={roleLabel} onChange={(e) => setRoleLabel(e.target.value)} /></div>
+            <div className="field"><label>Role</label><input value={roleLabel} onChange={(e) => setRoleLabel(e.target.value)} disabled={Boolean(selectedRecipeHash)} /></div>
             <div className="field"><label>Reward (GEN)</label><input value={reward} onChange={(e) => setReward(e.target.value)} required /></div>
             <div className="field"><label>Dependency A</label><input value={depA} onChange={(e) => setDepA(e.target.value)} /></div>
             <div className="field"><label>Dependency B</label><input value={depB} onChange={(e) => setDepB(e.target.value)} /></div>
             <div className="field full"><label>Agent reference</label><input value={agentRef} onChange={(e) => setAgentRef(e.target.value)} /></div>
             <div className="field full"><label>A2A endpoint</label><input value={a2a} onChange={(e) => setA2a(e.target.value)} placeholder="https://…" /></div>
-            <div className="field full"><label>Commitment</label><textarea value={requirement} onChange={(e) => setRequirement(e.target.value)} minLength={20} required /></div>
-            <div className="field full"><label>Acceptance rubric</label><textarea value={rubric} onChange={(e) => setRubric(e.target.value)} minLength={20} required /></div>
+            <div className="field full"><label>Commitment</label><textarea value={requirement} onChange={(e) => setRequirement(e.target.value)} minLength={20} required disabled={Boolean(selectedRecipeHash)} /></div>
+            <div className="field full"><label>Acceptance rubric</label><textarea value={rubric} onChange={(e) => setRubric(e.target.value)} minLength={20} required disabled={Boolean(selectedRecipeHash)} /></div>
             <div className="field full"><label>Deadline</label><input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)} required /></div>
           </div>
           <div className="actions">
             <button className="button" disabled={!!busy}>
-              {busy === "add_step" ? "Funding…" : "Add funded V3 step"}
+              {busy === "add_step" || busy === "add_step_from_recipe" ? "Funding…" : selectedRecipeHash ? "Add recipe-bound V3 step" : "Add funded V3 step"}
             </button>
           </div>
         </form>
