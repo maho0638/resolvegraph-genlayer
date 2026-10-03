@@ -59,8 +59,8 @@ export default function ReviewerMode() {
           </h1>
           <p className="lede">
             A reviewer needs no wallet. Live contract state, evidence versions,
-            challenge deltas, root-cause attribution, rewards, bonds and every
-            canonical transaction are presented in one inspectable path.
+            challenge deltas, root-cause attribution, rewards, bonds and the key
+            canonical transactions are presented in one inspectable path.
           </p>
         </div>
       </div>
@@ -257,10 +257,13 @@ export default function ReviewerMode() {
               </p>
               {Number(data.workflow.attribution_round || 0) > 1 ? (
                 <div className="decisionDiff">
-                  <strong>Attribution changed after challenge</strong>
+                  <strong>Attribution received a second consensus round</strong>
                   <span>
-                    The canonical proof records the initial PARTICIPANT / api-proof /
-                    97% attribution and the final EXTERNAL result before settlement.
+                    Final on-chain attribution: {String(data.workflow.fault_class)}{" "}
+                    {data.workflow.fault_step_id
+                      ? "/ " + String(data.workflow.fault_step_id)
+                      : ""}{" "}
+                    · confidence {pct(data.workflow.fault_confidence)}.
                   </span>
                 </div>
               ) : null}
@@ -271,7 +274,7 @@ export default function ReviewerMode() {
             <div className="sectionHead">
               <div>
                 <div className="eyebrow">Transaction + economic timeline</div>
-                <h2>Every canonical state transition links to Studionet Explorer</h2>
+                <h2>Key canonical state transitions link to Studionet Explorer</h2>
               </div>
             </div>
             <div className="tableWrap">
