@@ -1,2 +1,2 @@
 ResolveGraph controlled Studionet proof trigger.
-Development audit replay after attribution settlement guard.
+State-safe V1 consensus retry verification after transient read/NO_MAJORITY failures.
