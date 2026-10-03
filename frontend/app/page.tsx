@@ -43,8 +43,8 @@ export default function Home() {
       </section>
 
       <section className="proofStrip" aria-label="Verified release facts">
-        <div><strong>97/97</strong><span>direct tests</span></div>
-        <div><strong>18/18</strong><span>SDK tests</span></div>
+        <div><strong>104/104</strong><span>direct tests</span></div>
+        <div><strong>21/21</strong><span>SDK tests</span></div>
         <div><strong>2</strong><span>canonical live lifecycles</span></div>
         <div><strong>TRUE</strong><span>deployed source match</span></div>
       </section>
