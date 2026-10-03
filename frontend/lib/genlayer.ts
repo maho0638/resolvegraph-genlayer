@@ -87,6 +87,19 @@ export async function walletClient() {
   return { client, account: accounts[0] as string };
 }
 
+export async function estimateWriteAt(
+  address: `0x${string}`,
+  request: WriteRequest,
+) {
+  const { client } = await walletClient();
+  return client.estimateTransactionFeesForWrite({
+    address,
+    functionName: request.functionName,
+    args: request.args,
+    value: request.value ?? 0n,
+  });
+}
+
 export async function sendWriteAt(
   address: `0x${string}`,
   request: WriteRequest,
@@ -141,6 +154,10 @@ export async function sendWrite(request: WriteRequest) {
 
 export async function sendWriteV3(request: WriteRequest) {
   return sendWriteAt(v3ContractAddress(), request);
+}
+
+export async function estimateWriteV3(request: WriteRequest) {
+  return estimateWriteAt(v3ContractAddress(), request);
 }
 
 export async function readContractAt(
