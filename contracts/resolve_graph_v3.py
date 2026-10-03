@@ -377,6 +377,16 @@ class ResolveGraphV3(gl.Contract):
             workflow.fault_step_id != workflow.initial_fault_step_id
             or workflow.fault_class != workflow.initial_fault_class
             or workflow.fault_reason != workflow.initial_fault_reason
+            or self._attribution_slash_step_id(
+                workflow.fault_step_id,
+                workflow.fault_class,
+                int(workflow.fault_confidence),
+            )
+            != self._attribution_slash_step_id(
+                workflow.initial_fault_step_id,
+                workflow.initial_fault_class,
+                int(workflow.initial_fault_confidence),
+            )
         )
 
     def _attribution_slash_step_id(
