@@ -11,7 +11,9 @@ from gltest.assertions import tx_execution_succeeded
 
 
 _SECP256K1_N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
-SUBJECT_CONTRACT = "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754"
+SUBJECT_CONTRACT = Path(".github/resolvegraph-evidence-subject.txt").read_text(
+    encoding="utf-8"
+).strip()
 WORKFLOW_ID = "rg-live-success-v1"
 STEP_ID = "source-check"
 
@@ -56,6 +58,7 @@ def test_typed_evidence_registry_on_studionet():
 
     print("RG_EVIDENCE_REGISTRY=" + str(contract.address), flush=True)
     print("RG_EVIDENCE_PUBLISHER=" + str(publisher_account.address), flush=True)
+    print("RG_EVIDENCE_SUBJECT=" + SUBJECT_CONTRACT, flush=True)
 
     evidence = [
         {
@@ -137,10 +140,12 @@ def test_typed_evidence_registry_on_studionet():
         assert str(_field(stored, "immutable_ref")) == content_hash
         assert str(_field(stored, "rubric_relation")) == item["relation"]
         hashes.append(str(digest))
-        print(
-            "RG_EVIDENCE_" + item["role"] + "_DIGEST=" + str(digest),
-            flush=True,
-        )
+        prefix = "RG_EVIDENCE_" + item["role"]
+        print(prefix + "_DIGEST=" + str(digest), flush=True)
+        print(prefix + "_CONTENT_HASH=" + str(_field(stored, "content_hash")), flush=True)
+        print(prefix + "_CONTENT_TYPE=" + str(_field(stored, "content_type")), flush=True)
+        print(prefix + "_FETCHED_AT=" + str(int(_field(stored, "fetched_at"))), flush=True)
+        print(prefix + "_CREATED_AT=" + str(int(_field(stored, "created_at"))), flush=True)
 
     assert int(contract.get_record_count().call()) == 3
     assert len(set(hashes)) == 3

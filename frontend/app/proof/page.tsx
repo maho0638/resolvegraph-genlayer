@@ -1,15 +1,15 @@
 import Link from "next/link";
 
-const contract = "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754";
-const v2Contract = "0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1";
-const evidenceRegistry = "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390";
-const canonicalCi = "36545373008";
-const canonicalStudionet = "36545373155";
-const v2RecipeProof = "36587816018";
-const evidenceArchiveProof = "36598129489";
+const contract = "0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0";
+const v2Contract = "0x58De3354F739D6E1C9DBe1857B072262D96e5EE2";
+const evidenceRegistry = "0x7436623f5bc064179546344b587fe9BF30B71004";
+const canonicalCi = "37133973510";
+const canonicalStudionet = "37131853576";
+const v2RecipeProof = "37117935627";
+const evidenceArchiveProof = "37132147367";
 const firstProductionSmoke = "36587466475";
-const sourceHash = "f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb";
-const v2SourceHash = "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673";
+const sourceHash = "2241bbb42f4eafcd827f54f7ea065da794a55377159fe91ed9d09844b7416afa";
+const v2SourceHash = "271ad9bfadcf5fa0d123022097485cf0d6073ba65b1f6cf8d6e1f40938725849";
 const evidenceSourceHash = "8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472";
 
 export default function Proof() {
@@ -35,7 +35,7 @@ export default function Proof() {
       <section className="grid3">
         <div className="metric">
           <span>Direct tests</span>
-          <strong>97 / 97 PASS</strong>
+          <strong>104 / 104 PASS</strong>
           <span>V1 graph/economics, V2 recipes and typed evidence archive coverage</span>
         </div>
         <div className="metric">
@@ -54,8 +54,8 @@ export default function Proof() {
         <div className="eyebrow">Verification chain</div>
         <h2>From source to public product</h2>
         <div className="flow verificationFlow">
-          <span>97 direct tests</span><b>→</b>
-          <span>18 SDK tests</span><b>→</b>
+          <span>104 direct tests</span><b>→</b>
+          <span>21 SDK tests</span><b>→</b>
           <span>V1 Studionet lifecycles</span><b>→</b>
           <span>V2 recipe registry</span><b>→</b>
           <span>typed evidence archive</span><b>→</b>
@@ -69,7 +69,9 @@ export default function Proof() {
         <div className="proofFacts">
           <p><strong>V1 contract</strong><code>{contract}</code></p>
           <p><strong>CI run</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + canonicalCi} target="_blank" rel="noreferrer">{canonicalCi} · SUCCESS ↗</a></p>
-          <p><strong>Studionet run</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + canonicalStudionet} target="_blank" rel="noreferrer">{canonicalStudionet} · SUCCESS ↗</a></p>
+          <p><strong>Studionet completion</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + canonicalStudionet} target="_blank" rel="noreferrer">{canonicalStudionet} · RESUME SUCCESS ↗</a></p>
+          <p><strong>Interrupted run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/37117935584" target="_blank" rel="noreferrer">37117935584 · network timeout, state later finalized ↗</a></p>
+          <p><strong>Read-only recovery proof</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/37131762703" target="_blank" rel="noreferrer">37131762703 · SUCCESS ↗</a></p>
           <p><strong>Production smoke baseline</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + firstProductionSmoke} target="_blank" rel="noreferrer">{firstProductionSmoke} · SUCCESS ↗</a></p>
           <p><strong>V1 source SHA256</strong><code>{sourceHash}</code></p>
           <p><strong>Deployed-source equality</strong><code>true</code></p>
@@ -119,12 +121,12 @@ export default function Proof() {
         <div className="eyebrow">V3 bounded bonded appeals · LIVE VERIFIED</div>
         <h2>Appeal rounds are finite, bonded and explicitly finalized</h2>
         <div className="proofFacts">
-          <p><strong>V3 contract</strong><code>0x14948AD5dCd317Ec49f5CEf7e08c72176C900214</code></p>
+          <p><strong>V3 contract</strong><code>0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A</code></p>
           <p><strong>Policy</strong><code>RG_V3_BOUNDED_APPEALS</code></p>
-          <p><strong>Proof run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36604861578" target="_blank" rel="noreferrer">36604861578 · SUCCESS ↗</a></p>
-          <p><strong>Source SHA256</strong><code>4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee</code></p>
+          <p><strong>Proof run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/37135064005" target="_blank" rel="noreferrer">37135064005 · SUCCESS ↗</a></p>
+          <p><strong>Source SHA256</strong><code>b15e44514cf05c7c50713e21ad90bb76d194329e3232c32cce01ed72022b9342</code></p>
           <p><strong>Deployed-source equality</strong><code>true</code></p>
-          <p><strong>Live decision</strong><code>PASS → appeal → PASS · finalized · 50,000,000,000 appeal bond</code></p>
+          <p><strong>Live decision</strong><code>PASS → bonded appeal → PASS · finalized · PAID → workflow COMPLETED</code></p>
         </div>
         <div className="actions">
           <Link className="button secondary" href="/appeals">Open bounded appeals</Link>
@@ -174,7 +176,7 @@ export default function Proof() {
             unlocked the downstream dependency and completed the workflow.
           </p>
           <p><strong>Final status:</strong> COMPLETED</p>
-          <p><strong>Step 1 final decision:</strong> <code>7e7f81ae864920b34fe87674f73ec3b0c750db653d8d45e73cd949d24cea46e4</code></p>
+          <p><strong>Step 1 final decision:</strong> <code>bf299d3dd3276904426c56412c8c3e4f63050173214ca02263651efe3c60a9fe</code></p>
           <Link className="textLink" href="/workflows/rg-live-success-v1">Open live case →</Link>
         </div>
 
@@ -182,13 +184,13 @@ export default function Proof() {
           <div className="eyebrow">Failure workflow</div>
           <h2>rg-live-failure-v1</h2>
           <p className="muted">
-            A deliberately false API/SLA claim failed consensus. Initial
-            workflow attribution assigned PARTICIPANT fault at 97% confidence.
-            Fresh attribution evidence triggered a second consensus round and
-            changed the final fault class to EXTERNAL before settlement.
+            A deliberately false API/SLA claim failed consensus. Fresh
+            step and attribution evidence produced second consensus rounds.
+            The final workflow fault was PARTICIPANT / api-proof and the
+            deterministic failed-workflow settlement completed.
           </p>
           <p><strong>Final status:</strong> FAILED_SETTLED</p>
-          <p><strong>Final decision:</strong> <code>e1d87201e5b70ab509cb03ea6bc3979b178af0e9f3c3744d61ff456ed6bb537c</code></p>
+          <p><strong>Final decision:</strong> <code>389c2a7dc0a7e6c9fc0901b3ff52b3f58cd2d43835eced3dbbcc8eddd87f0c91</code></p>
           <Link className="textLink" href="/workflows/rg-live-failure-v1">Open live case →</Link>
         </div>
       </section>

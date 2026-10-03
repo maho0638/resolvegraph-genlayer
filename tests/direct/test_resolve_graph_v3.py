@@ -388,3 +388,50 @@ def test_failed_workflow_cannot_settle_before_attribution_finalization(
     settled = contract.settle_failed_workflow(WORKFLOW_ID)
     assert int(settled) > 0
     assert contract.get_workflow(WORKFLOW_ID).status == "FAILED_SETTLED"
+
+
+def test_attribution_appeal_refunds_when_slash_target_changes(
+    direct_vm, direct_deploy, direct_alice, direct_bob
+):
+    contract = direct_deploy("contracts/resolve_graph_v3.py")
+    create_active(direct_vm, contract, direct_alice, direct_bob)
+
+    resolve_initial(
+        direct_vm,
+        contract,
+        verdict="FAIL",
+        score=15,
+        confidence=96,
+        reason_code="CONTRADICTORY_EVIDENCE",
+        failure_class="LOCAL",
+    )
+    direct_vm.warp(
+        (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
+    )
+    contract.finalize_step_decision(WORKFLOW_ID, STEP_ID)
+
+    # Round 1 crosses the >=80 participant-bond slashing boundary.
+    mock_attribution(direct_vm, confidence=85)
+    contract.attribute_failure(WORKFLOW_ID, STEP_ID)
+
+    direct_vm.sender = direct_bob
+    direct_vm.value = APPEAL_BOND
+    contract.challenge_attribution(
+        WORKFLOW_ID,
+        ATTRIBUTION_CHALLENGE,
+        "Fresh evidence changes the economic slashing consequence.",
+    )
+    direct_vm.value = 0
+
+    # Same fault label/reason, but no participant slash after the appeal.
+    mock_attribution(direct_vm, confidence=75)
+    contract.resolve_attribution_challenge(WORKFLOW_ID)
+    returned = contract.finalize_attribution(WORKFLOW_ID)
+
+    workflow = contract.get_workflow(WORKFLOW_ID)
+    assert int(workflow.initial_fault_confidence) == 85
+    assert int(workflow.fault_confidence) == 75
+    assert workflow.initial_fault_class == "PARTICIPANT"
+    assert workflow.fault_class == "PARTICIPANT"
+    assert workflow.attribution_challenge_outcome_changed is True
+    assert int(returned) == APPEAL_BOND

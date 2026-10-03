@@ -17,6 +17,8 @@ ResolveGraph treats public evidence, agent metadata and AI output as untrusted.
 | Challenge is metadata only | Challenge triggers fresh evidence evaluation. |
 | Later failure reveals earlier bad work | Successful-step bonds remain locked until workflow terminal settlement. |
 | AI arbitrarily slashes a participant | Slash requires a valid workflow step, PARTICIPANT fault class, and a deterministic high-confidence threshold. |
+| Validator confidence drift crosses an economic threshold | Attribution validators compare the derived slash target as well as semantic fields, so numerically-close confidence values cannot agree if one would slash and the other would return the bond. |
+| V3 appeal changes only the slash consequence | Attribution appeal finalization treats a changed derived slash target as a material outcome change, so the challenger bond follows the actual economic consequence rather than only the textual fault label. |
 | Ambiguous fault destroys participant funds | EXTERNAL, MULTIPLE or UNDETERMINED attribution returns bonds. |
 | Double payout/refund | Reward and bond settlement flags plus terminal workflow states block repeats. |
 | Dependency bypass | A step can submit only after all configured prerequisites are PAID. |

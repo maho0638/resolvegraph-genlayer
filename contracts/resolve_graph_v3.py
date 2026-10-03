@@ -377,7 +377,28 @@ class ResolveGraphV3(gl.Contract):
             workflow.fault_step_id != workflow.initial_fault_step_id
             or workflow.fault_class != workflow.initial_fault_class
             or workflow.fault_reason != workflow.initial_fault_reason
+            or self._attribution_slash_step_id(
+                workflow.fault_step_id,
+                workflow.fault_class,
+                int(workflow.fault_confidence),
+            )
+            != self._attribution_slash_step_id(
+                workflow.initial_fault_step_id,
+                workflow.initial_fault_class,
+                int(workflow.initial_fault_confidence),
+            )
         )
+
+    def _attribution_slash_step_id(
+        self, fault_step_id: str, fault_class: str, confidence: int
+    ) -> str:
+        if (
+            fault_class == "PARTICIPANT"
+            and fault_step_id
+            and int(confidence) >= MIN_SLASH_CONFIDENCE
+        ):
+            return fault_step_id
+        return ""
 
     def _decision_hash_step(self, step: Step) -> str:
         payload = (
@@ -813,6 +834,16 @@ Return JSON only:
                     int(lead.get("confidence", 0))
                     - int(check.get("confidence", 0))
                 ) > 10:
+                    return False
+                if self._attribution_slash_step_id(
+                    str(lead.get("fault_step_id", "")),
+                    str(lead.get("fault_class", "")),
+                    int(lead.get("confidence", 0)),
+                ) != self._attribution_slash_step_id(
+                    str(check.get("fault_step_id", "")),
+                    str(check.get("fault_class", "")),
+                    int(check.get("confidence", 0)),
+                ):
                     return False
                 return True
             except Exception:
@@ -1719,13 +1750,11 @@ Return JSON only:
         if not self._attribution_settlement_ready(workflow):
             raise gl.vm.UserError("Workflow attribution is not settlement-ready")
 
-        slash_step_id = ""
-        if (
-            workflow.fault_class == "PARTICIPANT"
-            and workflow.fault_step_id
-            and int(workflow.fault_confidence) >= MIN_SLASH_CONFIDENCE
-        ):
-            slash_step_id = workflow.fault_step_id
+        slash_step_id = self._attribution_slash_step_id(
+            workflow.fault_step_id,
+            workflow.fault_class,
+            int(workflow.fault_confidence),
+        )
 
         sponsor_total = 0
         return_total = 0

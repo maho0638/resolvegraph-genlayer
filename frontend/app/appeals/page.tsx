@@ -27,8 +27,8 @@ function short(value?: string): string {
 
 const WORKFLOW_ID = "rg-v3-live-appeal-v1";
 const STEP_ID = "example-domain-proof";
-const PROOF_RUN = "36604861578";
-const SOURCE_HASH = "4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee";
+const PROOF_RUN = "37135064005";
+const SOURCE_HASH = "b15e44514cf05c7c50713e21ad90bb76d194329e3232c32cce01ed72022b9342";
 
 async function load() {
   const [workflow, step, appealBond] = await Promise.all([
@@ -116,7 +116,7 @@ export default async function Appeals() {
       <section className="panel section">
         <div className="eyebrow">Isolation boundary</div>
         <h2>V3 does not silently replace the proven V1 settlement contract</h2>
-        <p className="muted">V3 is an independently deployed, source-matched Studionet proof surface. The production builder continues to use canonical V1 until a deliberate migration is selected and separately verified.</p>
+        <p className="muted">V3 is an independently deployed, source-matched Studionet proof surface. The builder uses the promoted V1 settlement contract, while V3 remains an explicit policy surface with its own verified address and proof lineage.</p>
       </section>
     </>
   );

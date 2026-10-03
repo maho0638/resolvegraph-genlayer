@@ -17,18 +17,35 @@ export type WriteRequest = {
   value?: bigint;
 };
 
+const VERIFIED_V1_CONTRACT =
+  "0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0" as const;
+const VERIFIED_V3_APPEAL_CONTRACT =
+  "0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A" as const;
+
 export function contractAddress(): `0x${string}` {
-  const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
-  if (!value || !/^0x[a-fA-F0-9]{40}$/.test(value)) {
-    throw new Error("ResolveGraph contract address is not configured yet.");
+  const value =
+    process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS_V4?.trim() ||
+    VERIFIED_V1_CONTRACT;
+  if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+    throw new Error("ResolveGraph contract address is invalid.");
+  }
+  return value as `0x${string}`;
+}
+
+export function v3ContractAddress(): `0x${string}` {
+  const value =
+    process.env.NEXT_PUBLIC_RESOLVEGRAPH_V3_APPEAL_CONTRACT_ADDRESS_V4?.trim() ||
+    VERIFIED_V3_APPEAL_CONTRACT;
+  if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+    throw new Error("ResolveGraph V3 contract address is invalid.");
   }
   return value as `0x${string}`;
 }
 
 export function evidenceRegistryAddress(): `0x${string}` {
   const value =
-    process.env.NEXT_PUBLIC_RESOLVEGRAPH_EVIDENCE_REGISTRY_ADDRESS?.trim() ||
-    "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390";
+    process.env.NEXT_PUBLIC_RESOLVEGRAPH_EVIDENCE_REGISTRY_ADDRESS_V4?.trim() ||
+    "0x7436623f5bc064179546344b587fe9BF30B71004";
   if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
     throw new Error("ResolveGraph evidence registry address is invalid.");
   }
@@ -72,6 +89,19 @@ export async function walletClient() {
   const client: any = createClient(config);
   await client.connect("studionet");
   return { client, account: accounts[0] as string };
+}
+
+export async function estimateWriteAt(
+  address: `0x${string}`,
+  request: WriteRequest,
+) {
+  const { client } = await walletClient();
+  return client.estimateTransactionFeesForWrite({
+    address,
+    functionName: request.functionName,
+    args: request.args,
+    value: request.value ?? 0n,
+  });
 }
 
 export async function sendWriteAt(
@@ -126,16 +156,35 @@ export async function sendWrite(request: WriteRequest) {
   return sendWriteAt(contractAddress(), request);
 }
 
-export async function readContract(
+export async function sendWriteV3(request: WriteRequest) {
+  return sendWriteAt(v3ContractAddress(), request);
+}
+
+export async function estimateWriteV3(request: WriteRequest) {
+  return estimateWriteAt(v3ContractAddress(), request);
+}
+
+export async function readContractAt(
+  address: `0x${string}`,
   functionName: string,
   args: unknown[] = [],
 ): Promise<any> {
   const client: any = readClient();
-  return client.readContract({
-    address: contractAddress(),
-    functionName,
-    args,
-  });
+  return client.readContract({ address, functionName, args });
+}
+
+export async function readContract(
+  functionName: string,
+  args: unknown[] = [],
+): Promise<any> {
+  return readContractAt(contractAddress(), functionName, args);
+}
+
+export async function readContractV3(
+  functionName: string,
+  args: unknown[] = [],
+): Promise<any> {
+  return readContractAt(v3ContractAddress(), functionName, args);
 }
 
 export function parseGen(value: string): bigint {

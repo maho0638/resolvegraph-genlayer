@@ -19,6 +19,7 @@ export default function Home() {
             <Link className="button" href="/workflows/new">Build a workflow</Link>
             <Link className="button secondary" href="/explorer">Open explorer</Link>
             <Link className="button secondary" href="/proof">Review live proof</Link>
+            <Link className="button secondary" href="/advanced">Open V3 workbench</Link>
           </div>
         </div>
 
@@ -42,8 +43,8 @@ export default function Home() {
       </section>
 
       <section className="proofStrip" aria-label="Verified release facts">
-        <div><strong>80/80</strong><span>direct tests</span></div>
-        <div><strong>14/14</strong><span>SDK tests</span></div>
+        <div><strong>104/104</strong><span>direct tests</span></div>
+        <div><strong>21/21</strong><span>SDK tests</span></div>
         <div><strong>2</strong><span>canonical live lifecycles</span></div>
         <div><strong>TRUE</strong><span>deployed source match</span></div>
       </section>

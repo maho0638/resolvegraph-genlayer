@@ -31,20 +31,20 @@ Production: https://resolvegraph-genlayer.vercel.app
 
 ## Verified deterministic gate
 
-- 97/97 direct tests PASS.
+- 104/104 direct tests PASS.
 - GenVM lint PASS.
-- 18/18 SDK tests PASS.
+- 21/21 SDK tests PASS.
 - Frontend typecheck PASS.
 - Frontend production build PASS.
-- Canonical predeploy CI run: `36545373008`.
+- Final development CI must be SUCCESS on the promoted commit.
 
 ## Verified live contract proof
 
-Canonical Studionet run: `36545373155`.
+Canonical Studionet completion run: `37131853576`.
 
 Contract:
 
-`0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754`
+`0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0`
 
 The run completed:
 - a two-agent dependent success workflow with two challenged consensus rounds and terminal `COMPLETED`;
@@ -61,11 +61,11 @@ Normalized deployed/repository SHA256:
 
 ## Verified V2 immutable recipe registry
 
-Studionet run: `36587816018` — SUCCESS.
+Studionet run: `37117935627` — SUCCESS.
 
 V2 contract:
 
-`0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1`
+`0x58De3354F739D6E1C9DBe1857B072262D96e5EE2`
 
 V2 source SHA256:
 
@@ -75,11 +75,11 @@ The run registered software-delivery, research-verification and service-sla v1 p
 
 ## Verified typed evidence archive
 
-Studionet run: `36598129489` — SUCCESS.
+Studionet run: `37132147367` — SUCCESS.
 
 Evidence registry:
 
-`0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390`
+`0x7436623f5bc064179546344b587fe9BF30B71004`
 
 Evidence registry source SHA256:
 
@@ -101,15 +101,15 @@ A clean consumer installs the packed SDK through the package boundary, verifies 
 
 ## Verified V3 bounded appeals
 
-Studionet run: `36604861578` — SUCCESS.
+Studionet run: `37135064005` — SUCCESS.
 
 V3 contract:
 
-`0x14948AD5dCd317Ec49f5CEf7e08c72176C900214`
+`0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A`
 
 V3 source SHA256:
 
-`4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee`
+`b15e44514cf05c7c50713e21ad90bb76d194329e3232c32cce01ed72022b9342`
 
 The contract limits a step to one fresh-evidence appeal, requires an exact 5% appeal bond, performs a second consensus round, records decision lineage and blocks settlement until explicit finalization. Deployed-source equality is true.
 

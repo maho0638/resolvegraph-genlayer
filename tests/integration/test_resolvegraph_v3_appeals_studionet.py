@@ -1,6 +1,7 @@
 """Live Studionet proof for ResolveGraph V3 bounded bonded appeals."""
 
 import hashlib
+import time
 from pathlib import Path
 
 import pytest
@@ -22,6 +23,84 @@ def _field(value, name):
     if isinstance(value, dict):
         return value.get(name)
     return getattr(value, name)
+
+
+def _resolve_challenge_until_round2(
+    sponsor,
+    contract,
+    workflow_id: str,
+    step_id: str,
+    *,
+    attempts: int = 3,
+):
+    """Retry only while on-chain state proves the appeal is still unresolved.
+
+    A Studionet consensus transaction can terminate without applying round 2
+    during validator/gateway instability. Re-submission is safe only while the
+    step is still CHALLENGED at round 1. We never retry after round 2 appears.
+    """
+    last_error = None
+    for attempt in range(1, attempts + 1):
+        step = contract.get_step(args=[workflow_id, step_id]).call()
+        round_no = int(_field(step, "resolution_round"))
+        status = str(_field(step, "status"))
+        if round_no == 2:
+            return step
+        assert round_no == 1
+        assert status == "CHALLENGED"
+
+        print(
+            "RG_V3_RERESOLVE_ATTEMPT=" + str(attempt),
+            flush=True,
+        )
+        try:
+            tx = sponsor.resolve_step_challenge(
+                args=[workflow_id, step_id]
+            ).transact(
+                consensus_max_rotations=4,
+                wait_interval=10000,
+                wait_retries=180,
+            )
+            print(
+                "RG_V3_RERESOLVE_TX=" + str(tx.get("hash", "")),
+                flush=True,
+            )
+            print(
+                "RG_V3_RERESOLVE_STATUS=" +
+                str(tx.get("status_name", tx.get("status", ""))),
+                flush=True,
+            )
+            print(
+                "RG_V3_RERESOLVE_RESULT=" +
+                str(tx.get("result_name", tx.get("result", ""))),
+                flush=True,
+            )
+            assert tx_execution_succeeded(tx)
+        except Exception as exc:
+            last_error = exc
+            print(
+                "RG_V3_RERESOLVE_ERROR=" + repr(exc),
+                flush=True,
+            )
+
+        # Give a delayed finalized transaction a short chance to become
+        # observable before deciding whether a state-safe retry is needed.
+        for _ in range(12):
+            time.sleep(5)
+            step = contract.get_step(args=[workflow_id, step_id]).call()
+            if int(_field(step, "resolution_round")) == 2:
+                return step
+            if str(_field(step, "status")) != "CHALLENGED":
+                break
+
+    step = contract.get_step(args=[workflow_id, step_id]).call()
+    if int(_field(step, "resolution_round")) == 2:
+        return step
+    if last_error is not None:
+        raise AssertionError(
+            "V3 appeal did not reach round 2 after state-safe retries"
+        ) from last_error
+    raise AssertionError("V3 appeal did not reach round 2 after state-safe retries")
 
 
 @pytest.mark.integration
@@ -59,7 +138,6 @@ def test_resolvegraph_v3_bonded_step_appeal_on_studionet():
     ).transact(wait_interval=10000, wait_retries=60)
     assert tx_execution_succeeded(tx)
 
-    import time
     tx = sponsor.add_step(
         args=[
             workflow_id,
@@ -141,14 +219,12 @@ def test_resolvegraph_v3_bonded_step_appeal_on_studionet():
     assert str(_field(challenged, "status")) == "CHALLENGED"
     assert int(_field(challenged, "challenge_bond_posted")) == appeal_bond
 
-    tx = sponsor.resolve_step_challenge(args=[workflow_id, step_id]).transact(
-        consensus_max_rotations=4,
-        wait_interval=10000,
-        wait_retries=180,
+    after = _resolve_challenge_until_round2(
+        sponsor,
+        contract,
+        workflow_id,
+        step_id,
     )
-    assert tx_execution_succeeded(tx)
-
-    after = contract.get_step(args=[workflow_id, step_id]).call()
     assert int(_field(after, "resolution_round")) == 2
     assert int(_field(after, "challenge_count")) == 1
     assert str(_field(after, "decision_hash")) != first_decision
@@ -176,3 +252,23 @@ def test_resolvegraph_v3_bonded_step_appeal_on_studionet():
         flush=True,
     )
     print("RG_V3_FINAL_DECISION=" + str(_field(final, "decision_hash")), flush=True)
+
+    assert str(_field(final, "verdict")) == "PASS"
+    tx = sponsor.settle_passed_step(args=[workflow_id, step_id]).transact(
+        wait_interval=10000,
+        wait_retries=60,
+    )
+    assert tx_execution_succeeded(tx)
+
+    paid = contract.get_step(args=[workflow_id, step_id]).call()
+    assert str(_field(paid, "status")) == "PAID"
+    print("RG_V3_STEP_FINAL_STATUS=PAID", flush=True)
+
+    tx = sponsor.complete_workflow(args=[workflow_id]).transact(
+        wait_interval=10000,
+        wait_retries=60,
+    )
+    assert tx_execution_succeeded(tx)
+    completed = contract.get_workflow(args=[workflow_id]).call()
+    assert str(_field(completed, "status")) == "COMPLETED"
+    print("RG_V3_WORKFLOW_FINAL_STATUS=COMPLETED", flush=True)

@@ -36,6 +36,13 @@ export function requiredBond(reward: bigint | number | string): bigint {
   return bond > 0n ? bond : 1n;
 }
 
+export function requiredAppealBond(reward: bigint | number | string): bigint {
+  const n = BigInt(reward);
+  if (n <= 0n) throw new Error("Reward must be greater than zero.");
+  const bond = n / 20n;
+  return bond > 0n ? bond : 1n;
+}
+
 export function normalizeAgentRef(ref: AgentIdentityRef): {
   agentRef: string;
   a2aEndpoint: string;
@@ -131,6 +138,39 @@ export function buildAddStep(input: {
   };
 }
 
+export function buildAddStepFromRecipe(input: {
+  workflowId: string;
+  stepId: string;
+  assignee: HexAddress;
+  recipeHash: string;
+  identity?: AgentIdentityRef;
+  dependencyA?: string;
+  dependencyB?: string;
+  deadlineUnix: bigint | number | string;
+  rewardWei: bigint;
+}): ContractWriteRequest {
+  if (input.rewardWei <= 0n) throw new Error("Step reward must be greater than zero.");
+  if (!/^[a-fA-F0-9]{64}$/.test(input.recipeHash.trim())) {
+    throw new Error("Recipe hash must be a 64-character SHA-256 digest.");
+  }
+  const identity = normalizeAgentRef(input.identity ?? {});
+  return {
+    functionName: "add_step_from_recipe",
+    args: [
+      input.workflowId.trim(),
+      input.stepId.trim(),
+      input.assignee,
+      input.recipeHash.trim().toLowerCase(),
+      identity.agentRef,
+      identity.a2aEndpoint,
+      input.dependencyA ?? "",
+      input.dependencyB ?? "",
+      BigInt(input.deadlineUnix),
+    ],
+    value: input.rewardWei,
+  };
+}
+
 export function buildSealWorkflow(workflowId: string): ContractWriteRequest {
   return { functionName: "seal_workflow", args: [workflowId] };
 }
@@ -171,6 +211,33 @@ export function buildChallengeStep(
   return {
     functionName: "challenge_step",
     args: [workflowId, stepId, challengeUrl, note],
+  };
+}
+
+export function buildBondedStepChallenge(
+  workflowId: string,
+  stepId: string,
+  challengeUrl: string,
+  note: string,
+  appealBondWei: bigint,
+): ContractWriteRequest {
+  if (appealBondWei <= 0n) throw new Error("Appeal bond must be greater than zero.");
+  normalizedHttpsHost(challengeUrl);
+  if (note.trim().length < 20) throw new Error("Challenge note must be at least 20 characters.");
+  return {
+    functionName: "challenge_step",
+    args: [workflowId.trim(), stepId.trim(), challengeUrl.trim(), note.trim()],
+    value: appealBondWei,
+  };
+}
+
+export function buildFinalizeStepDecision(
+  workflowId: string,
+  stepId: string,
+): ContractWriteRequest {
+  return {
+    functionName: "finalize_step_decision",
+    args: [workflowId.trim(), stepId.trim()],
   };
 }
 

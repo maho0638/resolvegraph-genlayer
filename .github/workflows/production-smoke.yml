@@ -63,6 +63,7 @@ jobs:
           check_page "/explorer" "Public Explorer"
           check_page "/reviewer" "Reviewer Mode"
           check_page "/appeals" "Bounded Bonded Appeals"
+          check_page "/advanced" "Advanced V3 Workbench"
           check_page "/cross-chain" "Cross-Chain Conditioned Settlement"
           check_page "/operate" "Operator Console"
           check_page "/recipes" "Workflow Recipes"
@@ -124,7 +125,7 @@ jobs:
           data = json.loads(os.environ["FAILURE_JSON"])
           wf = data["workflow"]
           assert wf["status"] == "FAILED_SETTLED"
-          assert wf["fault_class"] == "EXTERNAL"
+          assert wf["fault_class"] == "PARTICIPANT"
           print("failure workflow ok")
           PY
 
@@ -232,7 +233,7 @@ jobs:
           data = json.loads(os.environ["ARCHIVE_JSON"])
           assert data["schema"] == "resolvegraph-evidence-archive-v1"
           assert data["archivedCount"] == 3
-          assert data["registryContract"].lower() == "0xb5b0dd5e454590fcb4fcefd85b11d16774552390"
+          assert data["registryContract"].lower() == "0x7436623f5bc064179546344b587fe9bf30b71004"
           roles = {(x["decisionRound"], x["role"]) for x in data["records"]}
           assert (1, "PRIMARY") in roles
           assert (1, "SUPPORT") in roles

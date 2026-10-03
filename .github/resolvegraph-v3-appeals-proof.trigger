@@ -1,3 +1,2 @@
 ResolveGraph V3 bounded bonded appeals live proof trigger.
-
-retry-long-consensus-window-2026-09-29
+State-safe retry replay after Studionet round-2 non-application.

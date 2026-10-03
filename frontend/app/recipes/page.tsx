@@ -6,10 +6,10 @@ import {
 } from "@/lib/server-genlayer";
 
 const proof = {
-  run: "36587816018",
+  run: "37117935627",
   workflow: "rg-v2-live-recipe-v1",
   sourceHash:
-    "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673",
+    "271ad9bfadcf5fa0d123022097485cf0d6073ba65b1f6cf8d6e1f40938725849",
 };
 
 function asText(value: unknown) {

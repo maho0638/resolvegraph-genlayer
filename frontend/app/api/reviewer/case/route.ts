@@ -4,6 +4,7 @@ import {
   explorerTxUrl,
 } from "@/lib/canonical-proof";
 import {
+  serverContractAddress,
   serverRead,
   serverReadEvidenceRegistry,
   serverEvidenceRegistryAddress,
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
         for (const role of ["PRIMARY", "SUPPORT", "CHALLENGE"]) {
           const digest = String(
             await serverReadEvidenceRegistry("get_record_hash_for_slot", [
-              process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS,
+              serverContractAddress(),
               workflowId,
               String(step?.id || ""),
               round,

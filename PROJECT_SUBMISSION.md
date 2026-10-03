@@ -2,7 +2,7 @@
 
 ## Status
 
-**LIVE_VERIFIED — SUBMISSION READY**
+**DEVELOPMENT VERIFIED — FINAL PRODUCTION PROMOTION PENDING**
 
 ResolveGraph is built for the GenLayer Projects category, where the Intelligent Contract is central to the product rather than an optional demo.
 
@@ -47,37 +47,37 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 
 ## Canonical verification
 
-- Predeploy CI run: `36545373008` — **SUCCESS**.
-- Direct tests: **97/97 PASS**.
+- Development CI is re-run on the final promoted commit before production deployment.
+- Direct tests: **104/104 PASS**.
 - GenVM lint: **PASS**.
-- SDK tests: **18/18 PASS**.
+- SDK tests: **21/21 PASS**.
 - Frontend typecheck/build: **PASS**.
-- Canonical Studionet run: `36545373155` — **SUCCESS**.
-- Contract: `0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754`.
+- Canonical Studionet completion run: `37131853576` — **SUCCESS** after read-only recovery inspection of a delayed consensus transaction.
+- Contract: `0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0`.
 - Success workflow `rg-live-success-v1`: **COMPLETED**.
 - Failure workflow `rg-live-failure-v1`: **FAILED_SETTLED**.
-- Failure attribution changed from **PARTICIPANT / api-proof / 97%** to **EXTERNAL** after the attribution challenge and second consensus round.
+- The failure path received a second attribution consensus round and finalized as **PARTICIPANT / api-proof** before deterministic settlement.
 - Normalized deployed source SHA256: `f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb`.
 - Normalized repository source SHA256: `f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb`.
 - Deployed-source equality: **true**.
 - Provenance feature verification commit: `5da51a7647dae310c551f4afcce49ea4c7e0b802`.
 - Provenance feature CI run: `36572374200` — **SUCCESS**.
 - Provenance feature production smoke run: `36572844244` — **SUCCESS**.
-- V2 immutable recipe registry Studionet run: `36587816018` — **SUCCESS** after retrying a transient GenLayer gateway 502.
-- V2 contract: `0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1`.
+- V2 immutable recipe registry Studionet run: `37117935627` — **SUCCESS**.
+- V2 contract: `0x58De3354F739D6E1C9DBe1857B072262D96e5EE2`.
 - V2 source SHA256: `2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673`.
 - V2 deployed-source equality: **true**.
 - V2 live workflow `rg-v2-live-recipe-v1`: **ACTIVE**, with software-delivery, research-verification and service-sla steps each bound to its immutable recipe hash.
-- Typed evidence registry Studionet run: `36598129489` — **SUCCESS**.
-- Evidence registry: `0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390`.
+- Typed evidence registry Studionet run: `37132147367` — **SUCCESS**.
+- Evidence registry: `0x7436623f5bc064179546344b587fe9BF30B71004`.
 - Evidence registry source SHA256: `8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472`.
 - Evidence registry deployed-source equality: **true**.
 - Canonical archive proof: `rg-live-success-v1/source-check` has round-1 PRIMARY/SUPPORT and round-2 CHALLENGE archive records with distinct content-addressed digests.
 - Source adapter E2E proof: `36604750863` — **SUCCESS**.
 - External SDK consumer proof: `36601714919` — **SUCCESS**.
-- V3 bounded appeals proof: `36604861578` — **SUCCESS**.
-- V3 contract: `0x14948AD5dCd317Ec49f5CEf7e08c72176C900214`.
-- V3 source SHA256: `4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee`.
+- V3 bounded appeals proof: `37135064005` — **SUCCESS**.
+- V3 contract: `0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A`.
+- V3 source SHA256: `b15e44514cf05c7c50713e21ad90bb76d194329e3232c32cce01ed72022b9342`.
 - V3 deployed-source equality: **true**.
 - Cross-chain conditioned settlement proof: `36606957197` — **SUCCESS**.
 - Cross-chain contract: `0x0ca7432339C86ab01118f46D847A11EF94CB4BAA`.
@@ -93,8 +93,8 @@ Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.
 - The GitHub provenance adapter independently verifies the on-chain assignee wallet signature, frozen step-policy digest, GitHub commit association and owner-controlled gist challenge. It emits an external receipt; it does not alter the current contract's payout rules and it does not maintain a global single-use nonce registry.
 - Evidence manifest v2 distinguishes contract snapshots from remote-byte captures. The capture API performs a bounded public-HTTPS fetch and computes SHA-256; the evidence-registry contract makes submitted capture metadata immutable and records its publisher, but the registry contract itself does not fetch the remote bytes. Reviewers can therefore distinguish a byte-capture claim from the publisher that anchored it.
 - The verified contract is on **GenLayer Studionet**; the frontend is a production web deployment, not a mainnet claim.
-- Cross-chain settlement is not claimed by this release. The dedicated on-chain recipe registry is implemented and live-verified in the separate V2 contract; it is not silently substituted for the canonical V1 settlement contract used by the production builder. Signed GitHub provenance remains an external verification layer, not on-chain settlement enforcement.
+- Cross-chain functionality is claimed only as relayer-attested conditioned GEN settlement, not as a trust-free token bridge. The promoted V1 consensus-guard contract is the production builder target; the dedicated V2 recipe registry and V3 appeal contract remain explicit, separately verified surfaces. Signed GitHub provenance remains an external verification layer, not on-chain settlement enforcement.
 
 ## Release gate
 
-All defined release gates are complete. The dossier is submission-ready.
+All development and Studionet gates are complete. Final production promotion and its matching smoke run remain before the upgraded dossier is submission-ready.

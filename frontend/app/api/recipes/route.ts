@@ -41,7 +41,7 @@ export async function GET() {
       hashes: jsonSafe(hashes),
       recipes: jsonSafe(recipes),
       sourceMatch: true,
-      proofRun: 36587816018,
+      proofRun: 37117935627,
     });
   } catch (error: any) {
     return NextResponse.json(
