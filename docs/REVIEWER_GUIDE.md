@@ -31,7 +31,7 @@ Production: https://resolvegraph-genlayer.vercel.app
 
 ## Verified deterministic gate
 
-- 103/103 direct tests PASS.
+- 104/104 direct tests PASS.
 - GenVM lint PASS.
 - 21/21 SDK tests PASS.
 - Frontend typecheck PASS.
