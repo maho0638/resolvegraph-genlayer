@@ -46,4 +46,6 @@ V2 recipe registry evidence: run `37117935627` — SUCCESS; contract `0x58De3354
 
 Typed evidence archive evidence: run `37132147367` — SUCCESS; contract `0x7436623f5bc064179546344b587fe9BF30B71004`; deployed-source equality true.
 
-Target achieved for this release: a complete ecosystem product, not a screenshot/demo submission.
+V3 bounded appeals evidence: run `37135064005` — SUCCESS; contract `0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A`; step `PAID`; workflow `COMPLETED`; deployed-source equality true.
+
+Development target achieved: a complete ecosystem product, not a screenshot/demo submission. Final production promotion and matching smoke verification are the remaining release gates.

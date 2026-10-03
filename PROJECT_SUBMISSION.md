@@ -2,7 +2,7 @@
 
 ## Status
 
-**LIVE_VERIFIED — SUBMISSION READY**
+**DEVELOPMENT VERIFIED — FINAL PRODUCTION PROMOTION PENDING**
 
 ResolveGraph is built for the GenLayer Projects category, where the Intelligent Contract is central to the product rather than an optional demo.
 
@@ -75,9 +75,9 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - Canonical archive proof: `rg-live-success-v1/source-check` has round-1 PRIMARY/SUPPORT and round-2 CHALLENGE archive records with distinct content-addressed digests.
 - Source adapter E2E proof: `36604750863` — **SUCCESS**.
 - External SDK consumer proof: `36601714919` — **SUCCESS**.
-- V3 bounded appeals proof: `37117935576` — **SUCCESS**.
-- V3 contract: `0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F`.
-- V3 source SHA256: `3f3f357e48cafbd8899f7296057d3cd57bfde3472c83c5f98adacd59b6efdfba`.
+- V3 bounded appeals proof: `37135064005` — **SUCCESS**.
+- V3 contract: `0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A`.
+- V3 source SHA256: `b15e44514cf05c7c50713e21ad90bb76d194329e3232c32cce01ed72022b9342`.
 - V3 deployed-source equality: **true**.
 - Cross-chain conditioned settlement proof: `36606957197` — **SUCCESS**.
 - Cross-chain contract: `0x0ca7432339C86ab01118f46D847A11EF94CB4BAA`.
@@ -97,4 +97,4 @@ Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.
 
 ## Release gate
 
-All defined release gates are complete. The dossier is submission-ready.
+All development and Studionet gates are complete. Final production promotion and its matching smoke run remain before the upgraded dossier is submission-ready.

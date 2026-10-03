@@ -67,7 +67,7 @@ Promotion order:
 - V2 contract: `0x58De3354F739D6E1C9DBe1857B072262D96e5EE2`
 - V2 policy: `RG_V2_IMMUTABLE_RECIPES`
 - V2 live workflow: `rg-v2-live-recipe-v1 — ACTIVE — 3 recipe-bound steps`
-- V2 deployed/repository source SHA256: `2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673`
+- V2 deployed/repository source SHA256: `271ad9bfadcf5fa0d123022097485cf0d6073ba65b1f6cf8d6e1f40938725849`
 - V2 deployed-source equality: **true**
 - Typed evidence registry Studionet run: **37132147367 — SUCCESS**
 - Evidence registry: `0x7436623f5bc064179546344b587fe9BF30B71004`
@@ -76,10 +76,11 @@ Promotion order:
 - Canonical archived evidence: round 1 PRIMARY + SUPPORT, round 2 CHALLENGE for `rg-live-success-v1/source-check`
 - Source adapters proof: **36604750863 — SUCCESS** (GitHub commit/PR/CI, Ethereum receipt, artifact capture, digest replay)
 - External SDK consumer proof: **36601714919 — SUCCESS**
-- V3 bounded appeals proof: **37117935576 — SUCCESS**
-- V3 contract: `0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F`
-- V3 source SHA256: `3f3f357e48cafbd8899f7296057d3cd57bfde3472c83c5f98adacd59b6efdfba`
+- V3 bounded appeals proof: **37135064005 — SUCCESS**
+- V3 contract: `0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A`
+- V3 source SHA256: `b15e44514cf05c7c50713e21ad90bb76d194329e3232c32cce01ed72022b9342`
 - V3 deployed-source equality: **true**
+- V3 terminal proof: **step PAID → workflow COMPLETED**, with state-safe retry only while the on-chain appeal remains `CHALLENGED` at round 1
 - Cross-chain settlement proof: **36606957197 — SUCCESS**
 - Cross-chain settlement contract: `0x0ca7432339C86ab01118f46D847A11EF94CB4BAA`
 - Cross-chain source SHA256: `67af44ce57eb4c672b156372c7fd042a0896d24794b788c897915b7f7993a4d0`
@@ -88,6 +89,6 @@ Promotion order:
 
 ## Status
 
-**LIVE_VERIFIED — SUBMISSION READY**
+**DEVELOPMENT VERIFIED — FINAL PRODUCTION PROMOTION PENDING**
 
-The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable release record. The GitHub provenance adapter is an external verification receipt. The promoted V1 consensus-guard deployment is the production workflow target; V2 recipes, V3 bonded appeals and the typed evidence archive remain separately deployed, source-matched verification surfaces.
+The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable development verification record until the final production promotion and smoke gate complete. The GitHub provenance adapter is an external verification receipt. The promoted V1 consensus-guard deployment is the production workflow target; V2 recipes, V3 bonded appeals and the typed evidence archive remain separately deployed, source-matched verification surfaces.

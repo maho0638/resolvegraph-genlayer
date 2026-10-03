@@ -101,15 +101,15 @@ A clean consumer installs the packed SDK through the package boundary, verifies 
 
 ## Verified V3 bounded appeals
 
-Studionet run: `37117935576` — SUCCESS.
+Studionet run: `37135064005` — SUCCESS.
 
 V3 contract:
 
-`0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F`
+`0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A`
 
 V3 source SHA256:
 
-`3f3f357e48cafbd8899f7296057d3cd57bfde3472c83c5f98adacd59b6efdfba`
+`b15e44514cf05c7c50713e21ad90bb76d194329e3232c32cce01ed72022b9342`
 
 The contract limits a step to one fresh-evidence appeal, requires an exact 5% appeal bond, performs a second consensus round, records decision lineage and blocks settlement until explicit finalization. Deployed-source equality is true.
 
