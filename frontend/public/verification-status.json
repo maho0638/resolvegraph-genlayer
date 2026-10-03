@@ -1,11 +1,11 @@
 {
   "schema": "resolvegraph-verification-status-v1",
-  "status": "DEVELOPMENT_VERIFIED",
+  "status": "LIVE_VERIFIED",
   "contract": "0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0",
   "canonical_ci": {
-    "run_id": 37133973510,
+    "run_id": 37136487001,
     "status": "SUCCESS",
-    "verified_code_commit": "4c741ef3594c0eb6734f672fb49c4e89a02c286d"
+    "verified_code_commit": "2d2c1c209e40f87e551ddc318a5979d995ce5615"
   },
   "canonical_studionet": {
     "run_id": 37131853576,
@@ -19,17 +19,17 @@
     "recovery_inspect_run_id": 37131762703
   },
   "production_deployment": {
-    "status": "BASELINE_LIVE_UPGRADE_PENDING",
+    "status": "LIVE_VERIFIED",
     "url": "https://resolvegraph-genlayer.vercel.app",
-    "verified_feature_commit": "5da51a7647dae310c551f4afcce49ea4c7e0b802",
-    "ci_run_id": 36572374200,
+    "verified_feature_commit": "2d2c1c209e40f87e551ddc318a5979d995ce5615",
+    "ci_run_id": 37136487001,
     "ci_status": "SUCCESS",
-    "smoke_run_id": 36572844244,
+    "smoke_run_id": 37136690904,
     "smoke_status": "SUCCESS",
-    "verified_at": "2026-09-29T13:07:30Z",
-    "upgrade_pending": true
+    "verified_at": "2026-10-03T16:24:45Z",
+    "upgrade_pending": false
   },
-  "submission_ready": false,
+  "submission_ready": true,
   "provenance": {
     "status": "VERIFIED_EXTERNAL_ADAPTER",
     "feature_commit": "5da51a7647dae310c551f4afcce49ea4c7e0b802",
@@ -39,7 +39,7 @@
     "ci_run_id": 36572374200,
     "smoke_run_id": 36572844244,
     "smoke_status": "SUCCESS",
-    "note": "Provenance remains an external verification layer; the upgraded V1 contract is awaiting final production promotion."
+    "note": "Provenance remains an external verification layer; the upgraded V1 contract is now the verified production settlement target."
   },
   "v2_recipe_registry": {
     "status": "LIVE_VERIFIED",

@@ -2,7 +2,7 @@
 
 ## Status
 
-**DEVELOPMENT VERIFIED — FINAL PRODUCTION PROMOTION PENDING**
+**LIVE_VERIFIED — SUBMISSION READY**
 
 ResolveGraph is built for the GenLayer Projects category, where the Intelligent Contract is central to the product rather than an optional demo.
 
@@ -97,4 +97,4 @@ Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.
 
 ## Release gate
 
-All development and Studionet gates are complete. Final production promotion and its matching smoke run remain before the upgraded dossier is submission-ready.
+All development, Studionet, production-promotion and matching smoke gates are complete. The upgraded dossier is submission-ready.

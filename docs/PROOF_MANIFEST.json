@@ -1,12 +1,12 @@
 {
   "schema": "resolvegraph-proof-v1",
-  "status": "DEVELOPMENT_VERIFIED",
-  "verified_at": "2026-10-03T16:02:58Z",
+  "status": "LIVE_VERIFIED",
+  "verified_at": "2026-10-03T16:24:45Z",
   "scope": {
     "project": "ResolveGraph — Multi-Agent Workflow Settlement",
     "network": "GenLayer Studionet"
   },
-  "canonical_commit": "9a2940fb9724a95d822948d32fa408cd66ba6f27",
+  "canonical_commit": "2d2c1c209e40f87e551ddc318a5979d995ce5615",
   "direct_tests": {
     "status": "PASS",
     "count": 104
@@ -23,9 +23,9 @@
     "production_build": "PASS"
   },
   "canonical_ci": {
-    "run_id": 37133973510,
+    "run_id": 37136487001,
     "status": "SUCCESS",
-    "commit": "4c741ef3594c0eb6734f672fb49c4e89a02c286d"
+    "commit": "2d2c1c209e40f87e551ddc318a5979d995ce5615"
   },
   "studionet": {
     "run_id": 37131853576,
@@ -91,23 +91,30 @@
     "note": "Resume proof recorded deployed/repository normalized equality; raw source hash was not separately emitted in that run."
   },
   "production": {
-    "status": "BASELINE_LIVE_UPGRADE_PENDING",
+    "status": "LIVE_VERIFIED",
     "url": "https://resolvegraph-genlayer.vercel.app",
-    "verified_feature_commit": "5da51a7647dae310c551f4afcce49ea4c7e0b802",
-    "ci_run_id": 36572374200,
+    "verified_feature_commit": "2d2c1c209e40f87e551ddc318a5979d995ce5615",
+    "ci_run_id": 37136487001,
     "ci_status": "SUCCESS",
-    "smoke_run_id": 36572844244,
+    "smoke_run_id": 37136690904,
     "smoke_status": "SUCCESS",
-    "smoke_verified_at": "2026-09-29T13:07:30Z",
+    "smoke_verified_at": "2026-10-03T16:24:45Z",
+    "upgrade_pending": false,
     "smoke_scope": [
       "overview",
       "explorer",
+      "reviewer",
+      "bounded appeals",
+      "advanced V3 workbench",
+      "cross-chain conditioned settlement",
       "operator",
       "recipes",
       "participants",
       "provenance verifier",
+      "source adapters",
+      "typed evidence archive",
       "developers",
-      "proof",
+      "proof dashboard",
       "canonical case room",
       "logo asset",
       "health API",
@@ -115,14 +122,18 @@
       "step API",
       "participant API",
       "receipt API",
+      "V2 recipes API",
+      "V3 appeals API",
+      "cross-chain API",
       "evidence manifest API",
+      "evidence archive API",
+      "source adapter validation",
       "provenance endpoint validation",
       "canonical success/failure state",
       "verification snapshot"
-    ],
-    "upgrade_pending": true
+    ]
   },
-  "submission_ready": false,
+  "submission_ready": true,
   "provenance": {
     "status": "VERIFIED_EXTERNAL_ADAPTER",
     "feature_commit": "5da51a7647dae310c551f4afcce49ea4c7e0b802",

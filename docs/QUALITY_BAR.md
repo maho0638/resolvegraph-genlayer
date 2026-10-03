@@ -39,8 +39,8 @@ Required gates:
 Verified production evidence:
 
 - provenance feature commit `5da51a7647dae310c551f4afcce49ea4c7e0b802`;
-- final promoted-main CI must pass;
-- `.github/workflows/production-smoke.yml` must pass against the matching Vercel deployment.
+- promoted-main CI `37136487001` — SUCCESS;
+- production smoke `37136690904` — SUCCESS against the matching Vercel deployment.
 
 V2 recipe registry evidence: run `37117935627` — SUCCESS; contract `0x58De3354F739D6E1C9DBe1857B072262D96e5EE2`; deployed-source equality true.
 
@@ -48,4 +48,4 @@ Typed evidence archive evidence: run `37132147367` — SUCCESS; contract `0x7436
 
 V3 bounded appeals evidence: run `37135064005` — SUCCESS; contract `0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A`; step `PAID`; workflow `COMPLETED`; deployed-source equality true.
 
-Development target achieved: a complete ecosystem product, not a screenshot/demo submission. Final production promotion and matching smoke verification are the remaining release gates.
+Release target achieved: a complete ecosystem product, not a screenshot/demo submission. Production promotion and matching smoke verification both passed.

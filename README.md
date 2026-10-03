@@ -89,6 +89,6 @@ Promotion order:
 
 ## Status
 
-**DEVELOPMENT VERIFIED — FINAL PRODUCTION PROMOTION PENDING**
+**LIVE_VERIFIED — SUBMISSION READY**
 
-The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable development verification record until the final production promotion and smoke gate complete. The GitHub provenance adapter is an external verification receipt. The promoted V1 consensus-guard deployment is the production workflow target; V2 recipes, V3 bonded appeals and the typed evidence archive remain separately deployed, source-matched verification surfaces.
+The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable release record. The upgraded production deployment and matching smoke gate are verified. The GitHub provenance adapter is an external verification receipt. The promoted V1 consensus-guard deployment is the production workflow target; V2 recipes, V3 bonded appeals and the typed evidence archive remain separately deployed, source-matched verification surfaces.

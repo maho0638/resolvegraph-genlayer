@@ -3,11 +3,11 @@ import Link from "next/link";
 const contract = "0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0";
 const v2Contract = "0x58De3354F739D6E1C9DBe1857B072262D96e5EE2";
 const evidenceRegistry = "0x7436623f5bc064179546344b587fe9BF30B71004";
-const canonicalCi = "37133973510";
+const canonicalCi = "37136487001";
 const canonicalStudionet = "37131853576";
 const v2RecipeProof = "37117935627";
 const evidenceArchiveProof = "37132147367";
-const firstProductionSmoke = "36587466475";
+const firstProductionSmoke = "37136690904";
 const sourceHash = "2241bbb42f4eafcd827f54f7ea065da794a55377159fe91ed9d09844b7416afa";
 const v2SourceHash = "271ad9bfadcf5fa0d123022097485cf0d6073ba65b1f6cf8d6e1f40938725849";
 const evidenceSourceHash = "8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472";
@@ -72,7 +72,7 @@ export default function Proof() {
           <p><strong>Studionet completion</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + canonicalStudionet} target="_blank" rel="noreferrer">{canonicalStudionet} · RESUME SUCCESS ↗</a></p>
           <p><strong>Interrupted run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/37117935584" target="_blank" rel="noreferrer">37117935584 · network timeout, state later finalized ↗</a></p>
           <p><strong>Read-only recovery proof</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/37131762703" target="_blank" rel="noreferrer">37131762703 · SUCCESS ↗</a></p>
-          <p><strong>Production smoke baseline</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + firstProductionSmoke} target="_blank" rel="noreferrer">{firstProductionSmoke} · SUCCESS ↗</a></p>
+          <p><strong>Production smoke</strong><a className="textLink" href={"https://github.com/maho0638/resolvegraph-genlayer/actions/runs/" + firstProductionSmoke} target="_blank" rel="noreferrer">{firstProductionSmoke} · SUCCESS ↗</a></p>
           <p><strong>V1 source SHA256</strong><code>{sourceHash}</code></p>
           <p><strong>Deployed-source equality</strong><code>true</code></p>
         </div>
