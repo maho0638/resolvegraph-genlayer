@@ -382,6 +382,7 @@ export default function AdvancedV3() {
           <p><strong>Verified contract</strong><code>{v3ContractAddress()}</code></p>
           <p><strong>Step appeal</strong><code>1 maximum · exact reward ÷ 20 bond</code></p>
           <p><strong>Finality</strong><code>explicit finalization before settlement</code></p>
+          <p><strong>Economic guard</strong><code>validator agreement must preserve the derived slash target</code></p>
         </div>
       </section>
 
