@@ -35,7 +35,7 @@ export default function Proof() {
       <section className="grid3">
         <div className="metric">
           <span>Direct tests</span>
-          <strong>103 / 103 PASS</strong>
+          <strong>104 / 104 PASS</strong>
           <span>V1 graph/economics, V2 recipes and typed evidence archive coverage</span>
         </div>
         <div className="metric">
@@ -54,7 +54,7 @@ export default function Proof() {
         <div className="eyebrow">Verification chain</div>
         <h2>From source to public product</h2>
         <div className="flow verificationFlow">
-          <span>103 direct tests</span><b>→</b>
+          <span>104 direct tests</span><b>→</b>
           <span>21 SDK tests</span><b>→</b>
           <span>V1 Studionet lifecycles</span><b>→</b>
           <span>V2 recipe registry</span><b>→</b>
