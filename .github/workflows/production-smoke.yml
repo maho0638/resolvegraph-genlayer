@@ -63,6 +63,7 @@ jobs:
           check_page "/explorer" "Public Explorer"
           check_page "/reviewer" "Reviewer Mode"
           check_page "/appeals" "Bounded Bonded Appeals"
+          check_page "/advanced" "Advanced V3 Workbench"
           check_page "/cross-chain" "Cross-Chain Conditioned Settlement"
           check_page "/operate" "Operator Console"
           check_page "/recipes" "Workflow Recipes"
