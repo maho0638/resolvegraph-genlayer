@@ -3,7 +3,7 @@ import Link from "next/link";
 const contract = "0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0";
 const v2Contract = "0x58De3354F739D6E1C9DBe1857B072262D96e5EE2";
 const evidenceRegistry = "0x7436623f5bc064179546344b587fe9BF30B71004";
-const canonicalCi = "36545373008";
+const canonicalCi = "37133973510";
 const canonicalStudionet = "37131853576";
 const v2RecipeProof = "37117935627";
 const evidenceArchiveProof = "37132147367";
@@ -121,12 +121,12 @@ export default function Proof() {
         <div className="eyebrow">V3 bounded bonded appeals · LIVE VERIFIED</div>
         <h2>Appeal rounds are finite, bonded and explicitly finalized</h2>
         <div className="proofFacts">
-          <p><strong>V3 contract</strong><code>0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F</code></p>
+          <p><strong>V3 contract</strong><code>0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A</code></p>
           <p><strong>Policy</strong><code>RG_V3_BOUNDED_APPEALS</code></p>
-          <p><strong>Proof run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/37117935576" target="_blank" rel="noreferrer">37117935576 · SUCCESS ↗</a></p>
-          <p><strong>Source SHA256</strong><code>3f3f357e48cafbd8899f7296057d3cd57bfde3472c83c5f98adacd59b6efdfba</code></p>
+          <p><strong>Proof run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/37135064005" target="_blank" rel="noreferrer">37135064005 · SUCCESS ↗</a></p>
+          <p><strong>Source SHA256</strong><code>b15e44514cf05c7c50713e21ad90bb76d194329e3232c32cce01ed72022b9342</code></p>
           <p><strong>Deployed-source equality</strong><code>true</code></p>
-          <p><strong>Live decision</strong><code>PASS → appeal → PASS · finalized · 50,000,000,000 appeal bond</code></p>
+          <p><strong>Live decision</strong><code>PASS → bonded appeal → PASS · finalized · PAID → workflow COMPLETED</code></p>
         </div>
         <div className="actions">
           <Link className="button secondary" href="/appeals">Open bounded appeals</Link>

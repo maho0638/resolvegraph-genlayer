@@ -20,7 +20,7 @@ export type WriteRequest = {
 const VERIFIED_V1_CONTRACT =
   "0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0" as const;
 const VERIFIED_V3_APPEAL_CONTRACT =
-  "0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F" as const;
+  "0xaE7169485b8838Cf1BE7B3D092Fdc41119eC114A" as const;
 
 export function contractAddress(): `0x${string}` {
   const value =

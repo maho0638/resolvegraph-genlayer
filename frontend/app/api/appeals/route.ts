@@ -34,8 +34,8 @@ export async function GET() {
       network: "studionet",
       contract: serverV3AppealContractAddress(),
       policyVersion: "RG_V3_BOUNDED_APPEALS",
-      proofRun: 37117935576,
-      sourceSha256: "3f3f357e48cafbd8899f7296057d3cd57bfde3472c83c5f98adacd59b6efdfba",
+      proofRun: 37135064005,
+      sourceSha256: "b15e44514cf05c7c50713e21ad90bb76d194329e3232c32cce01ed72022b9342",
       sourceMatch: true,
       rules: {
         maxStepAppeals: 1,
@@ -55,11 +55,14 @@ export async function GET() {
       },
       verifiedProof: {
         initialVerdict: "PASS",
-        initialDecisionHash: "4090f1b70433cb8aea92ce3040956b7d308368a7319c0f849a959e29a0524706",
+        initialDecisionHash: "bf5d47297b33995a1a50bb3c79b8e6c0302fa9aaf8da6bc7111b3761d217a94f",
         appealBond: "50000000000",
         finalVerdict: "PASS",
         appealOutcomeChanged: false,
-        finalDecisionHash: "3b6dae21e809a8de9bf999642c0bbba63279f00cfc2203218727f567a331b9c0",
+        finalDecisionHash: "8e8329b9ed4dae5699137bc0e4f8b138aa3fd0d944d00833d5d4994308409ae5",
+        stepFinalStatus: "PAID",
+        workflowFinalStatus: "COMPLETED",
+        stateSafeConsensusRetry: true,
       },
       trustBoundary: {
         productionV1SettlementUnchanged: true,
