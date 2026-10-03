@@ -1,2 +1,2 @@
 ResolveGraph V3 bounded bonded appeals live proof trigger.
-Terminal-settlement replay after slash-boundary appeal-economics hardening.
+State-safe retry replay after Studionet round-2 non-application.
