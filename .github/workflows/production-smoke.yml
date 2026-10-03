@@ -125,7 +125,7 @@ jobs:
           data = json.loads(os.environ["FAILURE_JSON"])
           wf = data["workflow"]
           assert wf["status"] == "FAILED_SETTLED"
-          assert wf["fault_class"] == "EXTERNAL"
+          assert wf["fault_class"] == "PARTICIPANT"
           print("failure workflow ok")
           PY
 
