@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
+import { serverContractAddress } from "@/lib/server-genlayer";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const address = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
+  const address = serverContractAddress();
   const rpc = process.env.NEXT_PUBLIC_GENLAYER_RPC_URL?.trim();
   const environment = process.env.VERCEL_ENV || "local";
 
@@ -13,8 +14,8 @@ export async function GET() {
     network: "studionet",
     environment,
     production: environment === "production",
-    contractConfigured: Boolean(address),
-    contract: address || null,
+    contractConfigured: true,
+    contract: address,
     rpcConfigured: Boolean(rpc),
     writesRequireWallet: true,
     receiptSchema: "resolvegraph-receipt-v1",
