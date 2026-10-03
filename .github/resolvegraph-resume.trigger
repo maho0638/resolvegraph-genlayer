@@ -1,0 +1,2 @@
+ResolveGraph controlled Studionet resume trigger.
+Resume inspected contract 0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0 after finalized step challenge.
