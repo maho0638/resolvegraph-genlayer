@@ -75,11 +75,11 @@ The run registered software-delivery, research-verification and service-sla v1 p
 
 ## Verified typed evidence archive
 
-Studionet run: `36598129489` — SUCCESS.
+Studionet run: `37132147367` — SUCCESS.
 
 Evidence registry:
 
-`0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390`
+`0x7436623f5bc064179546344b587fe9BF30B71004`
 
 Evidence registry source SHA256:
 
