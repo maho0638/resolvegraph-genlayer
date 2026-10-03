@@ -56,6 +56,8 @@ export default function AdvancedV3() {
   const [reward, setReward] = useState("0.001");
   const [deadline, setDeadline] = useState(nowPlus(24));
   const [recipeId, setRecipeId] = useState("");
+  const [registryRecipes, setRegistryRecipes] = useState<any[]>([]);
+  const [selectedRecipeHash, setSelectedRecipeHash] = useState("");
   const [loadedStep, setLoadedStep] = useState<any>(null);
   const [appealBond, setAppealBond] = useState<bigint>(0n);
   const [primary, setPrimary] = useState("");
@@ -67,6 +69,7 @@ export default function AdvancedV3() {
 
   function applyRecipe(id: string) {
     setRecipeId(id);
+    setSelectedRecipeHash("");
     const recipe = WORKFLOW_RECIPES.find((item) => item.id === id);
     if (!recipe) return;
     setRoleLabel(recipe.roleLabel);
@@ -77,6 +80,72 @@ export default function AdvancedV3() {
         recipeLabel(recipe) +
         ". These fields remain editable until the V3 step is funded.",
     );
+  }
+
+  async function loadRegistryRecipes() {
+    setBusy("load-recipes");
+    try {
+      const rawCount = await readContractV3("get_recipe_count");
+      const count = Math.min(Number(rawCount ?? 0), 64);
+      const entries: any[] = [];
+      for (let index = 0; index < count; index += 1) {
+        const hash = String(
+          await readContractV3("get_recipe_hash_by_index", [index]),
+        );
+        const recipe = await readContractV3("get_recipe", [hash]);
+        entries.push({ hash, ...recipe });
+      }
+      setRegistryRecipes(entries);
+      setNotice(
+        count === 0
+          ? "V3 registry is empty on this deployment."
+          : "Loaded " + String(count) + " immutable V3 recipe(s).",
+      );
+    } catch (error: any) {
+      setRegistryRecipes([]);
+      setNotice(error?.message || "Unable to load the V3 recipe registry.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  function selectRegistryRecipe(hash: string) {
+    setSelectedRecipeHash(hash);
+    const recipe = registryRecipes.find((item) => item.hash === hash);
+    if (!recipe) return;
+    setRecipeId("");
+    setRoleLabel(String(recipe.role_label || ""));
+    setRequirement(String(recipe.requirement || ""));
+    setRubric(String(recipe.rubric || ""));
+    setNotice(
+      "Immutable V3 recipe selected · " +
+        String(recipe.id || "recipe") +
+        "@" +
+        String(recipe.version || ""),
+    );
+  }
+
+  async function registerStarterRecipe() {
+    const recipe = WORKFLOW_RECIPES.find((item) => item.id === recipeId);
+    if (!recipe) {
+      setNotice("Choose a local starter first.");
+      return;
+    }
+    const hash = await act(
+      "register_recipe",
+      [
+        recipe.id,
+        recipe.version,
+        recipe.name,
+        roleLabel.trim(),
+        requirement.trim(),
+        rubric.trim(),
+        "PUBLIC_WEB",
+      ],
+      undefined,
+      false,
+    );
+    if (hash) await loadRegistryRecipes();
   }
 
   async function connect() {
@@ -149,6 +218,26 @@ export default function AdvancedV3() {
       setNotice("Choose a valid deadline.");
       return;
     }
+    if (selectedRecipeHash) {
+      await act(
+        "add_step_from_recipe",
+        [
+          workflowId.trim(),
+          stepId.trim(),
+          assignee.trim(),
+          selectedRecipeHash,
+          agentRef.trim(),
+          a2a.trim(),
+          depA.trim(),
+          depB.trim(),
+          deadlineUnix,
+        ],
+        parseGen(reward),
+        false,
+      );
+      return;
+    }
+
     await act(
       "add_step",
       [
@@ -315,7 +404,7 @@ export default function AdvancedV3() {
           on-chain.
         </p>
         <div className="field">
-          <label>Starter recipe</label>
+          <label>Local starter</label>
           <select value={recipeId} onChange={(e) => applyRecipe(e.target.value)}>
             <option value="">Choose a recipe…</option>
             {WORKFLOW_RECIPES.map((recipe) => (
@@ -325,6 +414,44 @@ export default function AdvancedV3() {
             ))}
           </select>
         </div>
+        <div className="actions">
+          <button
+            className="button secondary"
+            onClick={loadRegistryRecipes}
+            disabled={!!busy}
+          >
+            Load V3 registry
+          </button>
+          <button
+            className="button secondary"
+            onClick={registerStarterRecipe}
+            disabled={!!busy || !recipeId}
+          >
+            Register current policy
+          </button>
+        </div>
+        {registryRecipes.length ? (
+          <div className="field section">
+            <label>Immutable V3 recipe</label>
+            <select
+              value={selectedRecipeHash}
+              onChange={(e) => selectRegistryRecipe(e.target.value)}
+            >
+              <option value="">Use editable manual policy</option>
+              {registryRecipes.map((recipe) => (
+                <option key={recipe.hash} value={recipe.hash}>
+                  {String(recipe.name || recipe.id)} · {String(recipe.version)} · {String(recipe.hash).slice(0, 12)}…
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
+        {selectedRecipeHash ? (
+          <div className="status">
+            Immutable recipe mode · this funded step uses the exact registered
+            policy hash instead of editable requirement/rubric inputs.
+          </div>
+        ) : null}
       </section>
 
       <section className="grid2 section">
