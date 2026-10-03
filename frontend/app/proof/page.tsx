@@ -1,15 +1,15 @@
 import Link from "next/link";
 
 const contract = "0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754";
-const v2Contract = "0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1";
+const v2Contract = "0x58De3354F739D6E1C9DBe1857B072262D96e5EE2";
 const evidenceRegistry = "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390";
 const canonicalCi = "36545373008";
 const canonicalStudionet = "36545373155";
-const v2RecipeProof = "36587816018";
+const v2RecipeProof = "37117935627";
 const evidenceArchiveProof = "36598129489";
 const firstProductionSmoke = "36587466475";
 const sourceHash = "f5a80ea0589c88f8c45221195029bbd2b78c91b4b37302400e9d05a156374ddb";
-const v2SourceHash = "2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673";
+const v2SourceHash = "271ad9bfadcf5fa0d123022097485cf0d6073ba65b1f6cf8d6e1f40938725849";
 const evidenceSourceHash = "8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472";
 
 export default function Proof() {
@@ -35,7 +35,7 @@ export default function Proof() {
       <section className="grid3">
         <div className="metric">
           <span>Direct tests</span>
-          <strong>97 / 97 PASS</strong>
+          <strong>103 / 103 PASS</strong>
           <span>V1 graph/economics, V2 recipes and typed evidence archive coverage</span>
         </div>
         <div className="metric">
@@ -54,8 +54,8 @@ export default function Proof() {
         <div className="eyebrow">Verification chain</div>
         <h2>From source to public product</h2>
         <div className="flow verificationFlow">
-          <span>97 direct tests</span><b>→</b>
-          <span>18 SDK tests</span><b>→</b>
+          <span>103 direct tests</span><b>→</b>
+          <span>21 SDK tests</span><b>→</b>
           <span>V1 Studionet lifecycles</span><b>→</b>
           <span>V2 recipe registry</span><b>→</b>
           <span>typed evidence archive</span><b>→</b>
@@ -119,10 +119,10 @@ export default function Proof() {
         <div className="eyebrow">V3 bounded bonded appeals · LIVE VERIFIED</div>
         <h2>Appeal rounds are finite, bonded and explicitly finalized</h2>
         <div className="proofFacts">
-          <p><strong>V3 contract</strong><code>0x14948AD5dCd317Ec49f5CEf7e08c72176C900214</code></p>
+          <p><strong>V3 contract</strong><code>0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F</code></p>
           <p><strong>Policy</strong><code>RG_V3_BOUNDED_APPEALS</code></p>
-          <p><strong>Proof run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/36604861578" target="_blank" rel="noreferrer">36604861578 · SUCCESS ↗</a></p>
-          <p><strong>Source SHA256</strong><code>4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee</code></p>
+          <p><strong>Proof run</strong><a className="textLink" href="https://github.com/maho0638/resolvegraph-genlayer/actions/runs/37117935576" target="_blank" rel="noreferrer">36604861578 · SUCCESS ↗</a></p>
+          <p><strong>Source SHA256</strong><code>3f3f357e48cafbd8899f7296057d3cd57bfde3472c83c5f98adacd59b6efdfba</code></p>
           <p><strong>Deployed-source equality</strong><code>true</code></p>
           <p><strong>Live decision</strong><code>PASS → appeal → PASS · finalized · 50,000,000,000 appeal bond</code></p>
         </div>

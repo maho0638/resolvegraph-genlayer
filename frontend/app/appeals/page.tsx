@@ -27,8 +27,8 @@ function short(value?: string): string {
 
 const WORKFLOW_ID = "rg-v3-live-appeal-v1";
 const STEP_ID = "example-domain-proof";
-const PROOF_RUN = "36604861578";
-const SOURCE_HASH = "4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee";
+const PROOF_RUN = "37117935576";
+const SOURCE_HASH = "3f3f357e48cafbd8899f7296057d3cd57bfde3472c83c5f98adacd59b6efdfba";
 
 async function load() {
   const [workflow, step, appealBond] = await Promise.all([
@@ -101,7 +101,7 @@ export default async function Appeals() {
             <span>Finalized {String(Boolean(step?.decision_finalized))} · appeal outcome changed {String(Boolean(step?.challenge_outcome_changed))}</span>
           </div>
           <div className="proofFacts section">
-            <p><strong>Initial decision</strong><code>bf5d47297b33995a1a50bb3c79b8e6c0302fa9aaf8da6bc7111b3761d217a94f</code></p>
+            <p><strong>Initial decision</strong><code>4090f1b70433cb8aea92ce3040956b7d308368a7319c0f849a959e29a0524706</code></p>
             <p><strong>Final decision</strong><code>{String(step?.decision_hash || "—")}</code></p>
             <p><strong>Challenge evidence</strong>{step?.challenge_url ? <a className="textLink" href={String(step.challenge_url)} target="_blank" rel="noreferrer">{String(step.challenge_url)} ↗</a> : <span>—</span>}</p>
           </div>

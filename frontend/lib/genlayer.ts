@@ -18,7 +18,7 @@ export type WriteRequest = {
 };
 
 const VERIFIED_V3_APPEAL_CONTRACT =
-  "0x14948AD5dCd317Ec49f5CEf7e08c72176C900214" as const;
+  "0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F" as const;
 
 export function contractAddress(): `0x${string}` {
   const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
@@ -30,7 +30,7 @@ export function contractAddress(): `0x${string}` {
 
 export function v3ContractAddress(): `0x${string}` {
   const value =
-    process.env.NEXT_PUBLIC_RESOLVEGRAPH_V3_APPEAL_CONTRACT_ADDRESS?.trim() ||
+    process.env.NEXT_PUBLIC_RESOLVEGRAPH_V3_APPEAL_CONTRACT_ADDRESS_V4?.trim() ||
     VERIFIED_V3_APPEAL_CONTRACT;
   if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
     throw new Error("ResolveGraph V3 contract address is invalid.");
