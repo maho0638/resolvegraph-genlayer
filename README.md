@@ -48,23 +48,23 @@ Promotion order:
 
 ## Verified release
 
-- Direct tests: **97/97 PASS**
+- Direct tests: **103/103 PASS**
 - GenVM lint: **PASS**
 - SDK tests: **18/18 PASS**
 - Frontend typecheck/build: **PASS**
-- Canonical Studionet lifecycle run: **36545373155 — SUCCESS**
-- Canonical contract: `0x5E7e96dCfB5dF57881CFfBFc5b597f7b83c4A754`
+- Canonical Studionet completion run: **37131853576 — SUCCESS**
+- Canonical contract: `0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0`
 - Success case: `rg-live-success-v1 — COMPLETED`
 - Failure case: `rg-live-failure-v1 — FAILED_SETTLED`
-- Final challenged failure attribution: **EXTERNAL**
+- Final challenged failure attribution: **PARTICIPANT / api-proof**
 - Deployed source equality: **true**
 - Production URL: https://resolvegraph-genlayer.vercel.app
 - Provenance feature CI: **36572374200 — SUCCESS**
 - Provenance feature production smoke: **36572844244 — SUCCESS**
 - Signed GitHub provenance verifier: wallet ↔ on-chain assignee ↔ frozen step policy ↔ GitHub account ↔ immutable commit SHA ↔ owner-controlled gist challenge.
 - Provenance feature verification commit: `5da51a7647dae310c551f4afcce49ea4c7e0b802`
-- V2 immutable recipe registry Studionet run: **36587816018 — SUCCESS**
-- V2 contract: `0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1`
+- V2 immutable recipe registry Studionet run: **37117935627 — SUCCESS**
+- V2 contract: `0x58De3354F739D6E1C9DBe1857B072262D96e5EE2`
 - V2 policy: `RG_V2_IMMUTABLE_RECIPES`
 - V2 live workflow: `rg-v2-live-recipe-v1 — ACTIVE — 3 recipe-bound steps`
 - V2 deployed/repository source SHA256: `2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673`
@@ -76,9 +76,9 @@ Promotion order:
 - Canonical archived evidence: round 1 PRIMARY + SUPPORT, round 2 CHALLENGE for `rg-live-success-v1/source-check`
 - Source adapters proof: **36604750863 — SUCCESS** (GitHub commit/PR/CI, Ethereum receipt, artifact capture, digest replay)
 - External SDK consumer proof: **36601714919 — SUCCESS**
-- V3 bounded appeals proof: **36604861578 — SUCCESS**
-- V3 contract: `0x14948AD5dCd317Ec49f5CEf7e08c72176C900214`
-- V3 source SHA256: `4722a5fad4de2974c242ea1bc14e68f50da58914cd77c675e1a86b899acc25ee`
+- V3 bounded appeals proof: **37117935576 — SUCCESS**
+- V3 contract: `0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F`
+- V3 source SHA256: `3f3f357e48cafbd8899f7296057d3cd57bfde3472c83c5f98adacd59b6efdfba`
 - V3 deployed-source equality: **true**
 - Cross-chain settlement proof: **36606957197 — SUCCESS**
 - Cross-chain settlement contract: `0x0ca7432339C86ab01118f46D847A11EF94CB4BAA`
@@ -90,4 +90,4 @@ Promotion order:
 
 **LIVE_VERIFIED — SUBMISSION READY**
 
-The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable release record. The GitHub provenance adapter is an external verification receipt. The V2 recipe registry and typed evidence archive are separately deployed, source-matched Studionet verification surfaces; the production workflow UI intentionally keeps the canonical V1 settlement contract active until an explicit migration is chosen.
+The proof manifest at `docs/PROOF_MANIFEST.json` is the canonical machine-readable release record. The GitHub provenance adapter is an external verification receipt. The promoted V1 consensus-guard deployment is the production workflow target; V2 recipes, V3 bonded appeals and the typed evidence archive remain separately deployed, source-matched verification surfaces.
