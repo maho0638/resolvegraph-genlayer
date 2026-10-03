@@ -2,11 +2,11 @@ import Link from "next/link";
 
 const contract = "0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0";
 const v2Contract = "0x58De3354F739D6E1C9DBe1857B072262D96e5EE2";
-const evidenceRegistry = "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390";
+const evidenceRegistry = "0x7436623f5bc064179546344b587fe9BF30B71004";
 const canonicalCi = "36545373008";
 const canonicalStudionet = "37131853576";
 const v2RecipeProof = "37117935627";
-const evidenceArchiveProof = "36598129489";
+const evidenceArchiveProof = "37132147367";
 const firstProductionSmoke = "36587466475";
 const sourceHash = "2241bbb42f4eafcd827f54f7ea065da794a55377159fe91ed9d09844b7416afa";
 const v2SourceHash = "271ad9bfadcf5fa0d123022097485cf0d6073ba65b1f6cf8d6e1f40938725849";
