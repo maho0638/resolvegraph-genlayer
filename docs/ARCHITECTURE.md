@@ -56,7 +56,7 @@ ResolveGraph V2 adds a separate content-addressed policy registry without mutati
 The hash uses length-prefixed canonical fields before SHA-256 hashing, avoiding delimiter ambiguity. Registry entries have no update method. Re-registering identical content is rejected, and changing the version or policy content produces a different hash. `add_step_from_recipe` copies the registered policy into the step and also stores `recipe_id`, `recipe_version`, and `recipe_hash`, so later review can prove exactly which reusable policy instantiated the commitment.
 
 Verified V2 Studionet contract:
-`0x8025214a654Dd4d500bc549f204ED9a9a4d2a8c1`
+`0x58De3354F739D6E1C9DBe1857B072262D96e5EE2`
 
 Verified live workflow:
 `rg-v2-live-recipe-v1` with three recipe-bound steps.
