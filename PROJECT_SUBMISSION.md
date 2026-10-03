@@ -68,8 +68,8 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 - V2 source SHA256: `2d5939b27a116ca3754b301a3bbbf0a1f335aaa76d6f1ce1c0abd09b17d96673`.
 - V2 deployed-source equality: **true**.
 - V2 live workflow `rg-v2-live-recipe-v1`: **ACTIVE**, with software-delivery, research-verification and service-sla steps each bound to its immutable recipe hash.
-- Typed evidence registry Studionet run: `36598129489` — **SUCCESS**.
-- Evidence registry: `0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390`.
+- Typed evidence registry Studionet run: `37132147367` — **SUCCESS**.
+- Evidence registry: `0x7436623f5bc064179546344b587fe9BF30B71004`.
 - Evidence registry source SHA256: `8e7dbd50992f5d14544194d8e85a64e5ddcb4001ebc4b21d66ba979a31bba472`.
 - Evidence registry deployed-source equality: **true**.
 - Canonical archive proof: `rg-live-success-v1/source-check` has round-1 PRIMARY/SUPPORT and round-2 CHALLENGE archive records with distinct content-addressed digests.
