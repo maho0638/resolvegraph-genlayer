@@ -6,7 +6,7 @@ const VERIFIED_V1_CONTRACT =
 const VERIFIED_V2_RECIPE_CONTRACT =
   "0x58De3354F739D6E1C9DBe1857B072262D96e5EE2" as const;
 const VERIFIED_EVIDENCE_REGISTRY_CONTRACT =
-  "0xB5B0Dd5E454590fCb4FCEFD85B11d16774552390" as const;
+  "0x7436623f5bc064179546344b587fe9BF30B71004" as const;
 const VERIFIED_V3_APPEAL_CONTRACT =
   "0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F" as const;
 const VERIFIED_CROSS_CHAIN_SETTLEMENT_CONTRACT =
@@ -40,7 +40,7 @@ export function serverV2RecipeContractAddress(): `0x${string}` {
 
 export function serverEvidenceRegistryAddress(): `0x${string}` {
   const value =
-    process.env.RESOLVEGRAPH_EVIDENCE_REGISTRY_ADDRESS?.trim() ||
+    process.env.RESOLVEGRAPH_EVIDENCE_REGISTRY_ADDRESS_V4?.trim() ||
     VERIFIED_EVIDENCE_REGISTRY_CONTRACT;
   if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
     throw new Error("ResolveGraph evidence registry address is invalid.");
