@@ -20,6 +20,316 @@ def _field(value, name):
     return getattr(value, name)
 
 
+def _resolve_step_until_round1(
+    sponsor,
+    contract,
+    workflow_id: str,
+    step_id: str,
+    *,
+    attempts: int = 3,
+):
+    """Resolve an initial step decision and wait for round-1 state visibility."""
+    last_error = None
+    for attempt in range(1, attempts + 1):
+        step = contract.get_step(args=[workflow_id, step_id]).call()
+        round_no = int(_field(step, "resolution_round"))
+        verdict = str(_field(step, "verdict"))
+        status = str(_field(step, "status"))
+        if round_no == 1 and verdict:
+            return step
+        assert round_no == 0
+        assert status == "SUBMITTED"
+
+        print(
+            "RG_V1_RESOLVE_ATTEMPT="
+            + workflow_id
+            + ":"
+            + step_id
+            + ":"
+            + str(attempt),
+            flush=True,
+        )
+        try:
+            tx = sponsor.resolve_step(args=[workflow_id, step_id]).transact(
+                consensus_max_rotations=4,
+                wait_interval=10000,
+                wait_retries=180,
+            )
+            print("RG_V1_RESOLVE_TX=" + str(tx.get("hash", "")), flush=True)
+            print(
+                "RG_V1_RESOLVE_STATUS="
+                + str(tx.get("status_name", tx.get("status", ""))),
+                flush=True,
+            )
+            print(
+                "RG_V1_RESOLVE_RESULT="
+                + str(tx.get("result_name", tx.get("result", ""))),
+                flush=True,
+            )
+        except Exception as exc:
+            last_error = exc
+            print("RG_V1_RESOLVE_ERROR=" + repr(exc), flush=True)
+
+        # Studionet reads can lag a transaction result. Treat the persisted
+        # contract state, not the immediate transaction response, as final.
+        for _ in range(24):
+            time.sleep(5)
+            step = contract.get_step(args=[workflow_id, step_id]).call()
+            round_no = int(_field(step, "resolution_round"))
+            verdict = str(_field(step, "verdict"))
+            if round_no == 1 and verdict:
+                return step
+            if str(_field(step, "status")) != "SUBMITTED":
+                break
+
+    step = contract.get_step(args=[workflow_id, step_id]).call()
+    if int(_field(step, "resolution_round")) == 1 and str(_field(step, "verdict")):
+        return step
+    if last_error is not None:
+        raise AssertionError(
+            "V1 initial step decision did not persist after state-safe retries"
+        ) from last_error
+    raise AssertionError(
+        "V1 initial step decision did not persist after state-safe retries"
+    )
+
+
+def _attribute_failure_until_round1(
+    sponsor,
+    contract,
+    workflow_id: str,
+    failed_step_id: str,
+    *,
+    attempts: int = 3,
+):
+    """Run initial fault attribution and wait for persisted round-1 state."""
+    last_error = None
+    for attempt in range(1, attempts + 1):
+        workflow = contract.get_workflow(args=[workflow_id]).call()
+        round_no = int(_field(workflow, "attribution_round"))
+        fault_class = str(_field(workflow, "fault_class"))
+        if round_no == 1 and fault_class:
+            return workflow
+        assert round_no == 0
+        assert str(_field(workflow, "status")) == "ACTIVE"
+
+        print(
+            "RG_V1_ATTRIBUTION_ATTEMPT="
+            + workflow_id
+            + ":"
+            + str(attempt),
+            flush=True,
+        )
+        try:
+            tx = sponsor.attribute_failure(
+                args=[workflow_id, failed_step_id]
+            ).transact(
+                consensus_max_rotations=4,
+                wait_interval=10000,
+                wait_retries=180,
+            )
+            print(
+                "RG_V1_ATTRIBUTION_TX=" + str(tx.get("hash", "")),
+                flush=True,
+            )
+            print(
+                "RG_V1_ATTRIBUTION_STATUS="
+                + str(tx.get("status_name", tx.get("status", ""))),
+                flush=True,
+            )
+            print(
+                "RG_V1_ATTRIBUTION_RESULT="
+                + str(tx.get("result_name", tx.get("result", ""))),
+                flush=True,
+            )
+        except Exception as exc:
+            last_error = exc
+            print("RG_V1_ATTRIBUTION_ERROR=" + repr(exc), flush=True)
+
+        for _ in range(24):
+            time.sleep(5)
+            workflow = contract.get_workflow(args=[workflow_id]).call()
+            round_no = int(_field(workflow, "attribution_round"))
+            fault_class = str(_field(workflow, "fault_class"))
+            if round_no == 1 and fault_class:
+                return workflow
+            if str(_field(workflow, "status")) != "ACTIVE":
+                break
+
+    workflow = contract.get_workflow(args=[workflow_id]).call()
+    if (
+        int(_field(workflow, "attribution_round")) == 1
+        and str(_field(workflow, "fault_class"))
+    ):
+        return workflow
+    if last_error is not None:
+        raise AssertionError(
+            "V1 initial attribution did not persist after state-safe retries"
+        ) from last_error
+    raise AssertionError(
+        "V1 initial attribution did not persist after state-safe retries"
+    )
+
+
+def _resolve_step_challenge_until_round2(
+    sponsor,
+    contract,
+    workflow_id: str,
+    step_id: str,
+    *,
+    attempts: int = 3,
+):
+    """Retry only while the on-chain appeal is still unresolved at round 1."""
+    last_error = None
+    for attempt in range(1, attempts + 1):
+        step = contract.get_step(args=[workflow_id, step_id]).call()
+        round_no = int(_field(step, "resolution_round"))
+        status = str(_field(step, "status"))
+        if round_no == 2:
+            return step
+        assert round_no == 1
+        assert status == "CHALLENGED"
+
+        print(
+            "RG_V1_STEP_RERESOLVE_ATTEMPT="
+            + workflow_id
+            + ":"
+            + step_id
+            + ":"
+            + str(attempt),
+            flush=True,
+        )
+        try:
+            tx = sponsor.resolve_step_challenge(
+                args=[workflow_id, step_id]
+            ).transact(
+                consensus_max_rotations=4,
+                wait_interval=10000,
+                wait_retries=180,
+            )
+            print(
+                "RG_V1_STEP_RERESOLVE_TX=" + str(tx.get("hash", "")),
+                flush=True,
+            )
+            print(
+                "RG_V1_STEP_RERESOLVE_STATUS="
+                + str(tx.get("status_name", tx.get("status", ""))),
+                flush=True,
+            )
+            print(
+                "RG_V1_STEP_RERESOLVE_RESULT="
+                + str(tx.get("result_name", tx.get("result", ""))),
+                flush=True,
+            )
+            if tx_execution_succeeded(tx):
+                step = contract.get_step(args=[workflow_id, step_id]).call()
+                if int(_field(step, "resolution_round")) == 2:
+                    return step
+        except Exception as exc:
+            last_error = exc
+            print(
+                "RG_V1_STEP_RERESOLVE_ERROR=" + repr(exc),
+                flush=True,
+            )
+
+        for _ in range(12):
+            time.sleep(5)
+            step = contract.get_step(args=[workflow_id, step_id]).call()
+            if int(_field(step, "resolution_round")) == 2:
+                return step
+            if str(_field(step, "status")) != "CHALLENGED":
+                break
+
+    step = contract.get_step(args=[workflow_id, step_id]).call()
+    if int(_field(step, "resolution_round")) == 2:
+        return step
+    if last_error is not None:
+        raise AssertionError(
+            "V1 step appeal did not reach round 2 after state-safe retries"
+        ) from last_error
+    raise AssertionError(
+        "V1 step appeal did not reach round 2 after state-safe retries"
+    )
+
+
+def _resolve_attribution_challenge_until_round2(
+    sponsor,
+    contract,
+    workflow_id: str,
+    *,
+    attempts: int = 3,
+):
+    """Retry only while workflow attribution remains challenged at round 1."""
+    last_error = None
+    for attempt in range(1, attempts + 1):
+        workflow = contract.get_workflow(args=[workflow_id]).call()
+        round_no = int(_field(workflow, "attribution_round"))
+        status = str(_field(workflow, "status"))
+        if round_no == 2:
+            return workflow
+        assert round_no == 1
+        assert status == "ATTRIBUTION_CHALLENGED"
+
+        print(
+            "RG_V1_ATTRIBUTION_RERESOLVE_ATTEMPT="
+            + workflow_id
+            + ":"
+            + str(attempt),
+            flush=True,
+        )
+        try:
+            tx = sponsor.resolve_attribution_challenge(
+                args=[workflow_id]
+            ).transact(
+                consensus_max_rotations=4,
+                wait_interval=10000,
+                wait_retries=180,
+            )
+            print(
+                "RG_V1_ATTRIBUTION_RERESOLVE_TX=" + str(tx.get("hash", "")),
+                flush=True,
+            )
+            print(
+                "RG_V1_ATTRIBUTION_RERESOLVE_STATUS="
+                + str(tx.get("status_name", tx.get("status", ""))),
+                flush=True,
+            )
+            print(
+                "RG_V1_ATTRIBUTION_RERESOLVE_RESULT="
+                + str(tx.get("result_name", tx.get("result", ""))),
+                flush=True,
+            )
+            if tx_execution_succeeded(tx):
+                workflow = contract.get_workflow(args=[workflow_id]).call()
+                if int(_field(workflow, "attribution_round")) == 2:
+                    return workflow
+        except Exception as exc:
+            last_error = exc
+            print(
+                "RG_V1_ATTRIBUTION_RERESOLVE_ERROR=" + repr(exc),
+                flush=True,
+            )
+
+        for _ in range(12):
+            time.sleep(5)
+            workflow = contract.get_workflow(args=[workflow_id]).call()
+            if int(_field(workflow, "attribution_round")) == 2:
+                return workflow
+            if str(_field(workflow, "status")) != "ATTRIBUTION_CHALLENGED":
+                break
+
+    workflow = contract.get_workflow(args=[workflow_id]).call()
+    if int(_field(workflow, "attribution_round")) == 2:
+        return workflow
+    if last_error is not None:
+        raise AssertionError(
+            "V1 attribution appeal did not reach round 2 after state-safe retries"
+        ) from last_error
+    raise AssertionError(
+        "V1 attribution appeal did not reach round 2 after state-safe retries"
+    )
+
+
 _SECP256K1_N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
 
 
@@ -146,15 +456,12 @@ def test_resolvegraph_success_and_failure_lifecycles():
     assert tx_execution_succeeded(tx)
     print("RG_SUCCESS_SUBMIT_STEP1_TX=" + str(tx.get("hash", "")), flush=True)
 
-    tx = sponsor.resolve_step(args=[workflow_id, "source-check"]).transact(
-        consensus_max_rotations=4,
-        wait_interval=10000,
-        wait_retries=180,
+    step1_initial = _resolve_step_until_round1(
+        sponsor,
+        contract,
+        workflow_id,
+        "source-check",
     )
-    assert tx_execution_succeeded(tx)
-    print("RG_SUCCESS_RESOLVE_STEP1_TX=" + str(tx.get("hash", "")), flush=True)
-
-    step1_initial = contract.get_step(args=[workflow_id, "source-check"]).call()
     print("RG_SUCCESS_STEP1_INITIAL_VERDICT=" + str(_field(step1_initial, "verdict")), flush=True)
     print("RG_SUCCESS_STEP1_INITIAL_SCORE=" + str(int(_field(step1_initial, "score"))), flush=True)
     assert str(_field(step1_initial, "verdict")) == "PASS"
@@ -171,15 +478,12 @@ def test_resolvegraph_success_and_failure_lifecycles():
     assert tx_execution_succeeded(tx)
     print("RG_SUCCESS_CHALLENGE_STEP1_TX=" + str(tx.get("hash", "")), flush=True)
 
-    tx = sponsor.resolve_step_challenge(args=[workflow_id, "source-check"]).transact(
-        consensus_max_rotations=4,
-        wait_interval=10000,
-        wait_retries=180,
+    step1_final = _resolve_step_challenge_until_round2(
+        sponsor,
+        contract,
+        workflow_id,
+        "source-check",
     )
-    assert tx_execution_succeeded(tx)
-    print("RG_SUCCESS_RERESOLVE_STEP1_TX=" + str(tx.get("hash", "")), flush=True)
-
-    step1_final = contract.get_step(args=[workflow_id, "source-check"]).call()
     assert str(_field(step1_final, "verdict")) == "PASS"
     assert int(_field(step1_final, "resolution_round")) == 2
     print("RG_SUCCESS_STEP1_FINAL_HASH=" + str(_field(step1_final, "decision_hash")), flush=True)
@@ -203,15 +507,12 @@ def test_resolvegraph_success_and_failure_lifecycles():
     assert tx_execution_succeeded(tx)
     print("RG_SUCCESS_SUBMIT_STEP2_TX=" + str(tx.get("hash", "")), flush=True)
 
-    tx = sponsor.resolve_step(args=[workflow_id, "standards-check"]).transact(
-        consensus_max_rotations=4,
-        wait_interval=10000,
-        wait_retries=180,
+    step2_initial = _resolve_step_until_round1(
+        sponsor,
+        contract,
+        workflow_id,
+        "standards-check",
     )
-    assert tx_execution_succeeded(tx)
-    print("RG_SUCCESS_RESOLVE_STEP2_TX=" + str(tx.get("hash", "")), flush=True)
-
-    step2_initial = contract.get_step(args=[workflow_id, "standards-check"]).call()
     assert str(_field(step2_initial, "verdict")) == "PASS"
 
     tx = worker_b.challenge_step(
@@ -225,15 +526,12 @@ def test_resolvegraph_success_and_failure_lifecycles():
     assert tx_execution_succeeded(tx)
     print("RG_SUCCESS_CHALLENGE_STEP2_TX=" + str(tx.get("hash", "")), flush=True)
 
-    tx = sponsor.resolve_step_challenge(args=[workflow_id, "standards-check"]).transact(
-        consensus_max_rotations=4,
-        wait_interval=10000,
-        wait_retries=180,
+    step2_final = _resolve_step_challenge_until_round2(
+        sponsor,
+        contract,
+        workflow_id,
+        "standards-check",
     )
-    assert tx_execution_succeeded(tx)
-    print("RG_SUCCESS_RERESOLVE_STEP2_TX=" + str(tx.get("hash", "")), flush=True)
-
-    step2_final = contract.get_step(args=[workflow_id, "standards-check"]).call()
     assert str(_field(step2_final, "verdict")) == "PASS"
 
     tx = sponsor.settle_passed_step(args=[workflow_id, "standards-check"]).transact(
@@ -311,15 +609,12 @@ def test_resolvegraph_success_and_failure_lifecycles():
     assert tx_execution_succeeded(tx)
     print("RG_FAIL_SUBMIT_TX=" + str(tx.get("hash", "")), flush=True)
 
-    tx = sponsor.resolve_step(args=[failed_workflow, "api-proof"]).transact(
-        consensus_max_rotations=4,
-        wait_interval=10000,
-        wait_retries=180,
+    failed_initial = _resolve_step_until_round1(
+        sponsor,
+        contract,
+        failed_workflow,
+        "api-proof",
     )
-    assert tx_execution_succeeded(tx)
-    print("RG_FAIL_RESOLVE_TX=" + str(tx.get("hash", "")), flush=True)
-
-    failed_initial = contract.get_step(args=[failed_workflow, "api-proof"]).call()
     assert str(_field(failed_initial, "verdict")) != "PASS"
     print("RG_FAIL_INITIAL_VERDICT=" + str(_field(failed_initial, "verdict")), flush=True)
 
@@ -333,26 +628,20 @@ def test_resolvegraph_success_and_failure_lifecycles():
     ).transact(wait_interval=10000, wait_retries=50)
     assert tx_execution_succeeded(tx)
 
-    tx = sponsor.resolve_step_challenge(args=[failed_workflow, "api-proof"]).transact(
-        consensus_max_rotations=4,
-        wait_interval=10000,
-        wait_retries=180,
+    failed_final = _resolve_step_challenge_until_round2(
+        sponsor,
+        contract,
+        failed_workflow,
+        "api-proof",
     )
-    assert tx_execution_succeeded(tx)
-    print("RG_FAIL_RERESOLVE_TX=" + str(tx.get("hash", "")), flush=True)
-
-    failed_final = contract.get_step(args=[failed_workflow, "api-proof"]).call()
     assert str(_field(failed_final, "verdict")) != "PASS"
 
-    tx = sponsor.attribute_failure(args=[failed_workflow, "api-proof"]).transact(
-        consensus_max_rotations=4,
-        wait_interval=10000,
-        wait_retries=180,
+    attribution = _attribute_failure_until_round1(
+        sponsor,
+        contract,
+        failed_workflow,
+        "api-proof",
     )
-    assert tx_execution_succeeded(tx)
-    print("RG_FAIL_ATTRIBUTE_TX=" + str(tx.get("hash", "")), flush=True)
-
-    attribution = contract.get_workflow(args=[failed_workflow]).call()
     print("RG_FAIL_FAULT_CLASS=" + str(_field(attribution, "fault_class")), flush=True)
     print("RG_FAIL_FAULT_STEP=" + str(_field(attribution, "fault_step_id")), flush=True)
     print("RG_FAIL_FAULT_CONFIDENCE=" + str(int(_field(attribution, "fault_confidence"))), flush=True)
@@ -367,15 +656,11 @@ def test_resolvegraph_success_and_failure_lifecycles():
     assert tx_execution_succeeded(tx)
     print("RG_FAIL_ATTRIBUTION_CHALLENGE_TX=" + str(tx.get("hash", "")), flush=True)
 
-    tx = sponsor.resolve_attribution_challenge(args=[failed_workflow]).transact(
-        consensus_max_rotations=4,
-        wait_interval=10000,
-        wait_retries=180,
+    attribution_final = _resolve_attribution_challenge_until_round2(
+        sponsor,
+        contract,
+        failed_workflow,
     )
-    assert tx_execution_succeeded(tx)
-    print("RG_FAIL_ATTRIBUTION_RERESOLVE_TX=" + str(tx.get("hash", "")), flush=True)
-
-    attribution_final = contract.get_workflow(args=[failed_workflow]).call()
     assert int(_field(attribution_final, "attribution_round")) == 2
     assert contract.is_attribution_settlement_ready(args=[failed_workflow]).call() is True
 
