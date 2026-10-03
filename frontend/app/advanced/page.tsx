@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import {
+  estimateWriteV3,
   formatGen,
   parseGen,
   readContractV3,
@@ -15,6 +16,22 @@ import { WORKFLOW_RECIPES, recipeLabel } from "@/lib/recipes";
 function nowPlus(hours: number) {
   const d = new Date(Date.now() + hours * 3600_000);
   return d.toISOString().slice(0, 16);
+}
+
+function nextStepAction(step: any): string {
+  if (!step) return "Load a step to inspect the live lifecycle.";
+  const status = String(step.status || "");
+  if (status === "PENDING_ACCEPTANCE") return "Assignee must accept and post the exact participant bond.";
+  if (status === "ACCEPTED") return "Assignee should submit two independent HTTPS evidence sources.";
+  if (status === "SUBMITTED") return "Run GenLayer consensus for the first decision.";
+  if (status === "CHALLENGED") return "Resolve the one permitted fresh-evidence appeal.";
+  if (status === "RESOLVED_PASS" || status === "RESOLVED_FAIL" || status === "RESOLVED_UNDETERMINED") {
+    if (!Boolean(step.decision_finalized)) return "Finalize the decision after the challenge path is closed.";
+    if (status === "RESOLVED_PASS") return "Decision is final; settle the passed step.";
+    return "Decision is final; continue into workflow-level fault attribution.";
+  }
+  if (status === "PAID") return "Step is settled. Continue with downstream dependencies or complete the workflow.";
+  return "Inspect the live state before the next write.";
 }
 
 export default function AdvancedV3() {
@@ -69,6 +86,29 @@ export default function AdvancedV3() {
       setNotice("Connected " + short(wallet.account));
     } catch (error: any) {
       setNotice(error?.message || "Wallet connection failed.");
+    }
+  }
+
+  async function preflight(
+    functionName: string,
+    args: unknown[],
+    value?: bigint,
+  ) {
+    setBusy("preflight-" + functionName);
+    try {
+      const estimate: any = await estimateWriteV3({
+        functionName,
+        args,
+        value,
+      });
+      setNotice(
+        "Preflight OK · no state changed · estimated fee " +
+          formatGen(estimate?.feeValue ?? 0),
+      );
+    } catch (error: any) {
+      setNotice(error?.message || "Preflight failed.");
+    } finally {
+      setBusy("");
     }
   }
 
@@ -260,6 +300,9 @@ export default function AdvancedV3() {
         <button className="button secondary" onClick={connect}>
           {account ? "Wallet " + short(account) : "Connect wallet"}
         </button>
+        <a className="button secondary" href="/recipes">Policy registry</a>
+        <a className="button secondary" href="/reviewer">Reviewer mode</a>
+        <a className="button secondary" href="/proof">Proof dashboard</a>
       </div>
       <div className="status">{notice}</div>
 
@@ -342,11 +385,16 @@ export default function AdvancedV3() {
           </button>
         </div>
         {loadedStep ? (
-          <div className="grid3 section">
-            <div className="metric"><span>Status</span><strong>{String(loadedStep.status || "—")}</strong><span>round {String(loadedStep.resolution_round ?? 0)}</span></div>
-            <div className="metric"><span>Participant bond</span><strong>{formatGen(loadedStep.bond_required ?? 0)}</strong><span>exact amount required</span></div>
-            <div className="metric"><span>Appeal bond</span><strong>{formatGen(appealBond)}</strong><span>decision finalized {String(Boolean(loadedStep.decision_finalized))}</span></div>
-          </div>
+          <>
+            <div className="grid3 section">
+              <div className="metric"><span>Status</span><strong>{String(loadedStep.status || "—")}</strong><span>round {String(loadedStep.resolution_round ?? 0)}</span></div>
+              <div className="metric"><span>Participant bond</span><strong>{formatGen(loadedStep.bond_required ?? 0)}</strong><span>exact amount required</span></div>
+              <div className="metric"><span>Appeal bond</span><strong>{formatGen(appealBond)}</strong><span>decision finalized {String(Boolean(loadedStep.decision_finalized))}</span></div>
+            </div>
+            <div className="status">
+              Next safe lifecycle action · {nextStepAction(loadedStep)}
+            </div>
+          </>
         ) : null}
       </section>
 
@@ -379,6 +427,17 @@ export default function AdvancedV3() {
           <div className="field section"><label>Challenge note</label><textarea value={note} onChange={(e) => setNote(e.target.value)} /></div>
           <div className="proofFacts section"><p><strong>Exact appeal bond</strong><code>{formatGen(appealBond)}</code></p></div>
           <div className="actions">
+            <button
+              className="button secondary"
+              onClick={() => preflight(
+                "challenge_step",
+                [workflowId.trim(), stepId.trim(), challengeUrl.trim(), note.trim()],
+                appealBond,
+              )}
+              disabled={!!busy || !hasIds || appealBond <= 0n || note.trim().length < 20 || !challengeUrl.trim().startsWith("https://")}
+            >
+              Preflight appeal
+            </button>
             <button className="button" onClick={challengeStep} disabled={!!busy || !hasIds || appealBond <= 0n || note.trim().length < 20 || !challengeUrl.trim().startsWith("https://")}>Challenge + bond</button>
             <button className="button secondary" onClick={() => act("resolve_step_challenge", [workflowId.trim(), stepId.trim()])} disabled={!!busy || !hasIds}>Resolve appeal</button>
             <button className="button secondary" onClick={() => act("finalize_step_decision", [workflowId.trim(), stepId.trim()])} disabled={!!busy || !hasIds}>Finalize appealed decision</button>
@@ -392,6 +451,13 @@ export default function AdvancedV3() {
             <button className="button secondary" onClick={() => act("attribute_failure", [workflowId.trim(), stepId.trim()])} disabled={!!busy || !hasIds}>Attribute failure</button>
             <button className="button" onClick={challengeAttribution} disabled={!!busy || !workflowId.trim() || note.trim().length < 20 || !challengeUrl.trim().startsWith("https://")}>Challenge attribution + exact bond</button>
             <button className="button secondary" onClick={() => act("resolve_attribution_challenge", [workflowId.trim()])} disabled={!!busy || !workflowId.trim()}>Re-attribute</button>
+            <button
+              className="button secondary"
+              onClick={() => preflight("finalize_attribution", [workflowId.trim()])}
+              disabled={!!busy || !workflowId.trim()}
+            >
+              Preflight finalization
+            </button>
             <button className="button secondary" onClick={() => act("finalize_attribution", [workflowId.trim()])} disabled={!!busy || !workflowId.trim()}>Finalize attribution</button>
             <button className="button secondary" onClick={() => act("settle_failed_workflow", [workflowId.trim()])} disabled={!!busy || !workflowId.trim()}>Settle failed workflow</button>
           </div>
