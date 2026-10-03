@@ -48,9 +48,9 @@ Promotion order:
 
 ## Verified release
 
-- Direct tests: **103/103 PASS**
+- Direct tests: **104/104 PASS**
 - GenVM lint: **PASS**
-- SDK tests: **18/18 PASS**
+- SDK tests: **21/21 PASS**
 - Frontend typecheck/build: **PASS**
 - Canonical Studionet completion run: **37131853576 — SUCCESS**
 - Canonical contract: `0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0`
