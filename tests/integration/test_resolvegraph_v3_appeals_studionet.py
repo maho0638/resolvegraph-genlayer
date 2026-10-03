@@ -176,3 +176,23 @@ def test_resolvegraph_v3_bonded_step_appeal_on_studionet():
         flush=True,
     )
     print("RG_V3_FINAL_DECISION=" + str(_field(final, "decision_hash")), flush=True)
+
+    assert str(_field(final, "verdict")) == "PASS"
+    tx = sponsor.settle_passed_step(args=[workflow_id, step_id]).transact(
+        wait_interval=10000,
+        wait_retries=60,
+    )
+    assert tx_execution_succeeded(tx)
+
+    paid = contract.get_step(args=[workflow_id, step_id]).call()
+    assert str(_field(paid, "status")) == "PAID"
+    print("RG_V3_STEP_FINAL_STATUS=PAID", flush=True)
+
+    tx = sponsor.complete_workflow(args=[workflow_id]).transact(
+        wait_interval=10000,
+        wait_retries=60,
+    )
+    assert tx_execution_succeeded(tx)
+    completed = contract.get_workflow(args=[workflow_id]).call()
+    assert str(_field(completed, "status")) == "COMPLETED"
+    print("RG_V3_WORKFLOW_FINAL_STATUS=COMPLETED", flush=True)
