@@ -17,10 +17,23 @@ export type WriteRequest = {
   value?: bigint;
 };
 
+const VERIFIED_V3_APPEAL_CONTRACT =
+  "0x14948AD5dCd317Ec49f5CEf7e08c72176C900214" as const;
+
 export function contractAddress(): `0x${string}` {
   const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
   if (!value || !/^0x[a-fA-F0-9]{40}$/.test(value)) {
     throw new Error("ResolveGraph contract address is not configured yet.");
+  }
+  return value as `0x${string}`;
+}
+
+export function v3ContractAddress(): `0x${string}` {
+  const value =
+    process.env.NEXT_PUBLIC_RESOLVEGRAPH_V3_APPEAL_CONTRACT_ADDRESS?.trim() ||
+    VERIFIED_V3_APPEAL_CONTRACT;
+  if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+    throw new Error("ResolveGraph V3 contract address is invalid.");
   }
   return value as `0x${string}`;
 }
@@ -126,16 +139,31 @@ export async function sendWrite(request: WriteRequest) {
   return sendWriteAt(contractAddress(), request);
 }
 
-export async function readContract(
+export async function sendWriteV3(request: WriteRequest) {
+  return sendWriteAt(v3ContractAddress(), request);
+}
+
+export async function readContractAt(
+  address: `0x${string}`,
   functionName: string,
   args: unknown[] = [],
 ): Promise<any> {
   const client: any = readClient();
-  return client.readContract({
-    address: contractAddress(),
-    functionName,
-    args,
-  });
+  return client.readContract({ address, functionName, args });
+}
+
+export async function readContract(
+  functionName: string,
+  args: unknown[] = [],
+): Promise<any> {
+  return readContractAt(contractAddress(), functionName, args);
+}
+
+export async function readContractV3(
+  functionName: string,
+  args: unknown[] = [],
+): Promise<any> {
+  return readContractAt(v3ContractAddress(), functionName, args);
 }
 
 export function parseGen(value: string): bigint {

@@ -93,7 +93,7 @@ Full transaction evidence is pinned in `docs/PROOF_MANIFEST.json`.
 - The GitHub provenance adapter independently verifies the on-chain assignee wallet signature, frozen step-policy digest, GitHub commit association and owner-controlled gist challenge. It emits an external receipt; it does not alter the current contract's payout rules and it does not maintain a global single-use nonce registry.
 - Evidence manifest v2 distinguishes contract snapshots from remote-byte captures. The capture API performs a bounded public-HTTPS fetch and computes SHA-256; the evidence-registry contract makes submitted capture metadata immutable and records its publisher, but the registry contract itself does not fetch the remote bytes. Reviewers can therefore distinguish a byte-capture claim from the publisher that anchored it.
 - The verified contract is on **GenLayer Studionet**; the frontend is a production web deployment, not a mainnet claim.
-- Cross-chain settlement is not claimed by this release. The dedicated on-chain recipe registry is implemented and live-verified in the separate V2 contract; it is not silently substituted for the canonical V1 settlement contract used by the production builder. Signed GitHub provenance remains an external verification layer, not on-chain settlement enforcement.
+- Cross-chain functionality is claimed only as relayer-attested conditioned GEN settlement, not as a trust-free token bridge. The dedicated on-chain recipe registry is implemented and live-verified in the separate V2 contract; it is not silently substituted for the canonical V1 settlement contract used by the production builder. Signed GitHub provenance remains an external verification layer, not on-chain settlement enforcement.
 
 ## Release gate
 

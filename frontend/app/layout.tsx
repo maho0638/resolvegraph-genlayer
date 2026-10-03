@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 const nav = [
   ["/", "Overview"],
   ["/workflows/new", "Build"],
+  ["/advanced", "Advanced"],
   ["/recipes", "Recipes"],
   ["/operate", "Operate"],
   ["/explorer", "Explorer"],

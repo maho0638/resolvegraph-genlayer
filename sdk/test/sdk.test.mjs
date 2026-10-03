@@ -10,6 +10,10 @@ import {
   normalizeAgentRef,
   parseGen,
   requiredBond,
+  requiredAppealBond,
+  buildAddStepFromRecipe,
+  buildBondedStepChallenge,
+  buildFinalizeStepDecision,
   assertGithubProvenanceFresh,
   parseGithubSourceUrl,
   normalizeEthereumTxRef,
@@ -255,4 +259,42 @@ test("Ethereum source adapter reference validates chain and full transaction has
   assert.deepEqual(normalizeEthereumTxRef(1, tx), { chainId: 1, txHash: tx });
   assert.throws(() => normalizeEthereumTxRef(10, tx), /Supported chain IDs/);
   assert.throws(() => normalizeEthereumTxRef(1, "0x1234"), /32-byte/);
+});
+
+
+test("V3 appeal bond helper matches five percent policy", () => {
+  assert.equal(requiredAppealBond(5000n), 250n);
+  assert.equal(requiredAppealBond(1n), 1n);
+});
+
+test("recipe-bound step builder pins the immutable recipe hash", () => {
+  const recipeHash =
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const request = buildAddStepFromRecipe({
+    workflowId: "wf-v3",
+    stepId: "build",
+    assignee: "0x1111111111111111111111111111111111111111",
+    recipeHash,
+    deadlineUnix: 1900000000,
+    rewardWei: 5000n,
+  });
+  assert.equal(request.functionName, "add_step_from_recipe");
+  assert.equal(request.args[3], recipeHash);
+  assert.equal(request.value, 5000n);
+});
+
+test("bonded appeal and finalization builders preserve explicit V3 finality", () => {
+  const challenge = buildBondedStepChallenge(
+    "wf-v3",
+    "build",
+    "https://fresh.example/proof",
+    "Fresh independent evidence requires a second bounded review.",
+    250n,
+  );
+  assert.equal(challenge.functionName, "challenge_step");
+  assert.equal(challenge.value, 250n);
+  assert.deepEqual(buildFinalizeStepDecision("wf-v3", "build"), {
+    functionName: "finalize_step_decision",
+    args: ["wf-v3", "build"],
+  });
 });
