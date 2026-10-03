@@ -233,7 +233,7 @@ jobs:
           data = json.loads(os.environ["ARCHIVE_JSON"])
           assert data["schema"] == "resolvegraph-evidence-archive-v1"
           assert data["archivedCount"] == 3
-          assert data["registryContract"].lower() == "0xb5b0dd5e454590fcb4fcefd85b11d16774552390"
+          assert data["registryContract"].lower() == "0x7436623f5bc064179546344b587fe9bf30b71004"
           roles = {(x["decisionRound"], x["role"]) for x in data["records"]}
           assert (1, "PRIMARY") in roles
           assert (1, "SUPPORT") in roles
