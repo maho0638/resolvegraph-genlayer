@@ -48,9 +48,9 @@ The product is not limited to deciding whether one deliverable is good or bad. I
 ## Canonical verification
 
 - Development CI is re-run on the final promoted commit before production deployment.
-- Direct tests: **103/103 PASS**.
+- Direct tests: **104/104 PASS**.
 - GenVM lint: **PASS**.
-- SDK tests: **18/18 PASS**.
+- SDK tests: **21/21 PASS**.
 - Frontend typecheck/build: **PASS**.
 - Canonical Studionet completion run: `37131853576` — **SUCCESS** after read-only recovery inspection of a delayed consensus transaction.
 - Contract: `0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0`.
