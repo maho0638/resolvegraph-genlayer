@@ -194,10 +194,16 @@ jobs:
           assert data["policyVersion"] == "RG_V3_BOUNDED_APPEALS"
           assert data["sourceMatch"] is True
           assert data["rules"]["maxStepAppeals"] == 1
+          workflow = data["live"]["workflow"]
           step = data["live"]["step"]
+          assert workflow["status"] == "COMPLETED"
+          assert step["status"] == "PAID"
           assert int(step["resolution_round"]) == 2
           assert int(step["challenge_count"]) == 1
           assert step["decision_finalized"] is True
+          assert data["verifiedProof"]["stepFinalStatus"] == "PAID"
+          assert data["verifiedProof"]["workflowFinalStatus"] == "COMPLETED"
+          assert data["verifiedProof"]["stateSafeConsensusRetry"] is True
           print("V3 bounded appeal api ok")
           PY
 
@@ -279,7 +285,13 @@ jobs:
           VERIFY_JSON="$verification" python - <<'PY'
           import json, os
           data = json.loads(os.environ["VERIFY_JSON"])
+          assert data["status"] == "LIVE_VERIFIED"
+          assert data["submission_ready"] is True
           assert data["canonical_studionet"]["status"] == "SUCCESS"
           assert data["canonical_studionet"]["source_match"] is True
+          assert data["production_deployment"]["status"] == "LIVE_VERIFIED"
+          assert data["production_deployment"]["smoke_status"] == "SUCCESS"
+          assert data["v3_bounded_appeals"]["workflow_final_status"] == "COMPLETED"
+          assert data["v3_bounded_appeals"]["step_final_status"] == "PAID"
           print("verification snapshot ok")
           PY
