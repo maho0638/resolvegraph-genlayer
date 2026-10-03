@@ -1,1 +1,2 @@
-2026-09-29 read-only resume inspection for 0x8ecb0fd...
+ResolveGraph read-only inspect trigger.
+Inspect interrupted 2026-10-03 V1 canonical proof before resume.
