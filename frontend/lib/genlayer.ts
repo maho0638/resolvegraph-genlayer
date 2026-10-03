@@ -17,13 +17,17 @@ export type WriteRequest = {
   value?: bigint;
 };
 
+const VERIFIED_V1_CONTRACT =
+  "0x881665b7331CcE0a2f66A01aF14BB7CA14464FF0" as const;
 const VERIFIED_V3_APPEAL_CONTRACT =
   "0x8d9c489A2854faFa2bBd2E258B8C0AA9d0Da5F3F" as const;
 
 export function contractAddress(): `0x${string}` {
-  const value = process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS?.trim();
-  if (!value || !/^0x[a-fA-F0-9]{40}$/.test(value)) {
-    throw new Error("ResolveGraph contract address is not configured yet.");
+  const value =
+    process.env.NEXT_PUBLIC_RESOLVEGRAPH_CONTRACT_ADDRESS_V4?.trim() ||
+    VERIFIED_V1_CONTRACT;
+  if (!/^0x[a-fA-F0-9]{40}$/.test(value)) {
+    throw new Error("ResolveGraph contract address is invalid.");
   }
   return value as `0x${string}`;
 }
